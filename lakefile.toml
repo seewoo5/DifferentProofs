@@ -1,0 +1,10 @@
+name = "different-proofs"
+version = "0.1.0"
+defaultTargets = ["different-proofs"]
+
+[[lean_lib]]
+name = "DifferentProofs"
+
+[[lean_exe]]
+name = "different-proofs"
+root = "Main"
