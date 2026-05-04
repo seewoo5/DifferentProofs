@@ -46,6 +46,9 @@ jobs:
       - name: Build documentation
         run: ~/.elan/bin/lake -R -Kenv=dev build DifferentProofs:docs
 
+      - name: Extract blueprint
+        run: ~/.elan/bin/lake build :blueprint
+
       - name: Build blueprint and copy to `docs/blueprint`
         uses: xu-cheng/texlive-action@v2
         with:
