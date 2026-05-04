@@ -10,11 +10,6 @@ weak.linter.mathlibStandardSet = true
 weak.linter.flexible = false
 
 [[require]]
-name = "mathlib"
-git = "https://github.com/leanprover-community/mathlib4.git"
-rev = "v4.29.1"
-
-[[require]]
 name = "checkdecls"
 git = "https://github.com/PatrickMassot/checkdecls.git"
 
@@ -22,6 +17,11 @@ git = "https://github.com/PatrickMassot/checkdecls.git"
 name = "LeanArchitect"
 git = "https://github.com/hanwenzhu/LeanArchitect.git"
 rev = "f746499f9d3c829cdb29e0629ce2ed4ecfc0e2ac"
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4.git"
+rev = "v4.29.1"
 
 [[lean_lib]]
 name = "DifferentProofs"
