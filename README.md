@@ -2,7 +2,7 @@
 
 This project contains formalizations of different proofs of the same mathematical result(s).
 
-[Blueprint](https://seewoo5.github.io/DifferentProofs).
+[Blueprint](https://seewoo5.github.io/DifferentProofs/blueprint).
 
 ## Theorems and proofs
 
