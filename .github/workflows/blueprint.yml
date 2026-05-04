@@ -40,13 +40,15 @@ jobs:
         with:
           fetch-depth: 0 # Fetch all history for all branches and tags
 
-      - name: Build and lint project
+      - name: Build the project
         uses: leanprover/lean-action@434f25c2f80ded67bba02502ad3a86f25db50709 # 2025-07-02
         with:
-          build: true
-          lint: true
-          mk_all-check: true
+          use-github-cache: false
 
+      - name: "lake exe mk_all --check --module"
+        run: |
+          set -e
+          lake exe mk_all --check --module
       - name: Compile blueprint and documentation
         # workaround for https://github.com/leanprover-community/docgen-action/issues/28
         uses:  dwrensha/docgen-action@a3f8189646977363717917b605e6de25f9704656
