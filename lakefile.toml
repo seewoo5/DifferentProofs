@@ -19,9 +19,9 @@ name = "checkdecls"
 git = "https://github.com/PatrickMassot/checkdecls.git"
 
 [[require]]
-name = "«doc-gen4»"
-git = "https://github.com/leanprover/doc-gen4"
-rev = "main"
+name = "LeanArchitect"
+git = "https://github.com/hanwenzhu/LeanArchitect.git"
+rev = "f746499f9d3c829cdb29e0629ce2ed4ecfc0e2ac"
 
 [[lean_lib]]
 name = "DifferentProofs"
