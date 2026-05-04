@@ -1,5 +1,6 @@
 module
 
+import Architect
 public import DifferentProofs.FermatLittleTheorem.Basic
 public import Mathlib.Algebra.Group.Action.TypeTags
 public import Mathlib.Algebra.Order.Floor.Defs
@@ -16,27 +17,36 @@ public import Mathlib.SetTheory.Cardinal.Finite
 
 open scoped unitInterval
 
-/--
-For a natural number $n$ ($\ge 2$), define $T_n : [0, 1] \to [0, 1]$ by
-$$
-T_n(x) = \begin{cases} \{nx\} & 0 \le x < 1 \\ 1 & x = 1 \end{cases}
-$$
-where $\{y\}$ denotes the fractional part of $y$.
--/
+@[blueprint
+  "def:T"
+  (statement := /-- For a natural number $n$ ($\ge 2$), define $T_n : [0, 1] \to [0, 1]$ by
+    $T_n(x) = \{nx\}$ for $0 \le x < 1$ and $T_n(1) = 1$, where $\{y\}$ denotes the fractional
+    part of $y$. -/)
+  (title := "Definition of $T_n$")
+  (latexEnv := "definition")]
 noncomputable def T (n : ℕ) (x : I) : I :=
   if x = 1 then 1 else ⟨Int.fract (n * (x : ℝ)), unitInterval.fract_mem _⟩
 
-@[simp] lemma T_one (n : ℕ) : T n 1 = 1 := by rw [T]; simp
+@[simp] lemma T_one (n : ℕ) : T n 1 = 1 := by simp [T]
 
 private lemma T_val_of_ne {n : ℕ} {x : I} (hx : x ≠ 1) :
-    (T n x : ℝ) = Int.fract ((n : ℝ) * (x : ℝ)) := by rw [T]; simp [hx]
+    (T n x : ℝ) = Int.fract ((n : ℝ) * (x : ℝ)) := by simp [T, hx]
 
 private lemma T_ne_one {n : ℕ} {x : I} (hx : x ≠ 1) : T n x ≠ 1 := fun h => by
   have hv : (T n x : ℝ) = 1 := by rw [h]; rfl
   rw [T_val_of_ne hx] at hv
   linarith [Int.fract_lt_one ((n : ℝ) * (x : ℝ))]
 
-/-- The composition of $T_m$ and $T_n$ is $T_{mn}$. -/
+@[blueprint
+  "lem:T-comp-eq-mul"
+  (statement := /-- For any natural numbers $m, n$, the composition of $T_m$ and $T_n$
+    equals $T_{mn}$, i.e., $T_m \circ T_n = T_{mn}$. -/)
+  (hasProof := true)
+  (proof := /-- If $x = 1$, then both sides equal $1$. Otherwise $T_n(x) = \{nx\} \in [0, 1)$,
+    and $T_m(T_n(x)) = \{m \{nx\}\}$. Writing $m \{nx\} = mnx - m\lfloor nx \rfloor$ and noting
+    that $m \lfloor nx \rfloor \in \mathbb{Z}$, we have $\{m \{nx\}\} = \{mnx\} = T_{mn}(x)$. -/)
+  (title := "Composition law for $T_n$")
+  (latexEnv := "lemma")]
 lemma T_comp_eq_mul (m n : ℕ) : T m ∘ T n = T (m * n) := by
   funext x
   apply Subtype.ext
@@ -44,49 +54,49 @@ lemma T_comp_eq_mul (m n : ℕ) : T m ∘ T n = T (m * n) := by
   by_cases hx : x = 1
   · subst hx; simp
   · rw [T_val_of_ne (T_ne_one hx), T_val_of_ne hx, T_val_of_ne hx]
-    -- Goal: Int.fract (↑m * Int.fract (↑n * ↑x)) = Int.fract (↑(m*n) * ↑x)
     have h1 : (m : ℝ) * Int.fract ((n : ℝ) * (x : ℝ)) =
               ((m * n : ℕ) : ℝ) * (x : ℝ) -
               (((m : ℤ) * ⌊(n : ℝ) * (x : ℝ)⌋ : ℤ) : ℝ) := by
       rw [Int.fract]; push_cast; ring
     rw [h1, Int.fract_sub_intCast]
 
-/-- There are exactly $n$ fixed points of $T_n$. -/
+@[blueprint
+  "lem:T-num-fp-eq"
+  (statement := /-- For any $n \ge 2$, the map $T_n$ has exactly $n$ fixed points. -/)
+  (hasProof := true)
+  (proof := /-- For $x \in [0, 1)$, the equation $T_n(x) = x$ becomes $\{nx\} = x$, i.e.,
+    $(n-1)x \in \mathbb{Z}$. With $x \in [0, 1)$, this gives $x = j/(n-1)$ for
+    $j \in \{0, 1, \dots, n-2\}$, contributing $n - 1$ fixed points. Together with the fixed
+    point $x = 1$, this gives exactly $n$ fixed points. -/)
+  (title := "Number of fixed points of $T_n$")
+  (latexEnv := "lemma")]
 lemma T_num_fp_eq (n : ℕ) (hn : 2 ≤ n) : Nat.card {x : I | T n x = x} = n := by
   have hn1_le : (1 : ℕ) ≤ n := by lia
   have hn1_lt : (1 : ℝ) < n := by exact_mod_cast (by lia : 1 < n)
   have hn1_pos : (0 : ℝ) < (n : ℝ) - 1 := by linarith
   have hn1_ne : ((n : ℝ) - 1) ≠ 0 := ne_of_gt hn1_pos
-  have hn1_eq : ((n - 1 : ℕ) : ℝ) = (n : ℝ) - 1 := by
-    rw [Nat.cast_sub hn1_le, Nat.cast_one]
-  -- Forward map: Fin n → I, j ↦ ⟨j / (n - 1), _⟩
+  have hn1_eq : ((n - 1 : ℕ) : ℝ) = (n : ℝ) - 1 := by rw [Nat.cast_sub hn1_le, Nat.cast_one]
   let toI : Fin n → I := fun j => ⟨(j : ℝ) / ((n : ℝ) - 1), by
     refine ⟨div_nonneg (by positivity) hn1_pos.le, ?_⟩
     rw [div_le_one hn1_pos]
     have h1 : (j : ℕ) ≤ n - 1 := Nat.le_sub_one_of_lt j.is_lt
     have h2 : ((j : ℕ) : ℝ) ≤ ((n - 1 : ℕ) : ℝ) := by exact_mod_cast h1
     rwa [hn1_eq] at h2⟩
-  -- Injective
   have hinj : Function.Injective toI := by
     intro j k hjk
-    have h1 : (j : ℝ) / ((n : ℝ) - 1) = (k : ℝ) / ((n : ℝ) - 1) :=
-      congr_arg Subtype.val hjk
-    have h2 : (j : ℝ) = (k : ℝ) := by
-      field_simp at h1; exact h1
+    have h1 : (j : ℝ) / ((n : ℝ) - 1) = (k : ℝ) / ((n : ℝ) - 1) := congr_arg Subtype.val hjk
+    have h2 : (j : ℝ) = (k : ℝ) := by field_simp at h1; exact h1
     exact Fin.ext (by exact_mod_cast h2)
-  -- Maps to fixed points
   have hmaps : ∀ j : Fin n, T n (toI j) = toI j := by
     intro j
     by_cases hj_eq : (j : ℕ) = n - 1
-    · -- toI j = 1
-      have htoI_one : toI j = 1 := by
+    · have htoI_one : toI j = 1 := by
         apply Subtype.ext
         change (j : ℝ) / ((n : ℝ) - 1) = 1
         rw [show ((j : ℕ) : ℝ) = ((n - 1 : ℕ) : ℝ) by exact_mod_cast hj_eq, hn1_eq,
             div_self hn1_ne]
       rw [htoI_one, T_one]
-    · -- toI j ≠ 1, with j < n - 1
-      have hj_lt : (j : ℕ) < n - 1 := lt_of_le_of_ne (Nat.le_sub_one_of_lt j.is_lt) hj_eq
+    · have hj_lt : (j : ℕ) < n - 1 := lt_of_le_of_ne (Nat.le_sub_one_of_lt j.is_lt) hj_eq
       have hj_lt_real : (j : ℝ) < (n : ℝ) - 1 := by
         have : ((j : ℕ) : ℝ) < ((n - 1 : ℕ) : ℝ) := by exact_mod_cast hj_lt
         rwa [hn1_eq] at this
@@ -107,7 +117,6 @@ lemma T_num_fp_eq (n : ℕ) (hn : 2 ≤ n) : Nat.card {x : I | T n x = x} = n :=
       apply Int.fract_eq_self.mpr
       refine ⟨div_nonneg (by positivity) hn1_pos.le, ?_⟩
       rw [div_lt_one hn1_pos]; exact hj_lt_real
-  -- Surjective
   have hsurj : ∀ x : I, T n x = x → ∃ j : Fin n, toI j = x := by
     intro x hx
     by_cases hx1 : x = 1
@@ -147,7 +156,6 @@ lemma T_num_fp_eq (n : ℕ) (hn : 2 ≤ n) : Nat.card {x : I | T n x = x} = n :=
             Int.toNat_of_nonneg hk_int_nn]
       rw [hk_toNat_eq, div_eq_iff hn1_ne]
       linarith [hkx]
-  -- Build the bijection
   let e : Fin n ≃ {x : I | T n x = x} := Equiv.ofBijective
     (fun j => ⟨toI j, hmaps j⟩)
     ⟨fun j k hjk => hinj (congr_arg Subtype.val hjk),
@@ -162,10 +170,9 @@ private lemma T_iterate (a : ℕ) {k : ℕ} (hk : 0 < k) : (T a)^[k] = T (a^k) :
   induction k with
   | zero => lia
   | succ m ih =>
-    by_cases hm : m = 0
-    · subst hm; simp
-    · rw [Function.iterate_succ', ih (by lia), pow_succ]
-      rw [Nat.mul_comm]
+    rcases Nat.eq_zero_or_pos m with rfl | hm
+    · simp
+    · rw [Function.iterate_succ', ih hm, pow_succ, Nat.mul_comm]
       exact T_comp_eq_mul a (a^m)
 
 private def fixedDiff (a p : ℕ) : Set I := {x | T (a ^ p) x = x} \ {x | T a x = x}
@@ -236,8 +243,7 @@ private lemma fixedDiffStep_pow {a p : ℕ} (hp : p.Prime) :
   funext x
   apply Subtype.ext
   calc
-    (((fixedDiffStep a p hp)^[p] x : fixedDiff a p) : I) = (T a)^[p] (x : I) :=
-      fixedDiffStep_iter_val hp p x
+    _ = (T a)^[p] (x : I) := fixedDiffStep_iter_val hp p x
     _ = T (a ^ p) (x : I) := by rw [T_iterate a hp.pos]
     _ = (x : I) := by simpa [fixedDiff] using x.2.1
 
@@ -277,74 +283,50 @@ private lemma prime_dvd_card_of_fixedpointfree_periodic
       simpa [fZ] using (ZMod.lift_coe (n := p) (f := ⟨fZ, hfZ_p⟩) (1 : ℤ))
     rw [hφ_one]
     rfl
-  have hfixed_card :
-      Nat.card (MulAction.fixedPoints (Multiplicative (ZMod p)) α) = 0 := by
+  have hfixed_card : Nat.card (MulAction.fixedPoints (Multiplicative (ZMod p)) α) = 0 := by
     rw [Finite.card_eq_zero_iff]
     refine ⟨fun x => ?_⟩
     exact hfix x.1 ((hgen x.1).symm.trans (x.2 (Multiplicative.ofAdd (1 : ZMod p))))
-  have hG : IsPGroup p (Multiplicative (ZMod p)) :=
-    IsPGroup.of_card (p := p) (G := Multiplicative (ZMod p)) (n := 1) (by
-      simp [pow_one])
-  have hmod :
-      Nat.card α ≡ Nat.card (MulAction.fixedPoints (Multiplicative (ZMod p)) α) [MOD p] :=
-    hG.card_modEq_card_fixedPoints α
-  exact Nat.modEq_zero_iff_dvd.mp (by simpa [hfixed_card] using hmod)
+  have hG : IsPGroup p (Multiplicative (ZMod p)) := IsPGroup.of_card (n := 1) (by simp)
+  exact Nat.modEq_zero_iff_dvd.mp <| by
+    simpa [hfixed_card] using hG.card_modEq_card_fixedPoints α
 
 private lemma prime_dvd_card_of_fixedpointfree_periodic_map
     {α : Type*} [Finite α] {p : ℕ} (hp : p.Prime) (f : α → α)
     (hpow : f^[p] = id) (hfix : ∀ x : α, f x ≠ x) : p ∣ Nat.card α := by
-  let fPerm : Equiv.Perm α := {
-    toFun := f
-    invFun := f^[p - 1]
-    left_inv := by
-      intro x
-      rw [← Function.iterate_succ_apply f (p - 1) x, show (p - 1).succ = p by
-        rw [Nat.sub_one, Nat.succ_pred_eq_of_pos hp.pos]]
-      exact congr_fun hpow x
-    right_inv := by
-      intro x
-      rw [← Function.iterate_succ_apply' f (p - 1) x]
-      rw [show (p - 1).succ = p by rw [Nat.sub_one, Nat.succ_pred_eq_of_pos hp.pos]]
-      exact congr_fun hpow x }
-  have hperm_iter : ∀ n : ℕ, ∀ x : α, (fPerm ^ n) x = f^[n] x := by
-    intro n
-    induction n with
-    | zero => simp
-    | succ n ih =>
-        intro x
-        rw [pow_succ, Function.iterate_succ_apply', Equiv.Perm.mul_apply, ih (fPerm x)]
-        change f^[n] (f x) = f (f^[n] x)
-        rw [← Function.iterate_succ_apply f n x]
-        exact Function.iterate_succ_apply' f n x
-  refine prime_dvd_card_of_fixedpointfree_periodic hp fPerm ?_ ?_
-  · ext x
-    rw [hperm_iter p x]
-    exact congr_fun hpow x
-  · exact hfix
+  have hsucc : (p - 1).succ = p := Nat.succ_pred_eq_of_pos hp.pos
+  let fPerm : Equiv.Perm α := ⟨f, f^[p - 1],
+    fun x => by rw [← Function.iterate_succ_apply f (p - 1), hsucc]; exact congr_fun hpow x,
+    fun x => by rw [← Function.iterate_succ_apply' f (p - 1), hsucc]; exact congr_fun hpow x⟩
+  refine prime_dvd_card_of_fixedpointfree_periodic hp fPerm ?_ hfix
+  ext x
+  rw [← Equiv.Perm.iterate_eq_pow]
+  exact congr_fun hpow x
 
-/-- **Fermat's Little Theorem using Dynamical systems**
-
-Since Fermat's little theorem is trivial for $a = 0, 1$, it suffices to show for $a \ge 2$.
-Let $S$ be the set of fixed points of $T_{a^p}$ which are not fixed points of $T_a$.
-By `T_num_fp_eq`, $S$ has $a^p - a$ elements.
-Now, for each $x_0 \in S$, consider the orbit of $x_0$ under $T_a$.
-Since $x_0$ is a fixed point of $T_{a^p}$, we have $T_a^p x_0 = x_0$. It cannot have a smaller
-period since any period needs to divide $p$, and $p$ is prime, so the period has to be 1,
-which is impossible since $x_0$ is not a fixed point of $T_a$.
-Hence, each orbit has exactly $p$ distinct elements, and these orbits partition $S$.
-Therefore, $p$ divides the number of elements in $S$, which is $a^p - a$.
--/
+@[blueprint
+  "thm:flt-dynamical"
+  (statement := /-- For any prime $p$ and integer $a$, we have $a^p \equiv a \pmod{p}$. -/)
+  (hasProof := true)
+  (proof := /-- By the standard reduction to the natural-number version, it suffices to prove
+    the statement for natural numbers. The cases $a = 0$ and $a = 1$ are trivial; assume $a \ge 2$.
+    Let $S$ be the set of fixed points of $T_{a^p}$ that are not fixed points of $T_a$.
+    By \cref{lem:T-num-fp-eq} applied to $T_{a^p}$ and $T_a$, $S$ has $a^p - a$ elements.
+    For each $x_0 \in S$, since $x_0$ is fixed by $T_{a^p} = T_a^p$ (using
+    \cref{lem:T-comp-eq-mul} iteratively), the $T_a$-orbit of $x_0$ has size dividing $p$.
+    Because $p$ is prime, the size is $1$ or $p$; size $1$ would make $x_0$ a fixed point of
+    $T_a$, which is excluded. Hence every orbit has exactly $p$ elements, and these orbits
+    partition $S$. Therefore $p$ divides $|S| = a^p - a$. -/)
+  (title := "Fermat's Little Theorem using Dynamical Systems")
+  (latexEnv := "theorem")]
 theorem FermatLittleTheorem_Dynamical : FermatLittleTheorem := by
   apply FermatLittleTheoremNat_impl_FermatLittleTheorem
   intro p a hp
-  -- Cases on `a`. The cases `a = 0` and `a = 1` are trivial.
   rcases Nat.lt_or_ge a 2 with ha | ha
   · have ha_cases : a = 0 ∨ a = 1 := by lia
     rcases ha_cases with rfl | rfl
     · simpa [Nat.zero_pow hp.pos] using (Nat.ModEq.refl 0 : 0 ≡ 0 [MOD p])
     · simpa using (Nat.ModEq.refl 1 : 1 ≡ 1 [MOD p])
-  · -- a ≥ 2: dynamical argument.
-    classical
+  · classical
     have : Finite (fixedDiff a p) := Set.finite_coe_iff.mpr (fixedDiff_finite hp ha)
     have hcard_dvd : p ∣ Nat.card (fixedDiff a p) :=
       prime_dvd_card_of_fixedpointfree_periodic_map hp (fixedDiffStep a p hp)
