@@ -57,8 +57,11 @@ jobs:
             git config --global --add safe.directory `pwd`
             python3 -m venv env
             source env/bin/activate
-            pip install --upgrade pip requests wheel
-            pip install pygraphviz --global-option=build_ext --global-option="-L/usr/lib/graphviz/" --global-option="-R/usr/lib/graphviz/"
+            pip install --upgrade "pip<25" requests wheel
+            pip install pygraphviz \
+              --global-option=build_ext \
+              --global-option="-L/usr/lib/graphviz/" \
+              --global-option="-R/usr/lib/graphviz/"
             pip install leanblueprint
             leanblueprint pdf
             mkdir docs
