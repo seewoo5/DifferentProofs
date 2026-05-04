@@ -2,9 +2,25 @@ name = "different-proofs"
 version = "0.1.0"
 defaultTargets = ["different-proofs"]
 
-[[lean_lib]]
-name = "DifferentProofs"
-
 [[lean_exe]]
 name = "different-proofs"
 root = "Main"
+
+[leanOptions]
+pp.unicode.fun = true
+autoImplicit = false
+relaxedAutoImplicit = false
+weak.linter.mathlibStandardSet = true
+weak.linter.flexible = false
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4.git"
+rev = "v4.29.1"
+
+[[require]]
+name = "checkdecls"
+git = "https://github.com/PatrickMassot/checkdecls.git"
+
+[[lean_lib]]
+name = "DifferentProofs"

@@ -1,3 +1,7 @@
--- This module serves as the root of the `DifferentProofs` library.
--- Import modules here that should be built as part of the library.
-import DifferentProofs.Basic
+module  -- shake: keep-all
+
+public import DifferentProofs.FermatLittleTheorem.Basic
+public import DifferentProofs.FermatLittleTheorem.Binomial
+public import DifferentProofs.FermatLittleTheorem.Defs
+public import DifferentProofs.FermatLittleTheorem.Dynamical
+public import DifferentProofs.FermatLittleTheorem.Lagrange
