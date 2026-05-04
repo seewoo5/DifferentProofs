@@ -1,10 +1,6 @@
 name = "different-proofs"
 version = "0.1.0"
-defaultTargets = ["different-proofs"]
-
-[[lean_exe]]
-name = "different-proofs"
-root = "Main"
+defaultTargets = ["DifferentProofs"]
 
 [leanOptions]
 pp.unicode.fun = true
