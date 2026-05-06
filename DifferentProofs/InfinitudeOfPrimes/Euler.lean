@@ -16,7 +16,7 @@ open Finset
   "thm:harmonic-unbounded"
   (statement := /-- The harmonic series is unbounded. -/)
   (hasProof := true)
-  (proof := /-- Use the inequality $\log(n + 1) \le H_n$ (`log_add_one_le_harmonic`). -/)
+  (proof := /-- Use the inequality $\log(n + 1) \le H_n$. -/)
   (title := "Harmonic series is unbounded")
   (latexEnv := "theorem")]
 theorem harmonic_unbounded : ∀ M : ℝ, ∃ n : ℕ, harmonic n > M := fun M ↦
@@ -29,12 +29,12 @@ theorem harmonic_unbounded : ∀ M : ℝ, ∃ n : ℕ, harmonic n > M := fun M �
   (statement := /-- The product $\prod_{p \le n} p / (p - 1)$ over primes at most n
     is greater than or equal to the n-th harmonic number. -/)
   (hasProof := true)
-  (proof := /-- Use the geometric expansion of $(1 - 1/p)^{-1}$ for each prime $p$.
+  (proof := /-- Use the geometric expansion of $p / (p - 1) = (1 - 1/p)^{-1}$ for each prime $p$.
     Then the product is equal to the sum of inverses of the integers whose primes factors
     are all at most $n$, and the sum is greater than or equal to the n-th harmonic number. -/)
   (title := "Euler's product and the Harmonic number")
   (latexEnv := "theorem")]
-theorem prod_of_inv_of_one_sub_inv_prime_ge_harmonic (n : ℕ) :
+theorem prod_prime_div_prime_sub_one_ge_harmonic (n : ℕ) :
     ∏ p ∈ (range (n + 1)).filter Nat.Prime, (p : ℚ) / (p - 1) ≥ harmonic n := by
   have h_prod_ge_sum :
       (∏ p ∈ filter Nat.Prime (range (n + 1)), (∑ i ∈ range (Nat.log p n + 1),
@@ -89,8 +89,8 @@ theorem prod_of_inv_of_one_sub_inv_prime_ge_harmonic (n : ℕ) :
   (hasProof := true)
   (proof := /-- Assume that there are only finitely many primes.
     Then the product of $(1 - 1/p)^{-1}$ over all primes $p$ is finite.
-    But by the previous theorem, this product is greater than the harmonic series,
-    which is unbounded. This is a contradiction. -/)
+    But by \cref{thm:euler-prod-ge-harmonic}, this product is greater than the harmonic series,
+    which is unbounded (\cref{thm:harmonic-unbounded}), a contradiction. -/)
   (title := "Infinitude of primes (Euler, via Euler product)")
   (latexEnv := "theorem")]
 theorem InfinitudeOfPrimes_Euler : InfinitudeOfPrimes := by
@@ -99,7 +99,7 @@ theorem InfinitudeOfPrimes_Euler : InfinitudeOfPrimes := by
     ⟨hfin.toFinset.sup id, fun p hp ↦ le_sup (f := id) (hfin.mem_toFinset.mpr hp)⟩
   obtain ⟨n, hn⟩ := harmonic_unbounded
     (↑(∏ p ∈ (range (N + 1)).filter Nat.Prime, (p : ℚ) / (p - 1)))
-  have h1 := prod_of_inv_of_one_sub_inv_prime_ge_harmonic (max n N)
+  have h1 := prod_prime_div_prime_sub_one_ge_harmonic (max n N)
   have hprod_eq : (range (max n N + 1)).filter Nat.Prime = (range (N + 1)).filter Nat.Prime := by
     ext p
     simp only [mem_filter, mem_range]
