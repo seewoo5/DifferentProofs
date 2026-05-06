@@ -18,3 +18,4 @@ This project contains formalizations of different proofs of the same mathematica
 - [Goldbach's proof](DifferentProofs/InfinitudeOfPrimes/Goldbach.lean)
 - [Euler's proof](DifferentProofs/InfinitudeOfPrimes/Euler.lean)
 - [Saidak's proof](DifferentProofs/InfinitudeOfPrimes/Saidak.lean)
+- [Wunderlich's proof](DifferentProofs/InfinitudeOfPrimes/Wunderlich.lean)
