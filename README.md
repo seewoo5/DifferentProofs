@@ -16,3 +16,4 @@ This project contains formalizations of different proofs of the same mathematica
 
 - [Euclid's proof](DifferentProofs/InfinitudeOfPrimes/Euclid.lean)
 - [Goldbach's proof](DifferentProofs/InfinitudeOfPrimes/Goldbach.lean)
+- [Euler's proof](DifferentProofs/InfinitudeOfPrimes/Euler.lean)
