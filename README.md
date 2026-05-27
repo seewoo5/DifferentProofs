@@ -9,6 +9,7 @@ This project contains formalizations of different proofs of the same mathematica
 ### Fermat's little theorem
 
 - [Using Binomial theorem](DifferentProofs/FermatLittleTheorem/Binomial.lean)
+- [Using Alkauskas' product expansion](DifferentProofs/FermatLittleTheorem/Alkauskas.lean)
 - [Using Lagrange's theorem](DifferentProofs/FermatLittleTheorem/Lagrange.lean)
 - [Using a dynamical system](DifferentProofs/FermatLittleTheorem/Dynamical.lean)
 
