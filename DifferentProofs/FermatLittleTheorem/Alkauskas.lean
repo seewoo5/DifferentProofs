@@ -76,10 +76,9 @@ private lemma W_mul {g h : ℤ⟦X⟧} (hg : constantCoeff g = 1) (hh : constant
   have hg1 : g * invOfUnit g 1 = 1 := mul_invOfUnit g 1 (by simp [hg])
   have hh1 : h * invOfUnit h 1 = 1 := mul_invOfUnit h 1 (by simp [hh])
   have hne : (g * h : ℤ⟦X⟧) ≠ 0 := fun h0 => by simp [h0] at egh
-  have hprod1 : (g * h) * (invOfUnit g 1 * invOfUnit h 1) = 1 := by
-    rw [mul_mul_mul_comm, hg1, hh1, one_mul]
   have invprod : invOfUnit (g * h) 1 = invOfUnit g 1 * invOfUnit h 1 :=
-    mul_left_cancel₀ hne ((mul_invOfUnit (g * h) 1 egh).trans hprod1.symm)
+    mul_left_cancel₀ hne <| by
+      rw [mul_invOfUnit (g * h) 1 egh, mul_mul_mul_comm, hg1, hh1, one_mul]
   have key : (g * d⁄dX ℤ h + h * d⁄dX ℤ g) * (invOfUnit g 1 * invOfUnit h 1)
       = d⁄dX ℤ g * invOfUnit g 1 + d⁄dX ℤ h * invOfUnit h 1 := by
     linear_combination (d⁄dX ℤ h * invOfUnit h 1) * hg1 + (d⁄dX ℤ g * invOfUnit g 1) * hh1
@@ -215,12 +214,11 @@ private lemma coeff_invOfUnit_congr {g h : ℤ⟦X⟧} :
     by_cases hm : m = 0
     · simp [hm]
     · rw [if_neg hm, if_neg hm]
-      congr 1
-      refine Finset.sum_congr rfl (fun x hx => ?_)
+      refine congr_arg _ (Finset.sum_congr rfl fun x hx => ?_)
       rw [Finset.mem_antidiagonal] at hx
-      by_cases hlt : x.2 < m
-      · rw [if_pos hlt, if_pos hlt, H x.1 (by omega), ih x.2 hlt (fun k hk => H k (by omega))]
-      · rw [if_neg hlt, if_neg hlt]
+      split_ifs with hlt
+      · rw [H x.1 (by omega), ih x.2 hlt fun k hk => H k (by omega)]
+      · rfl
 
 /-- Two unit series agreeing up to degree `p` share the `Xᵖ`-coefficient of their `W`. -/
 private lemma coeff_W_congr {g h : ℤ⟦X⟧}
@@ -228,12 +226,11 @@ private lemma coeff_W_congr {g h : ℤ⟦X⟧}
     coeff p (W g) = coeff p (W h) := by
   obtain ⟨m, rfl⟩ : ∃ m, p = m + 1 := ⟨p - 1, by omega⟩
   simp only [W, map_neg, coeff_succ_X_mul]
-  congr 1
   rw [coeff_mul, coeff_mul]
-  refine Finset.sum_congr rfl (fun x hx => ?_)
+  refine congr_arg _ (Finset.sum_congr rfl fun x hx => ?_)
   rw [Finset.mem_antidiagonal] at hx
   rw [coeff_derivative, coeff_derivative, H (x.1 + 1) (by omega),
-      coeff_invOfUnit_congr x.2 (fun k hk => H k (by omega))]
+      coeff_invOfUnit_congr x.2 fun k hk => H k (by omega)]
 
 /-- The degree-`1` coefficient of `f d` is `-1` (matching `f = 1 - x - ∑ dⁿ xⁿ⁺¹`). -/
 private lemma coeff_one_f (d : ℤ) : coeff 1 (f d) = -1 := by
@@ -288,10 +285,8 @@ private lemma exists_intExpansion {g : ℤ⟦X⟧} (hg0 : constantCoeff g = 1)
     · intro k hk
       have hQ : (∏ n ∈ Finset.Icc 1 (N + 1), (1 - C (Function.update a (N + 1) c n) * X ^ n))
           = P * (1 - C c * X ^ (N + 1)) := by
-        rw [Finset.prod_Icc_succ_top (by omega : 1 ≤ N + 1), Function.update_self]
-        congr 1
-        rw [hP]
-        refine Finset.prod_congr rfl (fun n hn => ?_)
+        rw [Finset.prod_Icc_succ_top (by omega : 1 ≤ N + 1), Function.update_self, hP]
+        refine congr_arg (· * _) (Finset.prod_congr rfl fun n hn => ?_)
         rw [Function.update_of_ne (by have := (Finset.mem_Icc.mp hn).2; omega)]
       rw [hQ, show P * (1 - C c * X ^ (N + 1)) = P - C c * (P * X ^ (N + 1)) by ring,
           map_sub, coeff_C_mul, coeff_mul_X_pow']
