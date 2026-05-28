@@ -1,5 +1,6 @@
 module  -- shake: keep-all
 
+public import DifferentProofs.FermatLittleTheorem.Alkauskas
 public import DifferentProofs.FermatLittleTheorem.Basic
 public import DifferentProofs.FermatLittleTheorem.Binomial
 public import DifferentProofs.FermatLittleTheorem.Defs
