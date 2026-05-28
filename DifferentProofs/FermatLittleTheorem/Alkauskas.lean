@@ -72,12 +72,10 @@ private lemma constantCoeff_partialProduct (a : ℕ → ℤ) (N : ℕ) :
 /-- `W` is additive on products of units: `W (g*h) = W g + W h`. -/
 private lemma W_mul {g h : ℤ⟦X⟧} (hg : constantCoeff g = 1) (hh : constantCoeff h = 1) :
     W (g * h) = W g + W h := by
-  have e1 : constantCoeff g = ((1 : ℤˣ) : ℤ) := by rw [Units.val_one]; exact hg
-  have e2 : constantCoeff h = ((1 : ℤˣ) : ℤ) := by rw [Units.val_one]; exact hh
   have egh : constantCoeff (g * h) = ((1 : ℤˣ) : ℤ) := by
     rw [map_mul, Units.val_one, hg, hh, mul_one]
-  have hg1 : g * invOfUnit g 1 = 1 := mul_invOfUnit g 1 e1
-  have hh1 : h * invOfUnit h 1 = 1 := mul_invOfUnit h 1 e2
+  have hg1 : g * invOfUnit g 1 = 1 := mul_invOfUnit g 1 (by rw [Units.val_one]; exact hg)
+  have hh1 : h * invOfUnit h 1 = 1 := mul_invOfUnit h 1 (by rw [Units.val_one]; exact hh)
   have hne : (g * h : ℤ⟦X⟧) ≠ 0 := by intro h0; rw [h0] at egh; simp at egh
   have hprod1 : (g * h) * (invOfUnit g 1 * invOfUnit h 1) = 1 := by
     rw [mul_mul_mul_comm, hg1, hh1, one_mul]
@@ -146,9 +144,8 @@ private lemma invOfUnit_oneSubMonomial (c : ℤ) {n : ℕ} (hn : 0 < n) :
             ← pow_succ', Nat.sub_add_cancel hqpos, sub_self]
       · rw [if_neg hdvd]
         by_cases hle : n ≤ N
-        · have notdvd : ¬ n ∣ (N - n) := fun h => hdvd (by
-            have h2 : n ∣ (N - n) + n := dvd_add h dvd_rfl
-            rwa [Nat.sub_add_cancel hle] at h2)
+        · have notdvd : ¬ n ∣ (N - n) :=
+            fun h => hdvd (Nat.sub_add_cancel hle ▸ dvd_add h dvd_rfl)
           rw [if_pos hle, if_neg notdvd, mul_zero, sub_zero]
         · rw [if_neg hle, mul_zero, sub_zero]
   exact mul_left_cancel₀ hune ((mul_invOfUnit u 1 hcu).trans huG.symm)
@@ -189,9 +186,7 @@ private lemma coeff_W_oneSubMonomial (c : ℤ) {n : ℕ} (hn : 0 < n) (N : ℕ) 
       by_cases hle : n ≤ N
       · rw [if_pos hle]
         by_cases hd : n ∣ (N - n)
-        · refine absurd ⟨?_, by omega⟩ hcond
-          have h2 : n ∣ (N - n) + n := dvd_add hd dvd_rfl
-          rwa [Nat.sub_add_cancel hle] at h2
+        · exact absurd ⟨Nat.sub_add_cancel hle ▸ dvd_add hd dvd_rfl, by omega⟩ hcond
         · rw [if_neg hd]
       · rw [if_neg hle]
     rw [hinner, mul_zero]
@@ -317,7 +312,7 @@ private lemma exists_intExpansion {g : ℤ⟦X⟧} (hg0 : constantCoeff g = 1)
         congr 1
         rw [hP]
         refine Finset.prod_congr rfl (fun n hn => ?_)
-        rw [Function.update_of_ne (show n ≠ N + 1 by have := (Finset.mem_Icc.mp hn).2; omega)]
+        rw [Function.update_of_ne (by have := (Finset.mem_Icc.mp hn).2; omega)]
       rw [hQ, show P * (1 - C c * X ^ (N + 1)) = P - C c * (P * X ^ (N + 1)) by ring,
           map_sub, coeff_C_mul, coeff_mul_X_pow']
       rcases Nat.lt_or_ge k (N + 1) with hlt | hge
