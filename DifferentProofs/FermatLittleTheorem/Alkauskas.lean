@@ -138,15 +138,9 @@ private lemma invOfUnit_oneSubMonomial (c : ℤ) {n : ℕ} (hn : 0 < n) :
     · rw [if_neg hN0]
       by_cases hdvd : n ∣ N
       · obtain ⟨q, rfl⟩ := hdvd
-        have hqpos : 0 < q := by
-          rcases Nat.eq_zero_or_pos q with h | h
-          · exact absurd (by rw [h, mul_zero]) hN0
-          · exact h
+        have hqpos : 0 < q := Nat.pos_of_ne_zero fun h => hN0 (by rw [h, mul_zero])
         have hle : n ≤ n * q := Nat.le_mul_of_pos_right n hqpos
-        have hsub : n * q - n = n * (q - 1) := by
-          cases q with
-          | zero => simp
-          | succ k => rw [Nat.succ_sub_one, Nat.mul_succ, Nat.add_sub_cancel]
+        have hsub : n * q - n = n * (q - 1) := (Nat.mul_sub_one n q).symm
         rw [if_pos ⟨q, rfl⟩, if_pos hle, if_pos (hsub ▸ Dvd.intro _ rfl),
             Nat.mul_div_cancel_left q hn, hsub, Nat.mul_div_cancel_left _ hn,
             ← pow_succ', Nat.sub_add_cancel hqpos, sub_self]
@@ -183,14 +177,8 @@ private lemma coeff_W_oneSubMonomial (c : ℤ) {n : ℕ} (hn : 0 < n) (N : ℕ) 
   · obtain ⟨hdvd, hNpos⟩ := hcond
     have hle : n ≤ N := Nat.le_of_dvd hNpos hdvd
     obtain ⟨q, rfl⟩ := hdvd
-    have hqpos : 0 < q := by
-      rcases Nat.eq_zero_or_pos q with h | h
-      · simp [h] at hNpos
-      · exact h
-    have hsub : n * q - n = n * (q - 1) := by
-      cases q with
-      | zero => simp
-      | succ k => rw [Nat.succ_sub_one, Nat.mul_succ, Nat.add_sub_cancel]
+    have hqpos : 0 < q := Nat.pos_of_ne_zero fun h => by simp [h] at hNpos
+    have hsub : n * q - n = n * (q - 1) := (Nat.mul_sub_one n q).symm
     have hpow : c ^ q = c * c ^ (q - 1) := by rw [← pow_succ', Nat.sub_add_cancel hqpos]
     rw [if_pos hle, if_pos ⟨q - 1, hsub⟩, if_pos ⟨⟨q, rfl⟩, hNpos⟩,
         Nat.mul_div_cancel_left q hn, hsub, Nat.mul_div_cancel_left _ hn, hpow]
@@ -222,9 +210,7 @@ private lemma coeff_W_partialProduct {p : ℕ} (hp : p.Prime) (a : ℕ → ℤ) 
   rw [W_prod _ _ (fun n hn => constantCoeff_oneSubMonomial (a n) (Finset.mem_Icc.mp hn).1), map_sum,
       Finset.sum_congr rfl (fun n hn => coeff_W_oneSubMonomial (a n) (Finset.mem_Icc.mp hn).1 p)]
   have hsubset : ({1, p} : Finset ℕ) ⊆ Finset.Icc 1 p := by
-    intro x hx
-    simp only [Finset.mem_insert, Finset.mem_singleton] at hx
-    rcases hx with rfl | rfl <;> simp [Finset.mem_Icc, hp.one_le]
+    simp [Finset.insert_subset_iff, hp.one_le]
   have hzero : ∀ x ∈ Finset.Icc 1 p, x ∉ ({1, p} : Finset ℕ) →
       (if x ∣ p ∧ 0 < p then (x : ℤ) * a x ^ (p / x) else 0) = 0 := by
     intro x _ hxni
@@ -268,9 +254,6 @@ private lemma coeff_W_congr {g h : ℤ⟦X⟧}
   rw [coeff_derivative, coeff_derivative, H (x.1 + 1) (by omega),
       coeff_invOfUnit_congr x.2 (fun k hk => H k (by omega))]
 
-/-- `coeff 1 (X · φ) = coeff 0 φ`. -/
-private lemma coeff_one_X_mul (φ : ℤ⟦X⟧) : coeff 1 (X * φ) = coeff 0 φ := coeff_succ_X_mul 0 φ
-
 /-- The degree-`1` coefficient of `f d` is `-1` (matching `f = 1 - x - ∑ dⁿ xⁿ⁺¹`). -/
 private lemma coeff_one_f (d : ℤ) : coeff 1 (f d) = -1 := by
   have hinv : invOfUnit (1 - C d * X) 1 = mk (fun k => d ^ k) := by
@@ -279,7 +262,7 @@ private lemma coeff_one_f (d : ℤ) : coeff 1 (f d) = -1 := by
     congr 1; funext k; simp [Nat.div_one]
   rw [f, hinv, show (1 - C (d + 1) * X) * mk (fun k => d ^ k)
         = mk (fun k => d ^ k) - C (d + 1) * (X * mk (fun k => d ^ k)) by ring,
-      map_sub, coeff_C_mul, coeff_one_X_mul, coeff_mk, coeff_mk]
+      map_sub, coeff_C_mul, coeff_succ_X_mul, coeff_mk, coeff_mk]
   ring
 
 /-! ### The integer product expansion (heart of the proof) -/
@@ -378,12 +361,9 @@ theorem FermatLittleTheorem_Alkauskas : FermatLittleTheorem := by
   | zero => simpa [Nat.zero_pow hp.pos] using (Nat.ModEq.refl 0 : 0 ≡ 0 [MOD p])
   | succ d ih =>
       have hstep : (d + 1) ^ p ≡ d ^ p + 1 [MOD p] := by
-        rw [Nat.modEq_iff_dvd]
-        have hdvd : (p : ℤ) ∣ ((d : ℤ) + 1) ^ p - (d : ℤ) ^ p - 1 := alkauskas_step (d : ℤ) hp
-        have heq : (((d ^ p + 1 : ℕ) : ℤ) - (((d + 1) ^ p : ℕ) : ℤ)) =
-            -(((d : ℤ) + 1) ^ p - (d : ℤ) ^ p - 1) := by push_cast; ring
-        rw [heq]
-        exact dvd_neg.mpr hdvd
+        rw [Nat.modEq_iff_dvd, show (((d ^ p + 1 : ℕ) : ℤ) - ((d + 1) ^ p : ℕ)) =
+            -(((d : ℤ) + 1) ^ p - (d : ℤ) ^ p - 1) by push_cast; ring]
+        exact (alkauskas_step (d : ℤ) hp).neg_right
       exact hstep.trans (Nat.ModEq.add_right 1 ih)
 
 end FermatLittleTheorem.Alkauskas
