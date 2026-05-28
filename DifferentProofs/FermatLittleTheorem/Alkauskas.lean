@@ -56,12 +56,10 @@ private noncomputable def f (d : ℤ) : ℤ⟦X⟧ := (1 - C (d + 1) * X) * invO
 
 /-- A factor `1 - c·Xⁿ` with `n ≥ 1` has constant term `1`. -/
 private lemma constantCoeff_oneSubMonomial (c : ℤ) {n : ℕ} (hn : 0 < n) :
-    constantCoeff (1 - C c * X ^ n : ℤ⟦X⟧) = 1 := by
-  rw [map_sub, map_one, map_mul, map_pow, constantCoeff_X, zero_pow hn.ne', mul_zero, sub_zero]
+    constantCoeff (1 - C c * X ^ n : ℤ⟦X⟧) = 1 := by simp [hn.ne']
 
 /-- `f d` has constant term `1`. -/
-private lemma constantCoeff_f (d : ℤ) : constantCoeff (f d) = 1 := by
-  simp [f, constantCoeff_invOfUnit, constantCoeff_X]
+private lemma constantCoeff_f (d : ℤ) : constantCoeff (f d) = 1 := by simp [f]
 
 /-- The partial product is a unit (constant term `1`). -/
 private lemma constantCoeff_partialProduct (a : ℕ → ℤ) (N : ℕ) :
@@ -91,17 +89,14 @@ private lemma W_mul {g h : ℤ⟦X⟧} (hg : constantCoeff g = 1) (hh : constant
   simp only [W, (d⁄dX ℤ).leibniz, smul_eq_mul, invprod, key, mul_add, neg_add]
 
 /-- `W 1 = 0`, since the derivative of `1` vanishes. -/
-private lemma W_one : W (1 : ℤ⟦X⟧) = 0 := by
-  rw [W, (d⁄dX ℤ).map_one_eq_zero, zero_mul, mul_zero, neg_zero]
+private lemma W_one : W (1 : ℤ⟦X⟧) = 0 := by simp [W]
 
 /-- `W` turns the inverse of a unit into a negation: `W (invOfUnit g 1) = - W g`. -/
 private lemma W_invOfUnit {g : ℤ⟦X⟧} (hg : constantCoeff g = 1) :
     W (invOfUnit g 1) = - W g := by
-  have e1 : constantCoeff g = ((1 : ℤˣ) : ℤ) := by rw [Units.val_one]; exact hg
-  have hci : constantCoeff (invOfUnit g 1) = 1 := by
-    rw [constantCoeff_invOfUnit, inv_one, Units.val_one]
+  have hci : constantCoeff (invOfUnit g 1) = 1 := by simp [constantCoeff_invOfUnit]
   have hmul := W_mul hg hci
-  rw [mul_invOfUnit g 1 e1, W_one] at hmul
+  rw [mul_invOfUnit g 1 (by rw [Units.val_one]; exact hg), W_one] at hmul
   linear_combination -hmul
 
 /-- `W` is additive on finite products of units: `W (∏ gᵢ) = ∑ W gᵢ`. -/
@@ -219,7 +214,7 @@ private lemma coeff_W_f (d : ℤ) {N : ℕ} (hN : 0 < N) :
   have hlin : ∀ c : ℤ, coeff N (W (1 - C c * X)) = c ^ N := fun c => by
     rw [← pow_one (X : ℤ⟦X⟧), coeff_W_oneSubMonomial c Nat.one_pos N,
         if_pos ⟨one_dvd N, hN⟩, Nat.cast_one, Nat.div_one, one_mul]
-  rw [f, W_mul (by simp) (by rw [constantCoeff_invOfUnit, inv_one, Units.val_one]),
+  rw [f, W_mul (by simp) (by simp [constantCoeff_invOfUnit]),
       W_invOfUnit (by simp), map_add, map_neg, hlin, hlin, ← sub_eq_add_neg]
 
 private lemma coeff_W_partialProduct {p : ℕ} (hp : p.Prime) (a : ℕ → ℤ) (ha1 : a 1 = 1) :
