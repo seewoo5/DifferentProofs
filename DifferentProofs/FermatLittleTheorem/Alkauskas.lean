@@ -206,10 +206,9 @@ private lemma coeff_invOfUnit_congr {g h : ℤ⟦X⟧} :
   | _ m ih =>
     intro H
     rw [coeff_invOfUnit, coeff_invOfUnit]
-    by_cases hm : m = 0
-    · simp [hm]
-    · rw [if_neg hm, if_neg hm]
-      refine congr_arg _ (Finset.sum_congr rfl fun x hx => ?_)
+    split_ifs with hm
+    · rfl
+    · refine congr_arg _ (Finset.sum_congr rfl fun x hx => ?_)
       rw [Finset.mem_antidiagonal] at hx
       split_ifs with hlt
       · rw [H x.1 (by omega), ih x.2 hlt fun k hk => H k (by omega)]
