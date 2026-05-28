@@ -127,9 +127,7 @@ private lemma invOfUnit_oneSubMonomial (c : ℤ) {n : ℕ} (hn : 0 < n) :
     rw [hsplit, map_sub, coeff_C_mul, coeff_X_pow_mul', coeff_one]
     simp only [hGcoeff]
     by_cases hN0 : N = 0
-    · subst hN0
-      rw [if_pos (dvd_zero n), if_neg (by omega : ¬ n ≤ 0), Nat.zero_div, pow_zero,
-          mul_zero, sub_zero, if_pos rfl]
+    · subst hN0; simp [hn.ne']
     · rw [if_neg hN0]
       by_cases hdvd : n ∣ N
       · obtain ⟨q, rfl⟩ := hdvd
@@ -196,17 +194,13 @@ private lemma coeff_W_f (d : ℤ) {N : ℕ} (hN : 0 < N) :
 private lemma coeff_W_partialProduct {p : ℕ} (hp : p.Prime) (a : ℕ → ℤ) (ha1 : a 1 = 1) :
     coeff p (W (∏ n ∈ Finset.Icc 1 p, (1 - C (a n) * X ^ n))) = 1 + (p : ℤ) * a p := by
   rw [W_prod _ _ (fun n hn => constantCoeff_oneSubMonomial (a n) (Finset.mem_Icc.mp hn).1), map_sum,
-      Finset.sum_congr rfl (fun n hn => coeff_W_oneSubMonomial (a n) (Finset.mem_Icc.mp hn).1 p)]
-  have hsubset : ({1, p} : Finset ℕ) ⊆ Finset.Icc 1 p := by
-    simp [Finset.insert_subset_iff, hp.one_le]
-  have hzero : ∀ x ∈ Finset.Icc 1 p, x ∉ ({1, p} : Finset ℕ) →
-      (if x ∣ p ∧ 0 < p then (x : ℤ) * a x ^ (p / x) else 0) = 0 := fun x _ hxni =>
-    if_neg fun ⟨hxdvd, _⟩ =>
-      (hp.eq_one_or_self_of_dvd x hxdvd).elim (fun h => hxni (by simp [h]))
-        fun h => hxni (by simp [h])
-  rw [← Finset.sum_subset hsubset hzero, Finset.sum_pair hp.one_lt.ne,
-      if_pos ⟨one_dvd p, hp.pos⟩, if_pos ⟨dvd_refl p, hp.pos⟩, ha1, Nat.div_one,
-      Nat.div_self hp.pos, Nat.cast_one, one_pow, mul_one, pow_one]
+      Finset.sum_congr rfl (fun n hn => coeff_W_oneSubMonomial (a n) (Finset.mem_Icc.mp hn).1 p),
+      ← Finset.sum_subset (s₁ := {1, p}) (by simp [Finset.insert_subset_iff, hp.one_le])
+        (fun x _ hxni => if_neg fun ⟨hxdvd, _⟩ =>
+          (hp.eq_one_or_self_of_dvd x hxdvd).elim
+            (fun h => hxni (by simp [h])) fun h => hxni (by simp [h])),
+      Finset.sum_pair hp.one_lt.ne, if_pos ⟨one_dvd p, hp.pos⟩, if_pos ⟨dvd_refl p, hp.pos⟩,
+      ha1, Nat.div_one, Nat.div_self hp.pos, Nat.cast_one, one_pow, mul_one, pow_one]
 
 /-- If `g` and `h` agree up to degree `m`, so do their inverses (strong induction on the
 `coeff_invOfUnit` recursion). -/
@@ -280,9 +274,7 @@ private lemma exists_intExpansion {g : ℤ⟦X⟧} (hg0 : constantCoeff g = 1)
   | zero =>
     refine ⟨fun _ => 1, rfl, fun k hk => ?_⟩
     obtain rfl : k = 0 := by omega
-    rw [Finset.Icc_eq_empty_of_lt Nat.zero_lt_one, Finset.prod_empty,
-        coeff_zero_eq_constantCoeff_apply, coeff_zero_eq_constantCoeff_apply,
-        hg0, map_one]
+    simp [hg0]
   | succ N ih =>
     obtain ⟨a, ha1, hmatch⟩ := ih
     set P : ℤ⟦X⟧ := ∏ n ∈ Finset.Icc 1 N, (1 - C (a n) * X ^ n) with hP
@@ -291,10 +283,7 @@ private lemma exists_intExpansion {g : ℤ⟦X⟧} (hg0 : constantCoeff g = 1)
       rw [coeff_zero_eq_constantCoeff_apply, hP]; exact constantCoeff_partialProduct a N
     refine ⟨Function.update a (N + 1) c, ?_, ?_⟩
     · by_cases hN0 : N = 0
-      · subst hN0
-        rw [Function.update_self, hc, hP, Finset.Icc_eq_empty_of_lt Nat.zero_lt_one,
-            Finset.prod_empty, hg1]
-        simp
+      · subst hN0; simp [hc, hP, hg1]
       · rw [Function.update_of_ne (by omega : (1 : ℕ) ≠ N + 1)]; exact ha1
     · intro k hk
       have hQ : (∏ n ∈ Finset.Icc 1 (N + 1), (1 - C (Function.update a (N + 1) c n) * X ^ n))
@@ -320,9 +309,7 @@ the integer product expansion (no binomial theorem / Frobenius). -/
 private lemma alkauskas_step (d : ℤ) {p : ℕ} (hp : p.Prime) :
     (p : ℤ) ∣ (d + 1) ^ p - d ^ p - 1 := by
   obtain ⟨a, ha1, hmatch⟩ := exists_intExpansion (constantCoeff_f d) (coeff_one_f d) p
-  have key : coeff p (W (f d)) =
-      coeff p (W (∏ n ∈ Finset.Icc 1 p, (1 - C (a n) * X ^ n))) :=
-    coeff_W_congr hp.pos hmatch
+  have key := coeff_W_congr hp.pos hmatch
   rw [coeff_W_f d hp.pos, coeff_W_partialProduct hp a ha1] at key
   exact ⟨a p, by linarith [key]⟩
 
