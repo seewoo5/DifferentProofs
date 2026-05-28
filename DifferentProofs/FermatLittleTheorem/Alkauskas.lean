@@ -291,23 +291,26 @@ private lemma coeff_one_f (d : ℤ) : coeff 1 (f d) = -1 := by
 
 @[blueprint
   "lem:flt-alkauskas-expansion"
-  (statement := /-- For every $N \ge 0$ there is a sequence of integers $(a_n)_{n \ge 1}$ with
-    $a_1 = 1$ such that the series $f(x) = \frac{1-(d+1)x}{1-dx}$ agrees with the partial product
+  (statement := /-- Let $g \in \mathbb{Z}[[x]]$ be any integer power series of the form
+    $g(x) = 1 - x - d x^2 + \sum_{k \ge 3} b_k x^k$ (equivalently, $[x^0] g = 1$ and
+    $[x^1] g = -1$). Then for every $N \ge 0$ there is a sequence of integers $(a_n)_{n \ge 1}$
+    with $a_1 = 1$ such that $g$ agrees with the partial product
     $\prod_{n=1}^{N}(1 - a_n x^n)$ in every coefficient of degree $k \le N$. -/)
   (hasProof := true)
-  (proof := /-- Induct on $N$. For $N = 0$ the empty product is $1$ and $f$ has constant term $1$.
+  (proof := /-- Induct on $N$. For $N = 0$ the empty product is $1$ and $g$ has constant term $1$.
     Suppose integers $a_1, \dots, a_N$ have been chosen so that the partial product $P_N$ matches
-    $f$ in all degrees $\le N$. Since $P_N$ has constant term $1$, multiplying by a new factor
+    $g$ in all degrees $\le N$. Since $P_N$ has constant term $1$, multiplying by a new factor
     $1 - a_{N+1} x^{N+1}$ leaves every coefficient of degree $\le N$ unchanged and decreases the
     coefficient of $x^{N+1}$ by $a_{N+1}$. Choosing the integer
-    $a_{N+1} := [x^{N+1}] P_N - [x^{N+1}] f$ therefore matches degree $N+1$ as well. Every step uses
+    $a_{N+1} := [x^{N+1}] P_N - [x^{N+1}] g$ therefore matches degree $N+1$ as well. Every step uses
     only integer arithmetic, so all $a_n$ are integers; this integrality is the entire content of
-    the proof. (The value $a_1 = 1$ is forced, since $[x^1] f = -1$.) -/)
-  (title := "Integer formal product expansion of $f$")
+    the proof. (The value $a_1 = 1$ is forced, since $[x^1] g = -1$.) -/)
+  (title := "Integer formal product expansion of $1 - x - dx^2 + \\cdots$")
   (latexEnv := "lemma")]
-private lemma exists_intExpansion (d : ℤ) (N : ℕ) :
+private lemma exists_intExpansion {g : ℤ⟦X⟧} (hg0 : constantCoeff g = 1)
+    (hg1 : coeff 1 g = -1) (N : ℕ) :
     ∃ a : ℕ → ℤ, a 1 = 1 ∧
-      ∀ k ≤ N, coeff k (f d) = coeff k (∏ n ∈ Finset.Icc 1 N, (1 - C (a n) * X ^ n)) := by
+      ∀ k ≤ N, coeff k g = coeff k (∏ n ∈ Finset.Icc 1 N, (1 - C (a n) * X ^ n)) := by
   induction N with
   | zero =>
     refine ⟨fun _ => 1, rfl, ?_⟩
@@ -315,18 +318,18 @@ private lemma exists_intExpansion (d : ℤ) (N : ℕ) :
     obtain rfl : k = 0 := by omega
     rw [Finset.Icc_eq_empty_of_lt Nat.zero_lt_one, Finset.prod_empty,
         coeff_zero_eq_constantCoeff_apply, coeff_zero_eq_constantCoeff_apply,
-        constantCoeff_f, map_one]
+        hg0, map_one]
   | succ N ih =>
     obtain ⟨a, ha1, hmatch⟩ := ih
     set P : ℤ⟦X⟧ := ∏ n ∈ Finset.Icc 1 N, (1 - C (a n) * X ^ n) with hP
-    set c : ℤ := coeff (N + 1) P - coeff (N + 1) (f d) with hc
+    set c : ℤ := coeff (N + 1) P - coeff (N + 1) g with hc
     have hP0 : coeff 0 P = 1 := by
       rw [coeff_zero_eq_constantCoeff_apply, hP]; exact constantCoeff_partialProduct a N
     refine ⟨Function.update a (N + 1) c, ?_, ?_⟩
     · by_cases hN0 : N = 0
       · subst hN0
         rw [Function.update_self, hc, hP, Finset.Icc_eq_empty_of_lt Nat.zero_lt_one,
-            Finset.prod_empty, coeff_one_f]
+            Finset.prod_empty, hg1]
         simp
       · rw [Function.update_of_ne (by omega : (1 : ℕ) ≠ N + 1)]; exact ha1
     · intro k hk
@@ -352,7 +355,7 @@ private lemma exists_intExpansion (d : ℤ) (N : ℕ) :
 the integer product expansion (no binomial theorem / Frobenius). -/
 private lemma alkauskas_step (d : ℤ) {p : ℕ} (hp : p.Prime) :
     (p : ℤ) ∣ (d + 1) ^ p - d ^ p - 1 := by
-  obtain ⟨a, ha1, hmatch⟩ := exists_intExpansion d p
+  obtain ⟨a, ha1, hmatch⟩ := exists_intExpansion (constantCoeff_f d) (coeff_one_f d) p
   have key : coeff p (W (f d)) =
       coeff p (W (∏ n ∈ Finset.Icc 1 p, (1 - C (a n) * X ^ n))) :=
     coeff_W_congr hp.pos hmatch
