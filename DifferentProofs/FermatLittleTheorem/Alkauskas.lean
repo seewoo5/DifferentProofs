@@ -116,14 +116,13 @@ private lemma invOfUnit_oneSubMonomial (c : ℤ) {n : ℕ} (hn : 0 < n) :
     invOfUnit (1 - C c * X ^ n) 1 = mk (fun k => if n ∣ k then c ^ (k / n) else 0) := by
   set G : ℤ⟦X⟧ := mk (fun k => if n ∣ k then c ^ (k / n) else 0) with hG
   set u : ℤ⟦X⟧ := 1 - C c * X ^ n with hu
-  have hGcoeff : ∀ k, coeff k G = if n ∣ k then c ^ (k / n) else 0 := fun k => by rw [hG, coeff_mk]
   have hcu : constantCoeff u = ((1 : ℤˣ) : ℤ) := by simp [hu, hn.ne']
   have hune : u ≠ 0 := fun h0 => by simp [h0] at hcu
   have huG : u * G = 1 := by
     ext N
     have hsplit : u * G = G - C c * (X ^ n * G) := by rw [hu]; ring
     rw [hsplit, map_sub, coeff_C_mul, coeff_X_pow_mul', coeff_one]
-    simp only [hGcoeff]
+    simp only [hG, coeff_mk]
     by_cases hN0 : N = 0
     · subst hN0; simp [hn.ne']
     · rw [if_neg hN0]
@@ -192,9 +191,8 @@ private lemma coeff_W_partialProduct {p : ℕ} (hp : p.Prime) (a : ℕ → ℤ) 
   rw [W_prod _ _ (fun n hn => constantCoeff_oneSubMonomial (a n) (Finset.mem_Icc.mp hn).1), map_sum,
       Finset.sum_congr rfl (fun n hn => coeff_W_oneSubMonomial (a n) (Finset.mem_Icc.mp hn).1 p),
       ← Finset.sum_subset (s₁ := {1, p}) (by simp [Finset.insert_subset_iff, hp.one_le])
-        (fun x _ hxni => if_neg fun ⟨hxdvd, _⟩ =>
-          (hp.eq_one_or_self_of_dvd x hxdvd).elim
-            (fun h => hxni (by simp [h])) fun h => hxni (by simp [h])),
+        (fun x _ hxni => if_neg fun ⟨hxdvd, _⟩ => hxni <| by
+          rcases hp.eq_one_or_self_of_dvd x hxdvd with rfl | rfl <;> simp),
       Finset.sum_pair hp.one_lt.ne, if_pos ⟨one_dvd p, hp.pos⟩, if_pos ⟨dvd_refl p, hp.pos⟩,
       ha1, Nat.div_one, Nat.div_self hp.pos, Nat.cast_one, one_pow, mul_one, pow_one]
 
@@ -325,10 +323,9 @@ theorem FermatLittleTheorem_Alkauskas : FermatLittleTheorem := by
   induction a with
   | zero => simpa [Nat.zero_pow hp.pos] using (Nat.ModEq.refl 0 : 0 ≡ 0 [MOD p])
   | succ d ih =>
-      have hstep : (d + 1) ^ p ≡ d ^ p + 1 [MOD p] := by
-        rw [Nat.modEq_iff_dvd, show (((d ^ p + 1 : ℕ) : ℤ) - ((d + 1) ^ p : ℕ)) =
-            -(((d : ℤ) + 1) ^ p - (d : ℤ) ^ p - 1) by push_cast; ring]
-        exact (alkauskas_step (d : ℤ) hp).neg_right
-      exact hstep.trans (Nat.ModEq.add_right 1 ih)
+      refine Nat.ModEq.trans ?_ (Nat.ModEq.add_right 1 ih)
+      rw [Nat.modEq_iff_dvd, show (((d ^ p + 1 : ℕ) : ℤ) - ((d + 1) ^ p : ℕ)) =
+          -(((d : ℤ) + 1) ^ p - (d : ℤ) ^ p - 1) by push_cast; ring]
+      exact (alkauskas_step (d : ℤ) hp).neg_right
 
 end FermatLittleTheorem.Alkauskas
