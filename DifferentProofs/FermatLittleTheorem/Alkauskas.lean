@@ -72,11 +72,10 @@ private lemma constantCoeff_partialProduct (a : ℕ → ℤ) (N : ℕ) :
 /-- `W` is additive on products of units: `W (g*h) = W g + W h`. -/
 private lemma W_mul {g h : ℤ⟦X⟧} (hg : constantCoeff g = 1) (hh : constantCoeff h = 1) :
     W (g * h) = W g + W h := by
-  have egh : constantCoeff (g * h) = ((1 : ℤˣ) : ℤ) := by
-    rw [map_mul, Units.val_one, hg, hh, mul_one]
-  have hg1 : g * invOfUnit g 1 = 1 := mul_invOfUnit g 1 (by rw [Units.val_one]; exact hg)
-  have hh1 : h * invOfUnit h 1 = 1 := mul_invOfUnit h 1 (by rw [Units.val_one]; exact hh)
-  have hne : (g * h : ℤ⟦X⟧) ≠ 0 := by intro h0; rw [h0] at egh; simp at egh
+  have egh : constantCoeff (g * h) = ((1 : ℤˣ) : ℤ) := by simp [hg, hh]
+  have hg1 : g * invOfUnit g 1 = 1 := mul_invOfUnit g 1 (by simp [hg])
+  have hh1 : h * invOfUnit h 1 = 1 := mul_invOfUnit h 1 (by simp [hh])
+  have hne : (g * h : ℤ⟦X⟧) ≠ 0 := fun h0 => by simp [h0] at egh
   have hprod1 : (g * h) * (invOfUnit g 1 * invOfUnit h 1) = 1 := by
     rw [mul_mul_mul_comm, hg1, hh1, one_mul]
   have invprod : invOfUnit (g * h) 1 = invOfUnit g 1 * invOfUnit h 1 :=
@@ -105,12 +104,12 @@ private lemma W_prod {ι : Type*} (s : Finset ι) (g : ι → ℤ⟦X⟧)
   induction s using Finset.induction_on with
   | empty => simp [W_one]
   | @insert a s ha ih =>
-      have hca : constantCoeff (g a) = 1 := hg a (Finset.mem_insert_self a s)
       have hcs : ∀ i ∈ s, constantCoeff (g i) = 1 :=
         fun i hi => hg i (Finset.mem_insert_of_mem hi)
       have hcprod : constantCoeff (∏ i ∈ s, g i) = 1 := by
         rw [map_prod]; exact Finset.prod_eq_one hcs
-      rw [Finset.prod_insert ha, Finset.sum_insert ha, W_mul hca hcprod, ih hcs]
+      rw [Finset.prod_insert ha, Finset.sum_insert ha,
+          W_mul (hg a (Finset.mem_insert_self a s)) hcprod, ih hcs]
 
 /-! ### Coefficient computations -/
 
@@ -119,11 +118,9 @@ private lemma invOfUnit_oneSubMonomial (c : ℤ) {n : ℕ} (hn : 0 < n) :
     invOfUnit (1 - C c * X ^ n) 1 = mk (fun k => if n ∣ k then c ^ (k / n) else 0) := by
   set G : ℤ⟦X⟧ := mk (fun k => if n ∣ k then c ^ (k / n) else 0) with hG
   set u : ℤ⟦X⟧ := 1 - C c * X ^ n with hu
-  have hGcoeff : ∀ k, coeff k G = if n ∣ k then c ^ (k / n) else 0 := fun k => by
-    rw [hG, coeff_mk]
-  have hcu : constantCoeff u = ((1 : ℤˣ) : ℤ) := by
-    rw [Units.val_one]; exact constantCoeff_oneSubMonomial c hn
-  have hune : u ≠ 0 := by intro h0; rw [h0] at hcu; simp at hcu
+  have hGcoeff : ∀ k, coeff k G = if n ∣ k then c ^ (k / n) else 0 := fun k => by rw [hG, coeff_mk]
+  have hcu : constantCoeff u = ((1 : ℤˣ) : ℤ) := by simp [hu, hn.ne']
+  have hune : u ≠ 0 := fun h0 => by simp [h0] at hcu
   have huG : u * G = 1 := by
     ext N
     have hsplit : u * G = G - C c * (X ^ n * G) := by rw [hu]; ring
@@ -144,9 +141,8 @@ private lemma invOfUnit_oneSubMonomial (c : ℤ) {n : ℕ} (hn : 0 < n) :
             ← pow_succ', Nat.sub_add_cancel hqpos, sub_self]
       · rw [if_neg hdvd]
         by_cases hle : n ≤ N
-        · have notdvd : ¬ n ∣ (N - n) :=
-            fun h => hdvd (Nat.sub_add_cancel hle ▸ dvd_add h dvd_rfl)
-          rw [if_pos hle, if_neg notdvd, mul_zero, sub_zero]
+        · rw [if_pos hle, if_neg fun h => hdvd (Nat.sub_add_cancel hle ▸ dvd_add h dvd_rfl),
+              mul_zero, sub_zero]
         · rw [if_neg hle, mul_zero, sub_zero]
   exact mul_left_cancel₀ hune ((mul_invOfUnit u 1 hcu).trans huG.symm)
 
@@ -183,12 +179,9 @@ private lemma coeff_W_oneSubMonomial (c : ℤ) {n : ℕ} (hn : 0 < n) (N : ℕ) 
   · rw [if_neg hcond]
     have hinner : (if n ≤ N then (if n ∣ (N - n) then c ^ ((N - n) / n) else 0) else 0)
         = (0 : ℤ) := by
-      by_cases hle : n ≤ N
-      · rw [if_pos hle]
-        by_cases hd : n ∣ (N - n)
-        · exact absurd ⟨Nat.sub_add_cancel hle ▸ dvd_add hd dvd_rfl, by omega⟩ hcond
-        · rw [if_neg hd]
-      · rw [if_neg hle]
+      split_ifs with hle hd
+      · exact absurd ⟨Nat.sub_add_cancel hle ▸ dvd_add hd dvd_rfl, by omega⟩ hcond
+      all_goals rfl
     rw [hinner, mul_zero]
 
 /-- The coefficient of `Xᴺ` (for `N > 0`) in `W (f d)` is `(d+1)ᴺ - dᴺ`. -/
@@ -207,11 +200,10 @@ private lemma coeff_W_partialProduct {p : ℕ} (hp : p.Prime) (a : ℕ → ℤ) 
   have hsubset : ({1, p} : Finset ℕ) ⊆ Finset.Icc 1 p := by
     simp [Finset.insert_subset_iff, hp.one_le]
   have hzero : ∀ x ∈ Finset.Icc 1 p, x ∉ ({1, p} : Finset ℕ) →
-      (if x ∣ p ∧ 0 < p then (x : ℤ) * a x ^ (p / x) else 0) = 0 := by
-    intro x _ hxni
-    rw [if_neg]
-    rintro ⟨hxdvd, -⟩
-    rcases hp.eq_one_or_self_of_dvd x hxdvd with h | h <;> exact hxni (by simp [h])
+      (if x ∣ p ∧ 0 < p then (x : ℤ) * a x ^ (p / x) else 0) = 0 := fun x _ hxni =>
+    if_neg fun ⟨hxdvd, _⟩ =>
+      (hp.eq_one_or_self_of_dvd x hxdvd).elim (fun h => hxni (by simp [h]))
+        fun h => hxni (by simp [h])
   rw [← Finset.sum_subset hsubset hzero, Finset.sum_pair hp.one_lt.ne,
       if_pos ⟨one_dvd p, hp.pos⟩, if_pos ⟨dvd_refl p, hp.pos⟩, ha1, Nat.div_one,
       Nat.div_self hp.pos, Nat.cast_one, one_pow, mul_one, pow_one]
@@ -286,8 +278,7 @@ private lemma exists_intExpansion {g : ℤ⟦X⟧} (hg0 : constantCoeff g = 1)
       ∀ k ≤ N, coeff k g = coeff k (∏ n ∈ Finset.Icc 1 N, (1 - C (a n) * X ^ n)) := by
   induction N with
   | zero =>
-    refine ⟨fun _ => 1, rfl, ?_⟩
-    intro k hk
+    refine ⟨fun _ => 1, rfl, fun k hk => ?_⟩
     obtain rfl : k = 0 := by omega
     rw [Finset.Icc_eq_empty_of_lt Nat.zero_lt_one, Finset.prod_empty,
         coeff_zero_eq_constantCoeff_apply, coeff_zero_eq_constantCoeff_apply,
