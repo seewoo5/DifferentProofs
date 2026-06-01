@@ -16,7 +16,7 @@ git = "https://github.com/PatrickMassot/checkdecls.git"
 [[require]]
 name = "LeanArchitect"
 git = "https://github.com/hanwenzhu/LeanArchitect.git"
-rev = "f746499f9d3c829cdb29e0629ce2ed4ecfc0e2ac"
+rev = "b72ae37b08d264cf371f164f4ba60c5257c17727"  # v4.30.0
 
 [[require]]
 name = "doc-gen4"
