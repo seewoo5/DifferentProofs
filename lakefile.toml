@@ -27,3 +27,6 @@ rev = "v4.30.0"
 
 [[lean_lib]]
 name = "DifferentProofs"
+
+[[lean_lib]]
+name = "DifferentProofsBlueprint"

@@ -1,16 +1,15 @@
-import DifferentProofs.Blueprint
-import DifferentProofs.FermatLittleTheorem.Alkauskas
-import DifferentProofs.FermatLittleTheorem.Basic
-import DifferentProofs.FermatLittleTheorem.Binomial
-import DifferentProofs.FermatLittleTheorem.Blueprint
-import DifferentProofs.FermatLittleTheorem.Defs
-import DifferentProofs.FermatLittleTheorem.Dynamical
-import DifferentProofs.FermatLittleTheorem.Lagrange
-import DifferentProofs.InfinitudeOfPrimes.Basic
-import DifferentProofs.InfinitudeOfPrimes.Blueprint
-import DifferentProofs.InfinitudeOfPrimes.Defs
-import DifferentProofs.InfinitudeOfPrimes.Euclid
-import DifferentProofs.InfinitudeOfPrimes.Euler
-import DifferentProofs.InfinitudeOfPrimes.Goldbach
-import DifferentProofs.InfinitudeOfPrimes.Saidak
-import DifferentProofs.InfinitudeOfPrimes.Wunderlich
+module  -- shake: keep-all
+
+public import DifferentProofs.FermatLittleTheorem.Alkauskas
+public import DifferentProofs.FermatLittleTheorem.Basic
+public import DifferentProofs.FermatLittleTheorem.Binomial
+public import DifferentProofs.FermatLittleTheorem.Defs
+public import DifferentProofs.FermatLittleTheorem.Dynamical
+public import DifferentProofs.FermatLittleTheorem.Lagrange
+public import DifferentProofs.InfinitudeOfPrimes.Basic
+public import DifferentProofs.InfinitudeOfPrimes.Defs
+public import DifferentProofs.InfinitudeOfPrimes.Euclid
+public import DifferentProofs.InfinitudeOfPrimes.Euler
+public import DifferentProofs.InfinitudeOfPrimes.Goldbach
+public import DifferentProofs.InfinitudeOfPrimes.Saidak
+public import DifferentProofs.InfinitudeOfPrimes.Wunderlich
