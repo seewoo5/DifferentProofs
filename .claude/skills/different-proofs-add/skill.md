@@ -15,7 +15,7 @@ The repo collects several Lean 4 proofs of the same theorem. Each new proof goes
 4. **Update the root module**: `lake exe mk_all --lib DifferentProofs --module` regenerates `DifferentProofs.lean`.
 5. **Build** in this order and check each step is clean:
    - `lake build DifferentProofs.<Theorem>.<Name>` — Lean compiles.
-   - `lake env lean --run DifferentProofsBlueprintMain.lean --output _out/site` — Verso Blueprint renders.
+   - `lake build DifferentProofsBlueprint.Blueprint` — Verso Blueprint compiles.
    - `./scripts/ci-pages.sh` — local Pages-style build checks the expected HTML and preview manifest.
 
 ## Gotchas (learned the hard way)
