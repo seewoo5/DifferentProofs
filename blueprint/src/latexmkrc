@@ -1,8 +1,0 @@
-# This file configures the latexmk command you can use to compile
-# the pdf version of the blueprint
-$pdf_mode = 1;
-# `-interaction=nonstopmode` keeps xelatex from halting at an interactive `?`
-# prompt on the first pass (e.g. on a stale/corrupt `.aux`); latexmk then rewrites
-# the aux and reruns, so the build self-heals instead of emergency-stopping.
-$pdflatex = 'xelatex -synctex=1 -interaction=nonstopmode';
-@default_files = ('print.tex');

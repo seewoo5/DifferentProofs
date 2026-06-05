@@ -1,6 +1,5 @@
 module
 
-import Architect
 public import DifferentProofs.InfinitudeOfPrimes.Defs
 public import Mathlib.Algebra.Order.Ring.Star
 public import Mathlib.Data.Int.Star
@@ -12,28 +11,11 @@ public import Mathlib.Tactic.NormNum.Prime
 
 open Finset
 
-@[blueprint
-  "thm:harmonic-unbounded"
-  (statement := /-- The harmonic series is unbounded. -/)
-  (hasProof := true)
-  (proof := /-- Use the inequality $\log(n + 1) \le H_n$. -/)
-  (title := "Harmonic series is unbounded")
-  (latexEnv := "theorem")]
 theorem harmonic_unbounded : ∀ M : ℝ, ∃ n : ℕ, harmonic n > M := fun M ↦
   let ⟨n, hn⟩ := ((Real.tendsto_log_atTop.comp <| tendsto_natCast_atTop_atTop.comp <|
     Filter.tendsto_add_atTop_nat 1).eventually_gt_atTop M).exists
   ⟨n, hn.trans_le <| mod_cast log_add_one_le_harmonic n⟩
 
-@[blueprint
-  "thm:euler-prod-ge-harmonic"
-  (statement := /-- The product $\prod_{p \le n} p / (p - 1)$ over primes at most n
-    is greater than or equal to the n-th harmonic number. -/)
-  (hasProof := true)
-  (proof := /-- Use the geometric expansion of $p / (p - 1) = (1 - 1/p)^{-1}$ for each prime $p$.
-    Then the product is equal to the sum of inverses of the integers whose primes factors
-    are all at most $n$, and the sum is greater than or equal to the n-th harmonic number. -/)
-  (title := "Euler's product and the Harmonic number")
-  (latexEnv := "theorem")]
 theorem prod_prime_div_prime_sub_one_ge_harmonic (n : ℕ) :
     ∏ p ∈ (range (n + 1)).filter Nat.Prime, (p : ℚ) / (p - 1) ≥ harmonic n := by
   have h_prod_ge_sum :
@@ -83,16 +65,6 @@ theorem prod_prime_div_prime_sub_one_ge_harmonic (n : ℕ) :
         pow_pos (by positivity : 0 < (i : ℚ) + 1 + 1) (Nat.log (i + 1 + 1) n + 1),
         inv_pos.mpr (pow_pos (by positivity : 0 < (i : ℚ) + 1 + 1) (Nat.log (i + 1 + 1) n + 1))]
 
-@[blueprint
-  "thm:inf-primes-euler"
-  (statement := /-- The set of prime numbers is infinite. -/)
-  (hasProof := true)
-  (proof := /-- Assume that there are only finitely many primes.
-    Then the product of $(1 - 1/p)^{-1}$ over all primes $p$ is finite.
-    But by \cref{thm:euler-prod-ge-harmonic}, this product is greater than the harmonic series,
-    which is unbounded (\cref{thm:harmonic-unbounded}), a contradiction. -/)
-  (title := "Infinitude of primes (Euler, via Euler product)")
-  (latexEnv := "theorem")]
 theorem InfinitudeOfPrimes_Euler : InfinitudeOfPrimes := by
   intro hfin
   obtain ⟨N, hN⟩ : ∃ N, ∀ p, Nat.Prime p → p ≤ N :=

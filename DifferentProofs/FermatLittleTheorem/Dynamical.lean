@@ -1,6 +1,5 @@
 module
 
-import Architect
 public import DifferentProofs.FermatLittleTheorem.Basic
 public import Mathlib.Algebra.Group.Action.TypeTags
 public import Mathlib.Algebra.Order.Floor.Defs
@@ -17,13 +16,6 @@ public import Mathlib.SetTheory.Cardinal.Finite
 
 open scoped unitInterval
 
-@[blueprint
-  "def:T"
-  (statement := /-- For a natural number $n$ ($\ge 2$), define $T_n : [0, 1] \to [0, 1]$ by
-    $T_n(x) = \{nx\}$ for $0 \le x < 1$ and $T_n(1) = 1$, where $\{y\}$ denotes the fractional
-    part of $y$. -/)
-  (title := "Definition of $T_n$")
-  (latexEnv := "definition")]
 noncomputable def T (n : ℕ) (x : I) : I :=
   if x = 1 then 1 else ⟨Int.fract (n * (x : ℝ)), unitInterval.fract_mem _⟩
 
@@ -37,16 +29,6 @@ private lemma T_ne_one {n : ℕ} {x : I} (hx : x ≠ 1) : T n x ≠ 1 := fun h =
   rw [T_val_of_ne hx] at hv
   linarith [Int.fract_lt_one ((n : ℝ) * (x : ℝ))]
 
-@[blueprint
-  "lem:T-comp-eq-mul"
-  (statement := /-- For any natural numbers $m, n$, the composition of $T_m$ and $T_n$
-    equals $T_{mn}$, i.e., $T_m \circ T_n = T_{mn}$. -/)
-  (hasProof := true)
-  (proof := /-- If $x = 1$, then both sides equal $1$. Otherwise $T_n(x) = \{nx\} \in [0, 1)$,
-    and $T_m(T_n(x)) = \{m \{nx\}\}$. Writing $m \{nx\} = mnx - m\lfloor nx \rfloor$ and noting
-    that $m \lfloor nx \rfloor \in \mathbb{Z}$, we have $\{m \{nx\}\} = \{mnx\} = T_{mn}(x)$. -/)
-  (title := "Composition law for $T_n$")
-  (latexEnv := "lemma")]
 lemma T_comp_eq_mul (m n : ℕ) : T m ∘ T n = T (m * n) := by
   funext x
   apply Subtype.ext
@@ -60,16 +42,6 @@ lemma T_comp_eq_mul (m n : ℕ) : T m ∘ T n = T (m * n) := by
       rw [Int.fract]; push_cast; ring
     rw [h1, Int.fract_sub_intCast]
 
-@[blueprint
-  "lem:T-num-fp-eq"
-  (statement := /-- For any $n \ge 2$, the map $T_n$ has exactly $n$ fixed points. -/)
-  (hasProof := true)
-  (proof := /-- For $x \in [0, 1)$, the equation $T_n(x) = x$ becomes $\{nx\} = x$, i.e.,
-    $(n-1)x \in \mathbb{Z}$. With $x \in [0, 1)$, this gives $x = j/(n-1)$ for
-    $j \in \{0, 1, \dots, n-2\}$, contributing $n - 1$ fixed points. Together with the fixed
-    point $x = 1$, this gives exactly $n$ fixed points. -/)
-  (title := "Number of fixed points of $T_n$")
-  (latexEnv := "lemma")]
 lemma T_num_fp_eq (n : ℕ) (hn : 2 ≤ n) : Nat.card {x : I | T n x = x} = n := by
   have hn1_le : (1 : ℕ) ≤ n := by lia
   have hn1_lt : (1 : ℝ) < n := by exact_mod_cast (by lia : 1 < n)
@@ -303,21 +275,6 @@ private lemma prime_dvd_card_of_fixedpointfree_periodic_map
   rw [← Equiv.Perm.iterate_eq_pow]
   exact congr_fun hpow x
 
-@[blueprint
-  "thm:flt-dynamical"
-  (statement := /-- For any prime $p$ and integer $a$, we have $a^p \equiv a \pmod{p}$. -/)
-  (hasProof := true)
-  (proof := /-- By the standard reduction to the natural-number version, it suffices to prove
-    the statement for natural numbers. The cases $a = 0$ and $a = 1$ are trivial; assume $a \ge 2$.
-    Let $S$ be the set of fixed points of $T_{a^p}$ that are not fixed points of $T_a$.
-    By \cref{lem:T-num-fp-eq} applied to $T_{a^p}$ and $T_a$, $S$ has $a^p - a$ elements.
-    For each $x_0 \in S$, since $x_0$ is fixed by $T_{a^p} = T_a^p$ (using
-    \cref{lem:T-comp-eq-mul} iteratively), the $T_a$-orbit of $x_0$ has size dividing $p$.
-    Because $p$ is prime, the size is $1$ or $p$; size $1$ would make $x_0$ a fixed point of
-    $T_a$, which is excluded. Hence every orbit has exactly $p$ elements, and these orbits
-    partition $S$. Therefore $p$ divides $|S| = a^p - a$. -/)
-  (title := "Fermat's Little Theorem using Dynamical Systems")
-  (latexEnv := "theorem")]
 theorem FermatLittleTheorem_Dynamical : FermatLittleTheorem := by
   apply FermatLittleTheoremNat_impl_FermatLittleTheorem
   intro p a hp

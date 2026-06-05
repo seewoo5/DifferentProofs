@@ -1,6 +1,5 @@
 module
 
-import Architect
 public import DifferentProofs.FermatLittleTheorem.Basic
 public import Mathlib.RingTheory.PowerSeries.Derivative
 public import Mathlib.RingTheory.PowerSeries.Inverse
@@ -239,24 +238,6 @@ private lemma coeff_one_f (d : ℤ) : coeff 1 (f d) = -1 := by
 
 /-! ### The integer product expansion (heart of the proof) -/
 
-@[blueprint
-  "lem:flt-alkauskas-expansion"
-  (statement := /-- Let $g \in \mathbb{Z}[[x]]$ be any integer power series of the form
-    $g(x) = 1 - x - d x^2 + \sum_{k \ge 3} b_k x^k$ (equivalently, $[x^0] g = 1$ and
-    $[x^1] g = -1$). Then for every $N \ge 0$ there is a sequence of integers $(a_n)_{n \ge 1}$
-    with $a_1 = 1$ such that $g$ agrees with the partial product
-    $\prod_{n=1}^{N}(1 - a_n x^n)$ in every coefficient of degree $k \le N$. -/)
-  (hasProof := true)
-  (proof := /-- Induct on $N$. For $N = 0$ the empty product is $1$ and $g$ has constant term $1$.
-    Suppose integers $a_1, \dots, a_N$ have been chosen so that the partial product $P_N$ matches
-    $g$ in all degrees $\le N$. Since $P_N$ has constant term $1$, multiplying by a new factor
-    $1 - a_{N+1} x^{N+1}$ leaves every coefficient of degree $\le N$ unchanged and decreases the
-    coefficient of $x^{N+1}$ by $a_{N+1}$. Choosing the integer
-    $a_{N+1} := [x^{N+1}] P_N - [x^{N+1}] g$ therefore matches degree $N+1$ as well. Every step uses
-    only integer arithmetic, so all $a_n$ are integers; this integrality is the entire content of
-    the proof. (The value $a_1 = 1$ is forced, since $[x^1] g = -1$.) -/)
-  (title := "Integer formal product expansion of $1 - x - dx^2 + \\cdots$")
-  (latexEnv := "lemma")]
 private lemma exists_intExpansion {g : ℤ⟦X⟧} (hg0 : constantCoeff g = 1)
     (hg1 : coeff 1 g = -1) (N : ℕ) :
     ∃ a : ℕ → ℤ, a 1 = 1 ∧
@@ -302,20 +283,6 @@ private lemma alkauskas_step (d : ℤ) {p : ℕ} (hp : p.Prime) :
   rw [coeff_W_f d hp.pos, coeff_W_partialProduct hp a ha1] at key
   exact ⟨a p, by linarith [key]⟩
 
-@[blueprint
-  "thm:flt-alkauskas"
-  (statement := /-- For any prime $p$ and integer $a$, we have $a^p \equiv a \pmod{p}$. -/)
-  (hasProof := true)
-  (proof := /-- Working in $\mathbb{Z}[[x]]$, the rational series
-    $f(x) = \frac{1-(d+1)x}{1-dx}$ has constant term $1$, hence is a unit, so it expands uniquely
-    as a formal product $\prod_{n \ge 1}(1-a_nx^n)$ with \emph{integer} coefficients $a_n$ (the
-    coefficients are produced by an inductive integer coefficient-matching algorithm; this
-    integrality is the whole point). Taking the formal logarithmic derivative and comparing the
-    coefficient of $x^p$ on the rational side, $(d+1)^p - d^p$, with the product side, $1 + p a_p$,
-    gives $p \mid (d+1)^p-d^p-1$. Telescoping these consecutive congruences over $d$ yields
-    $a^p \equiv a \pmod p$, and the standard reduction gives the integer form. -/)
-  (title := "Fermat's Little Theorem using Alkauskas' product expansion")
-  (latexEnv := "theorem")]
 theorem FermatLittleTheorem_Alkauskas : FermatLittleTheorem := by
   apply FermatLittleTheoremNat_impl_FermatLittleTheorem
   intro p a hp
