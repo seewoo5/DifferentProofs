@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-lake build DifferentProofs.Blueprint
+lake build DifferentProofsBlueprint
 lake env lean --run DifferentProofsBlueprintMain.lean --output _out/site
 
 test -f _out/site/html-multi/index.html

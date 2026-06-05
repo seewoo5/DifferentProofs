@@ -11,8 +11,8 @@ The repo collects several Lean 4 proofs of the same theorem. Each new proof goes
 
 1. **Formalize** the body of the target lemmas/theorem in `<file>.lean`. Replace every `sorry`. Keep the existing header shape (`module`, `public import …`, `@[expose] public section`) unless the new proof needs additional imports.
 2. **Golf** with the project's `lean4:proof-golfer` agent (or `/cleanup` if available). Aim for ~30% reduction; don't sacrifice readability.
-3. **Update README.md and the Verso Blueprint chapter** under `DifferentProofs/Blueprint/<Theorem>.lean`. README gets a bullet `- [<Name>'s proof](DifferentProofs/<Theorem>/<Name>.lean)`. The chapter gets the appropriate `:::theorem`/`:::lemma_`/`:::proof` blocks with stable labels and `(lean := "...")` links to the formal declarations.
-4. **Update the root module**: `lake exe mk_all --module` regenerates `DifferentProofs.lean`.
+3. **Update README.md and the Verso Blueprint chapter** under `DifferentProofsBlueprint/<Theorem>.lean`. README gets a bullet `- [<Name>'s proof](DifferentProofs/<Theorem>/<Name>.lean)`. The chapter gets the appropriate `:::theorem`/`:::lemma_`/`:::proof` blocks with stable labels and `(lean := "...")` links to the formal declarations.
+4. **Update the root module**: `lake exe mk_all --lib DifferentProofs --module` regenerates `DifferentProofs.lean`.
 5. **Build** in this order and check each step is clean:
    - `lake build DifferentProofs.<Theorem>.<Name>` — Lean compiles.
    - `lake env lean --run DifferentProofsBlueprintMain.lean --output _out/site` — Verso Blueprint renders.
