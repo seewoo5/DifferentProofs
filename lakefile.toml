@@ -30,7 +30,3 @@ name = "DifferentProofs"
 
 [[lean_lib]]
 name = "DifferentProofsBlueprint"
-
-[[lean_exe]]
-name = "blueprint-gen"
-root = "DifferentProofsBlueprintMain"
