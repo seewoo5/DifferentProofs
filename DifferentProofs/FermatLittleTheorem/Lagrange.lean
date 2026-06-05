@@ -1,6 +1,5 @@
 module
 
-import Architect
 public import DifferentProofs.FermatLittleTheorem.Defs
 public import Mathlib.Algebra.Field.ZMod
 public import Mathlib.FieldTheory.Finite.Basic
@@ -8,18 +7,6 @@ public import Mathlib.GroupTheory.OrderOfElement
 
 @[expose] public section
 
-@[blueprint
-  "thm:flt-lagrange"
-  (statement := /-- For any prime $p$ and integer $a$, we have $a^p \equiv a \pmod{p}$.-/)
-  (hasProof := true)
-  (proof := /--If $a$ is divisible by $p$, then $a^p \equiv 0 \equiv a \pmod{p}$.
-    Assume that $a$ is not divisible by $p$.
-    Consider the multiplicative group $(\mathbb{Z}/p\mathbb{Z})^\times$ of nonzero elements
-    modulo a prime $p$. This group has order $p-1$. By Lagrange's theorem, the order of
-    any element divides the order of the group. Therefore, for any integer $a$ not divisible by $p$,
-    we have $a^{p-1} \equiv 1 \pmod{p}$. -/)
-  (title := "Fermat's Little Theorem using the Lagrange's theorem")
-  (latexEnv := "theorem")]
 theorem FermatLittleTheorem_Lagrange : FermatLittleTheorem := by
   intro p a hp
   have : Fact p.Prime := ⟨hp⟩

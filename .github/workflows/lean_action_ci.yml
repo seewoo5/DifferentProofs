@@ -16,5 +16,5 @@ jobs:
         run: |
           lake exe mk_all --lib DifferentProofs --module && exit 0
           echo "mk_all reported changes"
-          echo "Please run `lake mk_all --module` to fix"
+          echo 'Please run `lake exe mk_all --lib DifferentProofs --module` to fix'
           exit 1

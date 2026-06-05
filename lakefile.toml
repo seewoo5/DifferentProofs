@@ -8,19 +8,16 @@ autoImplicit = false
 relaxedAutoImplicit = false
 weak.linter.mathlibStandardSet = true
 weak.linter.flexible = false
+linter.style.header = false
+experimental.module = true
 
 [[require]]
 name = "checkdecls"
 git = "https://github.com/PatrickMassot/checkdecls.git"
 
 [[require]]
-name = "LeanArchitect"
-git = "https://github.com/hanwenzhu/LeanArchitect.git"
-rev = "b72ae37b08d264cf371f164f4ba60c5257c17727"  # v4.30.0
-
-[[require]]
-name = "doc-gen4"
-git = "https://github.com/leanprover/doc-gen4"
+name = "VersoBlueprint"
+git = "https://github.com/leanprover/verso-blueprint"
 rev = "v4.30.0"
 
 [[require]]
@@ -30,3 +27,6 @@ rev = "v4.30.0"
 
 [[lean_lib]]
 name = "DifferentProofs"
+
+[[lean_lib]]
+name = "DifferentProofsBlueprint"

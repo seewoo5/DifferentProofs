@@ -1,6 +1,5 @@
 module
 
-import Architect
 public import Mathlib.Algebra.BigOperators.Group.Finset.Piecewise
 public import Mathlib.Algebra.Order.Archimedean.Basic
 public import Mathlib.Algebra.Order.BigOperators.GroupWithZero.Finset
@@ -12,17 +11,6 @@ public import DifferentProofs.InfinitudeOfPrimes.Defs
 @[expose] public section
 
 
-@[blueprint
-  "thm:inf-primes-euclid-factorial"
-  (statement := /-- The set of prime numbers is infinite. -/)
-  (hasProof := true)
-  (proof := /-- Suppose for contradiction that the set of primes is finite.
-    Then it is bounded above by some $n \in \mathbb{N}$, i.e., every prime $p$ satisfies
-    $p \le n$. Consider $N := n! + 1$; since $N \ge 2$, it has a prime divisor $p$. Because $p$ is
-    prime and $p \le n$, we have $p \mid n!$, hence $p \mid N - n! = 1$, contradicting that $p$ is
-    prime. -/)
-  (title := "Infinitude of primes (Euclid, via $n! + 1$)")
-  (latexEnv := "theorem")]
 theorem InfinitudeOfPrimes_Euclid : InfinitudeOfPrimes := by
   intro hfin
   obtain ⟨n, hn⟩ := hfin.bddAbove
@@ -34,16 +22,6 @@ theorem InfinitudeOfPrimes_Euclid : InfinitudeOfPrimes := by
     simpa using Nat.dvd_sub hpdvd hpnfac
 
 
-@[blueprint
-  "thm:inf-primes-euclid-prod-primes"
-  (statement := /-- The set of prime numbers is infinite. -/)
-  (hasProof := true)
-  (proof := /-- Suppose for contradiction that the set of primes $S$ is finite.
-    Consider $N := \prod_{p \in S} p + 1$. Since $N > 1$, it has a prime divisor $p$.
-    But then $p \in S$, so $p \mid \prod_{p \in S} p$, hence
-    $p \mid N - \prod_{p \in S} p = 1$, contradicting that $p$ is prime. -/)
-  (title := "Infinitude of primes (Euclid, via the product of primes)")
-  (latexEnv := "theorem")]
 theorem InfinitudeOfPrimes_Euclid' : InfinitudeOfPrimes := by
   intro hfin
   have hne : hfin.toFinset.prod id + 1 ≠ 1 := by
