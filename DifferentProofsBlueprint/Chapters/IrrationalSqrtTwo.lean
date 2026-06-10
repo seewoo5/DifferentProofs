@@ -4,6 +4,7 @@ import VersoBlueprint
 import DifferentProofs.IrrationalSqrtTwo.Basic
 import DifferentProofs.IrrationalSqrtTwo.Defs
 import DifferentProofs.IrrationalSqrtTwo.Descent
+import DifferentProofs.IrrationalSqrtTwo.FermatLastTheorem
 import DifferentProofs.IrrationalSqrtTwo.Valuation
 
 open Verso.Genre
@@ -64,4 +65,17 @@ valuations and depends on {uses "thm:sqrt-two-nat-impl-sqrt-two"}[].
 Apply the exponent of $`2` in the prime factorization to both sides of
 $`p^2 = 2q^2`. The left side has even $`2`-adic valuation $`2v_2(p)`, while
 the right side has odd valuation $`1 + 2v_2(q)`, a contradiction.
+:::
+
+:::theorem "thm:sqrt-two-flt" (parent := "grp:sqrt-two") (lean := "IrrationalSqrtTwo_FermatLastTheorem")
+The real number $`\sqrt{2}` is irrational. This proof uses Fermat's Last
+Theorem for exponent $`3` and proves {uses "def:sqrt-two"}[].
+:::
+
+:::proof "thm:sqrt-two-flt"
+One has the identity $`(18+17\sqrt{2})^3 + (18-17\sqrt{2})^3 = 42^3`, due to
+Jarvis and Meekin. If $`\sqrt{2}` were a rational $`r`, then $`18+17r`,
+$`18-17r`, and $`42` would be nonzero rationals (nonzero because
+$`(\pm 18/17)^2 \neq 2`) solving $`x^3 + y^3 = z^3`, contradicting Fermat's
+Last Theorem for exponent $`3`.
 :::
