@@ -77,5 +77,6 @@ One has the identity $`(18+17\sqrt{2})^3 + (18-17\sqrt{2})^3 = 42^3`, due to
 Jarvis and Meekin. If $`\sqrt{2}` were a rational $`r`, then $`18+17r`,
 $`18-17r`, and $`42` would be nonzero rationals (nonzero because
 $`(\pm 18/17)^2 \neq 2`) solving $`x^3 + y^3 = z^3`, contradicting Fermat's
-Last Theorem for exponent $`3`.
+Last Theorem for exponent $`3`. See
+[this Math StackExchange answer](https://math.stackexchange.com/a/4438248).
 :::
