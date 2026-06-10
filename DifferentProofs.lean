@@ -13,3 +13,8 @@ public import DifferentProofs.InfinitudeOfPrimes.Euler
 public import DifferentProofs.InfinitudeOfPrimes.Goldbach
 public import DifferentProofs.InfinitudeOfPrimes.Saidak
 public import DifferentProofs.InfinitudeOfPrimes.Wunderlich
+public import DifferentProofs.IrrationalSqrtTwo.Basic
+public import DifferentProofs.IrrationalSqrtTwo.Defs
+public import DifferentProofs.IrrationalSqrtTwo.Descent
+public import DifferentProofs.IrrationalSqrtTwo.FermatLastTheorem
+public import DifferentProofs.IrrationalSqrtTwo.Valuation

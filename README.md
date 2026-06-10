@@ -20,3 +20,9 @@ This project contains formalizations of different proofs of the same mathematica
 - [Euler's proof](DifferentProofs/InfinitudeOfPrimes/Euler.lean)
 - [Saidak's proof](DifferentProofs/InfinitudeOfPrimes/Saidak.lean)
 - [Wunderlich's proof](DifferentProofs/InfinitudeOfPrimes/Wunderlich.lean)
+
+### Irrationality of √2
+
+- [Using infinite descent](DifferentProofs/IrrationalSqrtTwo/Descent.lean)
+- [Using 2-adic valuations](DifferentProofs/IrrationalSqrtTwo/Valuation.lean)
+- [Using Fermat's last theorem for n = 3](DifferentProofs/IrrationalSqrtTwo/FermatLastTheorem.lean)
