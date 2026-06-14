@@ -238,7 +238,7 @@ private lemma coeff_one_f (d : ℤ) : coeff 1 (f d) = -1 := by
 
 /-! ### The integer product expansion (heart of the proof) -/
 
-private lemma exists_intExpansion {g : ℤ⟦X⟧} (hg0 : constantCoeff g = 1)
+lemma exists_intExpansion {g : ℤ⟦X⟧} (hg0 : constantCoeff g = 1)
     (hg1 : coeff 1 g = -1) (N : ℕ) :
     ∃ a : ℕ → ℤ, a 1 = 1 ∧
       ∀ k ≤ N, coeff k g = coeff k (∏ n ∈ Finset.Icc 1 N, (1 - C (a n) * X ^ n)) := by

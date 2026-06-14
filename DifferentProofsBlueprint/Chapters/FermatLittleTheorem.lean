@@ -64,7 +64,7 @@ $`\mathbb{Z}/p\mathbb{Z}`; by Lagrange's theorem its order divides
 $`p - 1`, so $`a^{p-1} = 1`, and multiplying by $`a` gives the result.
 :::
 
-:::lemma_ "lem:flt-alkauskas-expansion" (parent := "grp:flt")
+:::lemma_ "lem:flt-alkauskas-expansion" (parent := "grp:flt") (lean := "FermatLittleTheorem.Alkauskas.exists_intExpansion")
 Let $`g \in \mathbb{Z}[[x]]` be an integer power series of the form
 $`g(x) = 1 - x - d x^2 + \sum_{k \ge 3} b_k x^k`. For every $`N`, there is a
 sequence of integers $`(a_n)_{n \ge 1}` with $`a_1 = 1` such that $`g` agrees
