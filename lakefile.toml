@@ -20,6 +20,14 @@ name = "VersoBlueprint"
 git = "https://github.com/leanprover/verso-blueprint"
 rev = "v4.30.0"
 
+# Override VersoBlueprint's inherited verso pin: it points at a bare SHA on a
+# branch that verso force-pushed/GC'd, so lake can no longer fetch it. The
+# stable v4.30.0 tag is identical in src/verso to that orphaned commit.
+[[require]]
+name = "verso"
+git = "https://github.com/leanprover/verso"
+rev = "v4.30.0"
+
 [[require]]
 name = "mathlib"
 git = "https://github.com/leanprover-community/mathlib4.git"
