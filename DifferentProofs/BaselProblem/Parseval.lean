@@ -11,7 +11,7 @@ open Real Complex MeasureTheory intervalIntegral Set
 
 namespace BaselProblem
 
-private lemma neg_pi_lt_pi : (-π : ℝ) < π := by linarith [pi_pos]
+private lemma neg_pi_lt_pi : (-π : ℝ) < π := neg_lt_self pi_pos
 
 /-- A constant function has vanishing Fourier coefficients at nonzero frequencies. -/
 private lemma fourierCoeffOn_one_eq_zero {a b : ℝ} (hab : a < b) {n : ℤ} (hn : n ≠ 0) :
@@ -51,24 +51,20 @@ private lemma coeff_norm_sq (n : ℤ) :
       div_pow, one_pow, sq_abs]
 
 theorem BaselProblem_Parseval : BaselProblem := by
-  -- `x ↦ (x : ℂ)` is square-integrable on `(-π, π]`, being continuous and bounded by `π`.
   have hL2 : MemLp (fun x : ℝ => (x : ℂ)) 2 (volume.restrict (Ioc (-π) π)) := by
     refine MemLp.of_bound Complex.continuous_ofReal.aestronglyMeasurable π ?_
     rw [ae_restrict_iff' measurableSet_Ioc]
     filter_upwards with x hx
     rw [Complex.norm_real, Real.norm_eq_abs]
     exact abs_le.mpr ⟨by linarith [hx.1], hx.2⟩
-  -- The right-hand `L²` integral: `∫_{-π}^{π} x² = 2π³/3`.
   have hint : ∫ x in (-π)..π, ‖(x : ℂ)‖ ^ 2 = 2 * π ^ 3 / 3 := by
     simp_rw [Complex.norm_real, Real.norm_eq_abs, sq_abs]
     rw [integral_pow]; ring
   have hsum : Summable (fun n : ℕ => (1 : ℝ) / (n : ℝ) ^ 2) :=
     summable_one_div_nat_pow.mpr one_lt_two
-  -- Parseval's identity, with both sides evaluated.
   have hp := tsum_sq_fourierCoeffOn neg_pi_lt_pi hL2
   simp_rw [coeff_norm_sq] at hp
   rw [hint, smul_eq_mul] at hp
-  -- The `ℤ`-sum is twice the `ℕ`-sum: the `n = 0` term vanishes and the summand is even.
   have hconv : ∑' (i : ℤ), (1 : ℝ) / (i : ℝ) ^ 2 = 2 * ∑' (n : ℕ), (1 : ℝ) / (n : ℝ) ^ 2 := by
     rw [Summable.tsum_of_nat_of_neg (f := fun i : ℤ => (1 : ℝ) / (i : ℝ) ^ 2)
         (hsum.congr fun n => by push_cast; ring) (hsum.congr fun n => by push_cast; ring)]

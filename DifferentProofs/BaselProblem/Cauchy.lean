@@ -39,17 +39,14 @@ lemma sin_two_mul_add_one (n : ℕ) (θ : ℝ) :
     ring_nf
   rw [hL, ← Complex.ofReal_cos, ← Complex.ofReal_sin, add_pow, Complex.im_sum]
   refine (Finset.sum_of_injOn (fun j => 2 * (n - j)) ?_ ?_ ?_ ?_).symm
-  · -- injective on `range (n+1)`
-    intro a ha b hb hab
+  · intro a ha b hb hab
     simp only [coe_range, Set.mem_Iio] at ha hb
     have h2 : 2 * (n - a) = 2 * (n - b) := hab
     omega
-  · -- maps into `range (2n+2)`
-    intro j hj
+  · intro j hj
     simp only [coe_range, Set.mem_Iio] at hj ⊢
     omega
-  · -- terms with odd index (not in the image) vanish
-    intro i hi hni
+  · intro i hi hni
     rw [mem_range] at hi
     have hodd : Odd i := by
       rw [← Nat.not_even_iff_odd]
@@ -60,8 +57,7 @@ lemma sin_two_mul_add_one (n : ℕ) (θ : ℝ) :
       I_pow_two_mul, show ((-1 : ℂ)) = ((-1 : ℝ) : ℂ) by norm_num]
     simp only [← Complex.ofReal_pow, ← Complex.ofReal_mul, Complex.mul_im, Complex.ofReal_re,
       Complex.ofReal_im, Complex.natCast_re, Complex.natCast_im, mul_zero, zero_mul, add_zero]
-  · -- the surviving (even-index) terms match
-    intro j hj
+  · intro j hj
     rw [mem_range] at hj
     rw [show 2 * n + 1 - 2 * (n - j) = 2 * j + 1 by omega, mul_pow, ← Complex.ofReal_pow,
       I_pow_two_mul_add_one, show ((-1 : ℂ)) = ((-1 : ℝ) : ℂ) by norm_num,
@@ -162,10 +158,8 @@ lemma cotSq_injOn (n : ℕ) :
   have hsa : 0 < Real.sin α := Real.sin_pos_of_pos_of_lt_pi ha0 (by linarith [pi_pos])
   have hsb : 0 < Real.sin β := Real.sin_pos_of_pos_of_lt_pi hb0 (by linarith [pi_pos])
   simp only at hab
-  -- the (positive) ratios are equal
   have hbase : Real.cos α / Real.sin α = Real.cos β / Real.sin β := by
     rw [← Real.sqrt_sq (div_pos hca hsa).le, ← Real.sqrt_sq (div_pos hcb hsb).le, hab]
-  -- hence the tangents agree
   have htan : Real.tan α = Real.tan β := by
     have h : (Real.tan α)⁻¹ = (Real.tan β)⁻¹ := by
       rw [Real.tan_eq_sin_div_cos, Real.tan_eq_sin_div_cos, inv_div, inv_div]; exact hbase
@@ -190,7 +184,6 @@ lemma cotSq_sum (n : ℕ) (hn : 1 ≤ n) :
   set S : Finset ℝ := (Finset.Icc 1 n).image f with hS
   have hScard : S.card = n := by
     rw [hS, Finset.card_image_of_injOn (cotSq_injOn n), Nat.card_Icc]; omega
-  -- the roots of `cotPoly n` are exactly the multiset `S.val`
   have hle : S.val ≤ (cotPoly n).roots := by
     rw [Multiset.le_iff_count]
     intro x
@@ -206,21 +199,17 @@ lemma cotSq_sum (n : ℕ) (hn : 1 ≤ n) :
     calc (cotPoly n).roots.card ≤ (cotPoly n).natDegree := card_roots' _
       _ = n := cotPoly_natDegree n
   have hroots : S.val = (cotPoly n).roots := Multiset.eq_of_le_of_card_le hle hcard
-  -- `cotPoly n` splits, so Vieta applies
   have hsplit : Splits (cotPoly n) := by
     rw [splits_iff_card_roots, ← hroots, cotPoly_natDegree]; exact hScard
   have hvieta := hsplit.nextCoeff_eq_neg_sum_roots_mul_leadingCoeff
   rw [cotPoly_leadingCoeff, ← hroots] at hvieta
-  -- the relevant coefficient
   have hnext : (cotPoly n).nextCoeff = -(Nat.choose (2 * n + 1) 3 : ℝ) := by
     rw [nextCoeff, if_neg (by rw [cotPoly_natDegree]; omega), cotPoly_natDegree,
       cotPoly_coeff n (n - 1) (by omega), show n - (n - 1) = 1 by omega]
     norm_num
   rw [hnext] at hvieta
-  -- relate the multiset sum to the `Finset` sum
   have hsumeq : S.val.sum = ∑ k ∈ Finset.Icc 1 n, f k := by
     rw [hS, Finset.image_val_of_injOn (cotSq_injOn n)]; rfl
-  -- combinatorial value: `6 · C(2n+1,3) = (2n-1)·2n·(2n+1)`
   have hchoose : (6 : ℝ) * (Nat.choose (2 * n + 1) 3 : ℝ)
       = (2 * (n : ℝ) - 1) * (2 * n) * (2 * n + 1) := by
     have hnat : 6 * Nat.choose (2 * n + 1) 3 = (2 * n - 1) * (2 * n) * (2 * n + 1) := by
@@ -278,7 +267,6 @@ theorem BaselProblem_Cauchy : BaselProblem := by
     summable_one_div_nat_pow.mpr one_lt_two
   set L := ∑' k : ℕ, (1 : ℝ) / (k : ℝ) ^ 2 with hLdef
   set D : ℕ → ℝ := fun n => ∑ k ∈ Finset.Icc 1 n, (1 : ℝ) / (k : ℝ) ^ 2 with hDdef
-  -- `D n` is the partial sum up to `n`, hence `D → L`.
   have hD_eq : ∀ n, D n = ∑ k ∈ Finset.range (n + 1), (1 : ℝ) / (k : ℝ) ^ 2 := fun n => by
     have hins : Finset.range (n + 1) = insert 0 (Finset.Icc 1 n) := by
       ext x; simp only [Finset.mem_range, Finset.mem_insert, Finset.mem_Icc]; omega
@@ -288,7 +276,6 @@ theorem BaselProblem_Cauchy : BaselProblem := by
         atTop (𝓝 L) := hsummable.hasSum.tendsto_sum_nat
     have hshift := hpart.comp (tendsto_add_atTop_nat 1)
     exact hshift.congr fun n => (hD_eq n).symm
-  -- key relation: `∑ 1/θ_k² = (2n+1)²/π² · D n`
   have hrel : ∀ n : ℕ, ∑ k ∈ Finset.Icc 1 n, 1 / ((k : ℝ) * π / (2 * n + 1)) ^ 2
       = (2 * (n : ℝ) + 1) ^ 2 / π ^ 2 * D n := by
     intro n
@@ -299,7 +286,6 @@ theorem BaselProblem_Cauchy : BaselProblem := by
     have hπ0 : π ≠ 0 := hπ.ne'
     have h2n : (2 * (n : ℝ) + 1) ≠ 0 := by positivity
     field_simp
-  -- the lower and upper bounding sequences
   set g : ℕ → ℝ := fun n => π ^ 2 * ((n : ℝ) * (2 * n - 1) / 3) / (2 * n + 1) ^ 2 with hgdef
   set h : ℕ → ℝ := fun n => π ^ 2 * ((n : ℝ) * (2 * n - 1) / 3 + n) / (2 * n + 1) ^ 2 with hhdef
   have hgD : ∀ n, g n ≤ D n := by
@@ -341,7 +327,6 @@ theorem BaselProblem_Cauchy : BaselProblem := by
     rw [show π ^ 2 * ((2 * (n : ℝ) + 1) ^ 2 / π ^ 2 * D n) = (2 * (n : ℝ) + 1) ^ 2 * D n by
       field_simp] at key
     nlinarith [key]
-  -- both bounds tend to `π²/6`
   have htends : ∀ c : ℝ, Tendsto (fun n : ℕ => π ^ 2 * ((n : ℝ) * (2 * n - 1) / 3 + c * n)
       / (2 * n + 1) ^ 2) atTop (𝓝 (π ^ 2 / 6)) := by
     intro c
@@ -365,7 +350,6 @@ theorem BaselProblem_Cauchy : BaselProblem := by
     have := htends 1
     simp only [one_mul] at this
     exact this.congr fun n => by rw [hhdef]
-  -- squeeze, then identify the two limits of `D`
   have hDπ : Tendsto D atTop (𝓝 (π ^ 2 / 6)) :=
     tendsto_of_tendsto_of_tendsto_of_le_of_le hgπ hhπ hgD hDh
   change L = π ^ 2 / 6
