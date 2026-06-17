@@ -40,7 +40,6 @@ $`c_n = \frac{(-1)^n}{2\pi i n} \cdot 2\pi`, whose squared modulus is
 $`\lvert c_n \rvert^2 = 1/n^2`, while $`c_0 = 0` because $`f` is odd. Hence the
 identity $`\lvert c_0 \rvert^2 = 1/0^2 = 0` makes $`\lvert c_n\rvert^2 = 1/n^2`
 hold for every integer $`n`.
-
 Parseval's identity states
 $`\sum_{n \in \mathbb{Z}} \lvert c_n \rvert^2
   = \frac{1}{2\pi} \int_{-\pi}^{\pi} \lvert f(x) \rvert^2 \, dx`.
