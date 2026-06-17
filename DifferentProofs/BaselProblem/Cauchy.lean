@@ -25,7 +25,7 @@ private lemma I_pow_two_mul_add_one (j : ℕ) : (I : ℂ) ^ (2 * j + 1) = (-1) ^
 /-- De Moivre expansion of `sin ((2n+1)θ)` as an odd polynomial in `sin θ` and `cos θ`. -/
 lemma sin_two_mul_add_one (n : ℕ) (θ : ℝ) :
     Real.sin ((2 * n + 1) * θ) =
-      ∑ j ∈ range (n + 1), (-1) ^ j * (Nat.choose (2 * n + 1) (2 * j + 1) : ℝ)
+      ∑ j ∈ range (n + 1), (-1 : ℝ) ^ j * Nat.choose (2 * n + 1) (2 * j + 1)
         * Real.cos θ ^ (2 * (n - j)) * Real.sin θ ^ (2 * j + 1) := by
   have hL : Real.sin ((2 * n + 1) * θ)
       = ((Complex.cos (θ : ℂ) + Complex.sin (θ : ℂ) * I) ^ (2 * n + 1)).im := by
@@ -38,31 +38,33 @@ lemma sin_two_mul_add_one (n : ℕ) (θ : ℝ) :
     push_cast
     ring_nf
   rw [hL, ← Complex.ofReal_cos, ← Complex.ofReal_sin, add_pow, Complex.im_sum]
-  refine (Finset.sum_of_injOn (fun j => 2 * (n - j)) ?_ ?_ ?_ ?_).symm
+  refine (Finset.sum_of_injOn (fun j ↦ 2 * (n - j)) ?_ ?_ ?_ ?_).symm
   · intro a ha b hb hab
     simp only [coe_range, Set.mem_Iio] at ha hb
     have h2 : 2 * (n - a) = 2 * (n - b) := hab
-    omega
+    lia
   · intro j hj
     simp only [coe_range, Set.mem_Iio] at hj ⊢
-    omega
+    lia
   · intro i hi hni
     rw [mem_range] at hi
     have hodd : Odd i := by
       rw [← Nat.not_even_iff_odd]
       rintro ⟨m, rfl⟩
-      exact hni ⟨n - m, by simp only [coe_range, Set.mem_Iio]; omega, by dsimp only; omega⟩
+      exact hni ⟨n - m, by simp only [coe_range, Set.mem_Iio]; lia, by dsimp only; lia⟩
     obtain ⟨m, rfl⟩ := hodd
-    rw [show 2 * n + 1 - (2 * m + 1) = 2 * (n - m) by omega, mul_pow, ← Complex.ofReal_pow,
+    rw [show 2 * n + 1 - (2 * m + 1) = 2 * (n - m) by lia, mul_pow, ← Complex.ofReal_pow,
       I_pow_two_mul, show ((-1 : ℂ)) = ((-1 : ℝ) : ℂ) by norm_num]
     simp only [← Complex.ofReal_pow, ← Complex.ofReal_mul, Complex.mul_im, Complex.ofReal_re,
       Complex.ofReal_im, Complex.natCast_re, Complex.natCast_im, mul_zero, zero_mul, add_zero]
   · intro j hj
     rw [mem_range] at hj
-    rw [show 2 * n + 1 - 2 * (n - j) = 2 * j + 1 by omega, mul_pow, ← Complex.ofReal_pow,
-      I_pow_two_mul_add_one, show ((-1 : ℂ)) = ((-1 : ℝ) : ℂ) by norm_num,
-      show Nat.choose (2 * n + 1) (2 * (n - j)) = Nat.choose (2 * n + 1) (2 * j + 1) by
-        rw [← Nat.choose_symm (by omega)]; congr 1; omega]
+    have hsymm : Nat.choose (2 * n + 1) (2 * (n - j)) = Nat.choose (2 * n + 1) (2 * j + 1) := by
+      rw [← Nat.choose_symm (by lia)]
+      congr 1
+      lia
+    rw [show 2 * n + 1 - 2 * (n - j) = 2 * j + 1 by lia, mul_pow, ← Complex.ofReal_pow,
+      I_pow_two_mul_add_one, show ((-1 : ℂ)) = ((-1 : ℝ) : ℂ) by norm_num, hsymm]
     simp only [← Complex.ofReal_pow, Complex.mul_im, Complex.mul_re, Complex.ofReal_re,
       Complex.ofReal_im, Complex.I_re, Complex.I_im, Complex.natCast_re, Complex.natCast_im,
       mul_zero, mul_one, zero_mul, sub_zero, add_zero, zero_add]
@@ -71,44 +73,44 @@ lemma sin_two_mul_add_one (n : ℕ) (θ : ℝ) :
 open Polynomial in
 /-- The degree-`n` polynomial whose roots are `(cot (kπ/(2n+1)))²` for `k = 1, …, n`. -/
 noncomputable def cotPoly (n : ℕ) : ℝ[X] :=
-  ∑ j ∈ range (n + 1), C ((-1) ^ j * (Nat.choose (2 * n + 1) (2 * j + 1) : ℝ)) * X ^ (n - j)
+  ∑ j ∈ range (n + 1), C ((-1 : ℝ) ^ j * Nat.choose (2 * n + 1) (2 * j + 1)) * X ^ (n - j)
 
 open Polynomial in
-/-- Evaluating `cotPoly` at `(cos θ / sin θ)²` recovers `sin ((2n+1)θ) / sin θ ^ (2n+1)`. -/
+/-- Evaluating `cotPoly` at `(cot θ)²` recovers `sin ((2n+1)θ) / sin θ ^ (2n+1)`. -/
 lemma cotPoly_eval (n : ℕ) (θ : ℝ) (hθ : Real.sin θ ≠ 0) :
-    (cotPoly n).eval ((Real.cos θ / Real.sin θ) ^ 2) * Real.sin θ ^ (2 * n + 1)
+    (cotPoly n).eval (Real.cot θ ^ 2) * Real.sin θ ^ (2 * n + 1)
       = Real.sin ((2 * n + 1) * θ) := by
-  rw [sin_two_mul_add_one, cotPoly, eval_finsetSum, Finset.sum_mul]
-  refine Finset.sum_congr rfl fun j hj => ?_
+  rw [Real.cot_eq_cos_div_sin, sin_two_mul_add_one, cotPoly, eval_finsetSum, Finset.sum_mul]
+  refine Finset.sum_congr rfl fun j hj ↦ ?_
   rw [mem_range] at hj
   simp only [eval_mul, eval_C, eval_pow, eval_X]
-  rw [← pow_mul, div_pow, show 2 * n + 1 = 2 * (n - j) + (2 * j + 1) by omega, pow_add]
+  rw [← pow_mul, div_pow, show 2 * n + 1 = 2 * (n - j) + (2 * j + 1) by lia, pow_add]
   field_simp
 
 open Polynomial in
 lemma cotPoly_coeff (n d : ℕ) (hd : d ≤ n) :
-    (cotPoly n).coeff d = (-1) ^ (n - d) * (Nat.choose (2 * n + 1) (2 * (n - d) + 1) : ℝ) := by
+    (cotPoly n).coeff d = (-1 : ℝ) ^ (n - d) * Nat.choose (2 * n + 1) (2 * (n - d) + 1) := by
   rw [cotPoly, finsetSum_coeff, Finset.sum_eq_single (n - d)]
-  · rw [coeff_C_mul, coeff_X_pow, if_pos (by omega), mul_one]
+  · rw [coeff_C_mul, coeff_X_pow, if_pos (by lia), mul_one]
   · intro j hj hjd
     rw [mem_range] at hj
-    rw [coeff_C_mul, coeff_X_pow, if_neg (by omega), mul_zero]
-  · intro h; exact absurd (mem_range.mpr (by omega)) h
+    rw [coeff_C_mul, coeff_X_pow, if_neg (by lia), mul_zero]
+  · intro h; exact absurd (mem_range.mpr (by lia)) h
 
 open Polynomial in
 lemma cotPoly_coeff_eq_zero (n d : ℕ) (hd : n < d) : (cotPoly n).coeff d = 0 := by
   rw [cotPoly, finsetSum_coeff, Finset.sum_eq_zero]
   intro j hj
   rw [mem_range] at hj
-  rw [coeff_C_mul, coeff_X_pow, if_neg (by omega), mul_zero]
+  rw [coeff_C_mul, coeff_X_pow, if_neg (by lia), mul_zero]
 
 open Polynomial in
 lemma cotPoly_natDegree (n : ℕ) : (cotPoly n).natDegree = n := by
-  refine le_antisymm (natDegree_le_iff_coeff_eq_zero.mpr fun d hd => cotPoly_coeff_eq_zero n d hd)
+  refine le_antisymm (natDegree_le_iff_coeff_eq_zero.mpr fun d hd ↦ cotPoly_coeff_eq_zero n d hd)
     (le_natDegree_of_ne_zero ?_)
   rw [cotPoly_coeff n n le_rfl]
   simp only [Nat.sub_self, pow_zero, one_mul, mul_zero, zero_add, Nat.choose_one_right]
-  exact Nat.cast_ne_zero.mpr (by omega)
+  exact Nat.cast_ne_zero.mpr (by lia)
 
 open Polynomial in
 lemma cotPoly_leadingCoeff (n : ℕ) : (cotPoly n).leadingCoeff = (2 * n + 1 : ℝ) := by
@@ -132,7 +134,7 @@ lemma theta_mem (n k : ℕ) (hk1 : 1 ≤ k) (hk2 : k ≤ n) :
 /-- `(cot (kπ/(2n+1)))²` is a root of `cotPoly n` for `1 ≤ k ≤ n`. -/
 lemma cotPoly_eval_eq_zero (n k : ℕ) (hk1 : 1 ≤ k) (hk2 : k ≤ n) :
     (cotPoly n).eval
-      ((Real.cos ((k : ℝ) * π / (2 * n + 1)) / Real.sin ((k : ℝ) * π / (2 * n + 1))) ^ 2) = 0 := by
+      (Real.cot ((k : ℝ) * π / (2 * n + 1)) ^ 2) = 0 := by
   obtain ⟨hpos, hlt⟩ := theta_mem n k hk1 hk2
   have hsin : Real.sin ((k : ℝ) * π / (2 * n + 1)) ≠ 0 :=
     (Real.sin_pos_of_pos_of_lt_pi hpos (hlt.trans (by linarith [pi_pos]))).ne'
@@ -144,8 +146,8 @@ lemma cotPoly_eval_eq_zero (n k : ℕ) (hk1 : 1 ≤ k) (hk2 : k ≤ n) :
 
 /-- Distinctness of the roots: `k ↦ (cot (kπ/(2n+1)))²` is injective on `{1, …, n}`. -/
 lemma cotSq_injOn (n : ℕ) :
-    Set.InjOn (fun k : ℕ =>
-        (Real.cos ((k : ℝ) * π / (2 * n + 1)) / Real.sin ((k : ℝ) * π / (2 * n + 1))) ^ 2)
+    Set.InjOn (fun k : ℕ ↦
+        Real.cot ((k : ℝ) * π / (2 * n + 1)) ^ 2)
       ↑(Finset.Icc 1 n) := by
   intro a ha b hb hab
   simp only [Finset.coe_Icc, Set.mem_Icc] at ha hb
@@ -157,7 +159,7 @@ lemma cotSq_injOn (n : ℕ) :
   have hcb : 0 < Real.cos β := Real.cos_pos_of_mem_Ioo ⟨by linarith [pi_pos], hbpos⟩
   have hsa : 0 < Real.sin α := Real.sin_pos_of_pos_of_lt_pi ha0 (by linarith [pi_pos])
   have hsb : 0 < Real.sin β := Real.sin_pos_of_pos_of_lt_pi hb0 (by linarith [pi_pos])
-  simp only at hab
+  simp only [Real.cot_eq_cos_div_sin] at hab
   have hbase : Real.cos α / Real.sin α = Real.cos β / Real.sin β := by
     rw [← Real.sqrt_sq (div_pos hca hsa).le, ← Real.sqrt_sq (div_pos hcb hsb).le, hab]
   have htan : Real.tan α = Real.tan β := by
@@ -168,7 +170,10 @@ lemma cotSq_injOn (n : ℕ) :
     Real.strictMonoOn_tan.injOn ⟨by linarith [pi_pos], hapos⟩ ⟨by linarith [pi_pos], hbpos⟩ htan
   have h2n : (2 * (n : ℝ) + 1) ≠ 0 := by positivity
   have hab' : (a : ℝ) = b := by
-    have h := hαβ; rw [hα, hβ] at h; field_simp at h; exact h
+    have h := hαβ
+    rw [hα, hβ] at h
+    field_simp at h
+    exact h
   exact_mod_cast hab'
 
 open Polynomial in
@@ -176,14 +181,14 @@ open Polynomial in
 obtained from Vieta's formula applied to `cotPoly n`. -/
 lemma cotSq_sum (n : ℕ) (hn : 1 ≤ n) :
     ∑ k ∈ Finset.Icc 1 n,
-        (Real.cos ((k : ℝ) * π / (2 * n + 1)) / Real.sin ((k : ℝ) * π / (2 * n + 1))) ^ 2
+        Real.cot ((k : ℝ) * π / (2 * n + 1)) ^ 2
       = (n : ℝ) * (2 * n - 1) / 3 := by
   classical
-  set f : ℕ → ℝ := fun k =>
-    (Real.cos ((k : ℝ) * π / (2 * n + 1)) / Real.sin ((k : ℝ) * π / (2 * n + 1))) ^ 2 with hf
+  set f : ℕ → ℝ := fun k ↦
+    Real.cot ((k : ℝ) * π / (2 * n + 1)) ^ 2 with hf
   set S : Finset ℝ := (Finset.Icc 1 n).image f with hS
   have hScard : S.card = n := by
-    rw [hS, Finset.card_image_of_injOn (cotSq_injOn n), Nat.card_Icc]; omega
+    rw [hS, Finset.card_image_of_injOn (cotSq_injOn n), Nat.card_Icc]; lia
   have hle : S.val ≤ (cotPoly n).roots := by
     rw [Multiset.le_iff_count]
     intro x
@@ -204,8 +209,8 @@ lemma cotSq_sum (n : ℕ) (hn : 1 ≤ n) :
   have hvieta := hsplit.nextCoeff_eq_neg_sum_roots_mul_leadingCoeff
   rw [cotPoly_leadingCoeff, ← hroots] at hvieta
   have hnext : (cotPoly n).nextCoeff = -(Nat.choose (2 * n + 1) 3 : ℝ) := by
-    rw [nextCoeff, if_neg (by rw [cotPoly_natDegree]; omega), cotPoly_natDegree,
-      cotPoly_coeff n (n - 1) (by omega), show n - (n - 1) = 1 by omega]
+    rw [nextCoeff, if_neg (by rw [cotPoly_natDegree]; lia), cotPoly_natDegree,
+      cotPoly_coeff n (n - 1) (by lia), show n - (n - 1) = 1 by lia]
     norm_num
   rw [hnext] at hvieta
   have hsumeq : S.val.sum = ∑ k ∈ Finset.Icc 1 n, f k := by
@@ -216,11 +221,13 @@ lemma cotSq_sum (n : ℕ) (hn : 1 ≤ n) :
       have h := Nat.descFactorial_eq_factorial_mul_choose (2 * n + 1) 3
       have hval : Nat.descFactorial (2 * n + 1) 3 = (2 * n - 1) * (2 * n) * (2 * n + 1) := by
         simp only [Nat.descFactorial, Nat.sub_zero, Nat.mul_one,
-          show 2 * n + 1 - 2 = 2 * n - 1 by omega, show 2 * n + 1 - 1 = 2 * n by omega]
+          show 2 * n + 1 - 2 = 2 * n - 1 by lia, show 2 * n + 1 - 1 = 2 * n by lia]
         ring
-      rw [hval] at h; simp only [Nat.factorial] at h; omega
+      rw [hval] at h
+      simp only [Nat.factorial] at h
+      lia
     have := congrArg (Nat.cast (R := ℝ)) hnat
-    push_cast [Nat.cast_sub (by omega : 1 ≤ 2 * n)] at this
+    push_cast [Nat.cast_sub (by lia : 1 ≤ 2 * n)] at this
     linarith [this]
   have h2n : (2 * (n : ℝ) + 1) ≠ 0 := by positivity
   have hv : (Nat.choose (2 * n + 1) 3 : ℝ) = (2 * (n : ℝ) + 1) * S.val.sum := by linarith [hvieta]
@@ -231,23 +238,25 @@ lemma cotSq_sum (n : ℕ) (hn : 1 ≤ n) :
 
 /-- For `x ∈ (0, π/2)`, `cot²x < 1/x²`. -/
 lemma cotSq_lt_inv_sq (x : ℝ) (hx0 : 0 < x) (hx : x < π / 2) :
-    (Real.cos x / Real.sin x) ^ 2 < 1 / x ^ 2 := by
+    Real.cot x ^ 2 < 1 / x ^ 2 := by
   have hcos : 0 < Real.cos x := Real.cos_pos_of_mem_Ioo ⟨by linarith [pi_pos], hx⟩
   have hsin : 0 < Real.sin x := Real.sin_pos_of_pos_of_lt_pi hx0 (by linarith [pi_pos])
   have htan : x < Real.tan x := Real.lt_tan hx0 hx
   rw [Real.tan_eq_sin_div_cos, lt_div_iff₀ hcos] at htan
   have h1 : Real.cos x / Real.sin x < 1 / x := by
     rw [div_lt_div_iff₀ hsin hx0]; nlinarith [htan]
-  rw [show (1 : ℝ) / x ^ 2 = (1 / x) ^ 2 by rw [div_pow, one_pow]]
+  rw [Real.cot_eq_cos_div_sin, show (1 : ℝ) / x ^ 2 = (1 / x) ^ 2 by rw [div_pow, one_pow]]
   exact pow_lt_pow_left₀ h1 (div_pos hcos hsin).le two_ne_zero
 
 /-- For `x ∈ (0, π/2)`, `1/x² < 1 + cot²x` (right half of the squeeze; `csc² = 1 + cot²`). -/
 lemma inv_sq_lt_one_add_cotSq (x : ℝ) (hx0 : 0 < x) (hx : x < π / 2) :
-    1 / x ^ 2 < 1 + (Real.cos x / Real.sin x) ^ 2 := by
+    1 / x ^ 2 < 1 + Real.cot x ^ 2 := by
   have hsin : 0 < Real.sin x := Real.sin_pos_of_pos_of_lt_pi hx0 (by linarith [pi_pos])
   have hsinlt : Real.sin x < x := Real.sin_lt hx0
-  have hcsc : 1 + (Real.cos x / Real.sin x) ^ 2 = 1 / Real.sin x ^ 2 := by
-    rw [div_pow]; field_simp; linarith [Real.sin_sq_add_cos_sq x]
+  have hcsc : 1 + Real.cot x ^ 2 = 1 / Real.sin x ^ 2 := by
+    rw [Real.cot_eq_cos_div_sin, div_pow]
+    field_simp
+    linarith [Real.sin_sq_add_cos_sq x]
   rw [hcsc]
   exact one_div_lt_one_div_of_lt (by positivity)
     (pow_lt_pow_left₀ hsinlt hsin.le two_ne_zero)
@@ -255,7 +264,7 @@ lemma inv_sq_lt_one_add_cotSq (x : ℝ) (hx0 : 0 < x) (hx : x < π / 2) :
 open Filter Topology in
 /-- A linear-over-linear ratio with matching leading coefficients tends to `1`. -/
 private lemma tendsto_lin_ratio (a : ℝ) :
-    Tendsto (fun n : ℕ => (a + 2 * (n : ℝ)) / (1 + 2 * (n : ℝ))) atTop (𝓝 1) := by
+    Tendsto (fun n : ℕ ↦ (a + 2 * (n : ℝ)) / (1 + 2 * (n : ℝ))) atTop (𝓝 1) := by
   have h2 : (2 : ℝ) ≠ 0 := two_ne_zero
   have := tendsto_add_mul_div_add_mul_atTop_nhds a 1 2 h2
   rwa [div_self h2] at this
@@ -263,40 +272,42 @@ private lemma tendsto_lin_ratio (a : ℝ) :
 open Filter Topology in
 theorem BaselProblem_Cauchy : BaselProblem := by
   have hπ : (0 : ℝ) < π := pi_pos
-  have hsummable : Summable (fun k : ℕ => (1 : ℝ) / (k : ℝ) ^ 2) :=
+  have hsummable : Summable (fun k : ℕ ↦ (1 : ℝ) / (k : ℝ) ^ 2) :=
     summable_one_div_nat_pow.mpr one_lt_two
   set L := ∑' k : ℕ, (1 : ℝ) / (k : ℝ) ^ 2 with hLdef
-  set D : ℕ → ℝ := fun n => ∑ k ∈ Finset.Icc 1 n, (1 : ℝ) / (k : ℝ) ^ 2 with hDdef
-  have hD_eq : ∀ n, D n = ∑ k ∈ Finset.range (n + 1), (1 : ℝ) / (k : ℝ) ^ 2 := fun n => by
+  set D : ℕ → ℝ := fun n ↦ ∑ k ∈ Finset.Icc 1 n, (1 : ℝ) / (k : ℝ) ^ 2 with hDdef
+  have hD_eq : ∀ n, D n = ∑ k ∈ Finset.range (n + 1), (1 : ℝ) / (k : ℝ) ^ 2 := fun n ↦ by
     have hins : Finset.range (n + 1) = insert 0 (Finset.Icc 1 n) := by
-      ext x; simp only [Finset.mem_range, Finset.mem_insert, Finset.mem_Icc]; omega
+      ext x
+      simp only [Finset.mem_range, Finset.mem_insert, Finset.mem_Icc]
+      lia
     rw [hDdef, hins, Finset.sum_insert (by simp)]; simp
   have hDL : Tendsto D atTop (𝓝 L) := by
-    have hpart : Tendsto (fun n : ℕ => ∑ k ∈ Finset.range n, (1 : ℝ) / (k : ℝ) ^ 2)
+    have hpart : Tendsto (fun n : ℕ ↦ ∑ k ∈ Finset.range n, (1 : ℝ) / (k : ℝ) ^ 2)
         atTop (𝓝 L) := hsummable.hasSum.tendsto_sum_nat
     have hshift := hpart.comp (tendsto_add_atTop_nat 1)
-    exact hshift.congr fun n => (hD_eq n).symm
+    exact hshift.congr fun n ↦ (hD_eq n).symm
   have hrel : ∀ n : ℕ, ∑ k ∈ Finset.Icc 1 n, 1 / ((k : ℝ) * π / (2 * n + 1)) ^ 2
       = (2 * (n : ℝ) + 1) ^ 2 / π ^ 2 * D n := by
     intro n
     rw [hDdef, Finset.mul_sum]
-    refine Finset.sum_congr rfl fun k hk => ?_
+    refine Finset.sum_congr rfl fun k hk ↦ ?_
     rw [Finset.mem_Icc] at hk
-    have hk0 : (k : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr (by omega)
+    have hk0 : (k : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr (by lia)
     have hπ0 : π ≠ 0 := hπ.ne'
     have h2n : (2 * (n : ℝ) + 1) ≠ 0 := by positivity
     field_simp
-  set g : ℕ → ℝ := fun n => π ^ 2 * ((n : ℝ) * (2 * n - 1) / 3) / (2 * n + 1) ^ 2 with hgdef
-  set h : ℕ → ℝ := fun n => π ^ 2 * ((n : ℝ) * (2 * n - 1) / 3 + n) / (2 * n + 1) ^ 2 with hhdef
+  set g : ℕ → ℝ := fun n ↦ π ^ 2 * ((n : ℝ) * (2 * n - 1) / 3) / (2 * n + 1) ^ 2 with hgdef
+  set h : ℕ → ℝ := fun n ↦ π ^ 2 * ((n : ℝ) * (2 * n - 1) / 3 + n) / (2 * n + 1) ^ 2 with hhdef
   have hgD : ∀ n, g n ≤ D n := by
     intro n
     rcases Nat.eq_zero_or_pos n with rfl | hn
     · simp [hgdef, hDdef]
     have hne : (Finset.Icc 1 n).Nonempty := ⟨1, Finset.mem_Icc.mpr ⟨le_rfl, hn⟩⟩
     have hlt : ∑ k ∈ Finset.Icc 1 n,
-        (Real.cos ((k : ℝ) * π / (2 * n + 1)) / Real.sin ((k : ℝ) * π / (2 * n + 1))) ^ 2
+        Real.cot ((k : ℝ) * π / (2 * n + 1)) ^ 2
         < ∑ k ∈ Finset.Icc 1 n, 1 / ((k : ℝ) * π / (2 * n + 1)) ^ 2 := by
-      refine Finset.sum_lt_sum_of_nonempty hne fun k hk => ?_
+      refine Finset.sum_lt_sum_of_nonempty hne fun k hk ↦ ?_
       rw [Finset.mem_Icc] at hk
       obtain ⟨h0, h2⟩ := theta_mem n k hk.1 hk.2
       exact cotSq_lt_inv_sq _ h0 h2
@@ -313,9 +324,8 @@ theorem BaselProblem_Cauchy : BaselProblem := by
     · simp [hhdef, hDdef]
     have hne : (Finset.Icc 1 n).Nonempty := ⟨1, Finset.mem_Icc.mpr ⟨le_rfl, hn⟩⟩
     have hlt : ∑ k ∈ Finset.Icc 1 n, 1 / ((k : ℝ) * π / (2 * n + 1)) ^ 2 < ∑ k ∈ Finset.Icc 1 n,
-        (1 + (Real.cos ((k : ℝ) * π / (2 * n + 1))
-          / Real.sin ((k : ℝ) * π / (2 * n + 1))) ^ 2) := by
-      refine Finset.sum_lt_sum_of_nonempty hne fun k hk => ?_
+        (1 + Real.cot ((k : ℝ) * π / (2 * n + 1)) ^ 2) := by
+      refine Finset.sum_lt_sum_of_nonempty hne fun k hk ↦ ?_
       rw [Finset.mem_Icc] at hk
       obtain ⟨h0, h2⟩ := theta_mem n k hk.1 hk.2
       exact inv_sq_lt_one_add_cotSq _ h0 h2
@@ -327,10 +337,10 @@ theorem BaselProblem_Cauchy : BaselProblem := by
     rw [show π ^ 2 * ((2 * (n : ℝ) + 1) ^ 2 / π ^ 2 * D n) = (2 * (n : ℝ) + 1) ^ 2 * D n by
       field_simp] at key
     nlinarith [key]
-  have htends : ∀ c : ℝ, Tendsto (fun n : ℕ => π ^ 2 * ((n : ℝ) * (2 * n - 1) / 3 + c * n)
+  have htends : ∀ c : ℝ, Tendsto (fun n : ℕ ↦ π ^ 2 * ((n : ℝ) * (2 * n - 1) / 3 + c * n)
       / (2 * n + 1) ^ 2) atTop (𝓝 (π ^ 2 / 6)) := by
     intro c
-    have key : Tendsto (fun n : ℕ =>
+    have key : Tendsto (fun n : ℕ ↦
         π ^ 2 / 6 * ((0 + 2 * (n : ℝ)) / (1 + 2 * n)) * (((3 * c - 1) + 2 * (n : ℝ)) / (1 + 2 * n)))
         atTop (𝓝 (π ^ 2 / 6)) := by
       have := ((tendsto_const_nhds (x := π ^ 2 / 6)).mul (tendsto_lin_ratio 0)).mul
@@ -338,18 +348,17 @@ theorem BaselProblem_Cauchy : BaselProblem := by
       simpa using this
     refine key.congr' ?_
     filter_upwards [eventually_ne_atTop 0] with n hn
-    have h2n : (2 * (n : ℝ) + 1) ≠ 0 := by positivity
     have : (1 : ℝ) + 2 * (n : ℝ) ≠ 0 := by positivity
     field_simp
     ring
   have hgπ : Tendsto g atTop (𝓝 (π ^ 2 / 6)) := by
     have := htends 0
     simp only [zero_mul, add_zero] at this
-    exact this.congr fun n => by rw [hgdef]
+    exact this.congr fun n ↦ by rw [hgdef]
   have hhπ : Tendsto h atTop (𝓝 (π ^ 2 / 6)) := by
     have := htends 1
     simp only [one_mul] at this
-    exact this.congr fun n => by rw [hhdef]
+    exact this.congr fun n ↦ by rw [hhdef]
   have hDπ : Tendsto D atTop (𝓝 (π ^ 2 / 6)) :=
     tendsto_of_tendsto_of_tendsto_of_le_of_le hgπ hhπ hgD hDh
   change L = π ^ 2 / 6
