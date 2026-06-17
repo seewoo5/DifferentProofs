@@ -40,12 +40,9 @@ lemma sin_two_mul_add_one (n : ℕ) (θ : ℝ) :
   rw [hL, ← Complex.ofReal_cos, ← Complex.ofReal_sin, add_pow, Complex.im_sum]
   refine (Finset.sum_of_injOn (fun j ↦ 2 * (n - j)) ?_ ?_ ?_ ?_).symm
   · intro a ha b hb hab
-    simp only [coe_range, Set.mem_Iio] at ha hb
-    have h2 : 2 * (n - a) = 2 * (n - b) := hab
-    lia
+    grind
   · intro j hj
-    simp only [coe_range, Set.mem_Iio] at hj ⊢
-    lia
+    grind
   · intro i hi hni
     rw [mem_range] at hi
     have hodd : Odd i := by
@@ -169,12 +166,9 @@ lemma cotSq_injOn (n : ℕ) :
   have hαβ : α = β :=
     Real.strictMonoOn_tan.injOn ⟨by linarith [pi_pos], hapos⟩ ⟨by linarith [pi_pos], hbpos⟩ htan
   have h2n : (2 * (n : ℝ) + 1) ≠ 0 := by positivity
-  have hab' : (a : ℝ) = b := by
-    have h := hαβ
-    rw [hα, hβ] at h
-    field_simp at h
-    exact h
-  exact_mod_cast hab'
+  rw [hα, hβ] at hαβ
+  field_simp at hαβ
+  exact_mod_cast hαβ
 
 open Polynomial in
 /-- **Cauchy's identity.** The sum of `(cot (kπ/(2n+1)))²` over `k = 1, …, n` equals `n(2n-1)/3`,
@@ -201,8 +195,7 @@ lemma cotSq_sum (n : ℕ) (hn : 1 ≤ n) :
     · rw [Multiset.count_eq_zero.mpr (by simpa using hx)]; exact Nat.zero_le _
   have hcard : (cotPoly n).roots.card ≤ S.val.card := by
     rw [show S.val.card = n from hScard]
-    calc (cotPoly n).roots.card ≤ (cotPoly n).natDegree := card_roots' _
-      _ = n := cotPoly_natDegree n
+    exact (card_roots' _).trans_eq (cotPoly_natDegree n)
   have hroots : S.val = (cotPoly n).roots := Multiset.eq_of_le_of_card_le hle hcard
   have hsplit : Splits (cotPoly n) := by
     rw [splits_iff_card_roots, ← hroots, cotPoly_natDegree]; exact hScard

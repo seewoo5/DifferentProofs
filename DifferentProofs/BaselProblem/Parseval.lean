@@ -33,8 +33,7 @@ private lemma coeff_norm_sq (n : ℤ) :
       norm_num
     rw [h0]
     simp
-  · have hn' : (n : ℝ) ≠ 0 := Int.cast_ne_zero.mpr hn
-    rw [fourierCoeffOn_of_hasDerivAt neg_pi_lt_pi hn (f' := fun _ ↦ 1)
+  · rw [fourierCoeffOn_of_hasDerivAt neg_pi_lt_pi hn (f' := fun _ ↦ 1)
         (fun x _ ↦ by simpa using (hasDerivAt_id x).ofReal_comp) intervalIntegrable_const,
       fourierCoeffOn_one_eq_zero neg_pi_lt_pi hn,
       mul_zero, sub_zero, norm_mul, norm_mul]
@@ -71,7 +70,6 @@ theorem BaselProblem_Parseval : BaselProblem := by
     rw [show (1 : ℝ) / (0 : ℝ) ^ 2 = 0 by norm_num]
     ring
   change ∑' n : ℕ, (1 : ℝ) / (n : ℝ) ^ 2 = π ^ 2 / 6
-  have hπ : π ≠ 0 := pi_ne_zero
   have h2S := hconv.symm.trans hp
   rw [show (π - -π)⁻¹ * (2 * π ^ 3 / 3) = π ^ 2 / 3 by field_simp; ring] at h2S
   linarith [h2S]
