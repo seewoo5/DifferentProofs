@@ -15,21 +15,19 @@ set_option linter.style.longLine false
 #doc (Manual) "Basel problem" =>
 
 :::group "grp:basel"
-Statements and proofs of the Basel problem, the evaluation of the sum of the
-reciprocals of the squares.
+Basel problem.
 :::
 
 :::definition "def:basel" (parent := "grp:basel") (lean := "BaselProblem")
 The Basel problem asserts the value of the convergent series
 $`\sum_{n \geq 1} \frac{1}{n^2} = \frac{\pi^2}{6}`. The summand at $`n = 0` is
-$`1 / 0 = 0` by convention, so the natural-number sum agrees with the series
-over positive integers.
+$`1 / 0 = 0` by convention.
 :::
 
+First proof uses Parseval's identity, applied to the function $`f(x) = x` on $`(-\pi, \pi]`.
+
 :::theorem "thm:basel-parseval" (parent := "grp:basel") (lean := "BaselProblem.BaselProblem_Parseval")
-The sum $`\sum_{n \geq 1} \frac{1}{n^2}` equals $`\frac{\pi^2}{6}`. This proof
-uses Parseval's identity for the Fourier series of the function $`x \mapsto x`
-and proves {uses "def:basel"}[].
+$`\sum_{n \geq 1} \frac{1}{n^2} = \frac{\pi^2}{6}`.
 :::
 
 :::proof "thm:basel-parseval"
@@ -49,10 +47,12 @@ is $`\sum_{n \in \mathbb{Z}} \frac{1}{n^2}
   = 2 \sum_{n \geq 1} \frac{1}{n^2}` because the summand is even and the
 $`n = 0` term vanishes. Equating the two sides gives
 $`2 \sum_{n \geq 1} \frac{1}{n^2} = \frac{\pi^2}{3}`, hence
-$`\sum_{n \geq 1} \frac{1}{n^2} = \frac{\pi^2}{6}`.
+$`\sum_{n \geq 1} \frac{1}{n^2} = \frac{\pi^2}{6}`, the value asserted by the
+Basel problem {uses "def:basel"}[].
 :::
 
-The remaining entries record the main steps of Cauchy's proof.
+Second proof uses Cauchy's method of bounding the partial sums by evaluating a certain
+trigonometric polynomial at the angles $`\frac{k\pi}{2n+1}` for $`k = 1, \dots, n`.
 
 :::lemma_ "lem:de-moivre" (parent := "grp:basel") (lean := "BaselProblem.Cauchy.sin_two_mul_add_one")
 For all $`\theta \in \mathbb{R}` and $`n \in \mathbb{N}`,
@@ -122,9 +122,7 @@ $`\frac{1}{x^2} < \frac{1}{\sin^2 x} = 1 + \cot^2 x`.
 :::
 
 :::theorem "thm:basel-cauchy" (parent := "grp:basel") (lean := "BaselProblem.Cauchy.BaselProblem_Cauchy")
-The sum $`\sum_{n \geq 1} \frac{1}{n^2}` equals $`\frac{\pi^2}{6}`. This is
-Cauchy's elementary proof by a cotangent squeeze, using no analytic machinery
-beyond limits, and proves {uses "def:basel"}[].
+$`\sum_{n \geq 1} \frac{1}{n^2} = \frac{\pi^2}{6}`.
 :::
 
 :::proof "thm:basel-cauchy"
@@ -139,5 +137,5 @@ $`\frac{n(2n-1)}{3} < \frac{(2n+1)^2}{\pi^2} \sum_{k=1}^n \frac{1}{k^2}
 Multiplying through by $`\frac{\pi^2}{(2n+1)^2}` sandwiches the partial sum
 $`\sum_{k=1}^n \frac{1}{k^2}` between two sequences both tending to
 $`\frac{\pi^2}{6}`, so by the squeeze theorem the series converges to
-$`\frac{\pi^2}{6}`.
+$`\frac{\pi^2}{6}`, the value asserted by the Basel problem {uses "def:basel"}[].
 :::

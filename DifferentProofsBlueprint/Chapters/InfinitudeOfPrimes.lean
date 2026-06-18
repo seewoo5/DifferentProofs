@@ -19,7 +19,7 @@ set_option linter.style.longLine false
 #doc (Manual) "Infinitude of Primes" =>
 
 :::group "grp:inf-primes"
-Equivalent formulations and proofs of the infinitude of primes.
+Infinitude of primes.
 :::
 
 :::definition "def:inf-primes" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes")
@@ -40,15 +40,7 @@ Specialize the general characterization of infinite subsets of a locally finite
 linear order to the set of natural primes.
 :::
 
-:::theorem "thm:inf-primes-euclid-factorial" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_Euclid")
-There are infinitely many prime numbers. This proof uses Euclid's factorial
-argument and proves {uses "def:inf-primes"}[].
-:::
-
-:::proof "thm:inf-primes-euclid-factorial"
-If all primes were bounded by $`n`, a prime divisor of $`n! + 1` would both
-divide $`n!` and divide $`n! + 1`, hence divide $`1`, impossible.
-:::
+First proof is by Euclid.
 
 :::theorem "thm:inf-primes-euclid-prod-primes" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_Euclid'")
 There are infinitely many prime numbers. This proof uses the product of the
@@ -60,6 +52,20 @@ If the set of primes were finite, a prime divisor of one plus their product
 would already lie in the set, and therefore divide both the product and the
 product plus one.
 :::
+
+A variant of Euclid's proof uses $`n! + 1` instead of the product of all primes.
+
+:::theorem "thm:inf-primes-euclid-factorial" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_Euclid")
+There are infinitely many prime numbers.
+:::
+
+:::proof "thm:inf-primes-euclid-factorial"
+If all primes were bounded by $`n`, a prime divisor of $`n! + 1` would both
+divide $`n!` and divide $`n! + 1`, hence divide $`1`, impossible; so the primes
+are infinite {uses "def:inf-primes"}[].
+:::
+
+Second proof is by Goldbach, using Fermat numbers $`F_n = 2^{2^n} + 1` and their pairwise coprimality.
 
 :::definition "def:fermat-number" (parent := "grp:inf-primes") (lean := "Fermat")
 The $`n`-th Fermat number is $`F_n = 2^{2^n} + 1`.
@@ -115,14 +121,16 @@ numbers, which is coprime to $`F_n`.
 :::
 
 :::theorem "thm:inf-primes-goldbach" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_Goldbach")
-There are infinitely many prime numbers. Goldbach's proof uses Fermat numbers,
-especially {uses "lem:fermat-pairwise-coprime"}[].
+There are infinitely many prime numbers.
 :::
 
 :::proof "thm:inf-primes-goldbach"
-Each Fermat number has a prime divisor. Pairwise coprimality makes the chosen
-prime divisors pairwise distinct, producing infinitely many primes.
+Each Fermat number has a prime divisor. Pairwise coprimality
+{uses "lem:fermat-pairwise-coprime"}[] makes the chosen prime divisors pairwise
+distinct, producing infinitely many primes.
 :::
+
+Third proof is by Euler, using the divergence of the harmonic series and the Euler product formula.
 
 :::theorem "thm:harmonic-unbounded" (parent := "grp:inf-primes") (lean := "harmonic_unbounded")
 The harmonic series is unbounded.
@@ -144,15 +152,17 @@ contains terms corresponding to reciprocals of positive integers up to $`n`.
 :::
 
 :::theorem "thm:inf-primes-euler" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_Euler")
-There are infinitely many prime numbers. Euler's proof depends on
-{uses "thm:harmonic-unbounded"}[] and {uses "thm:euler-prod-ge-harmonic"}[].
+There are infinitely many prime numbers.
 :::
 
 :::proof "thm:inf-primes-euler"
 If there were only finitely many primes, the Euler product over all of them
 would be fixed. But the product over primes below a sufficiently large bound
-dominates arbitrarily large harmonic sums, a contradiction.
+{uses "thm:euler-prod-ge-harmonic"}[] dominates arbitrarily large harmonic sums
+{uses "thm:harmonic-unbounded"}[], a contradiction.
 :::
+
+Fourth proof is by Saidak, using the sequence $`a_0 = 2` and $`a_{n+1} = a_n(a_n+1)`.
 
 :::definition "def:saidak-sequence" (parent := "grp:inf-primes") (lean := "a")
 Saidak's sequence is defined by $`a_0 = 2` and
@@ -180,15 +190,16 @@ $`a_{n+1}` split as a disjoint union of the prime factors of the two factors.
 :::
 
 :::theorem "thm:inf-primes-saidak" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_Saidak")
-There are infinitely many prime numbers. Saidak's proof uses
-{uses "lem:saidak-primeFactors-card"}[].
+There are infinitely many prime numbers.
 :::
 
 :::proof "thm:inf-primes-saidak"
 If only finitely many primes existed, the number of prime factors of any
 $`a_n` would be bounded by that finite set, contradicting the previous lemma
-for large $`n`.
+{uses "lem:saidak-primeFactors-card"}[] for large $`n`.
 :::
+
+Fifth proof is by Wunderlich, using Fibonacci numbers, their coprimality, and the fact that $`F_{37}` has three distinct prime factors.
 
 :::lemma_ "lem:fib-37-factorization" (parent := "grp:inf-primes") (lean := "fib_37")
 The Fibonacci number $`F_{37}` factors as $`73 \cdot 149 \cdot 2221`.
@@ -217,14 +228,13 @@ $`\gcd(F_m,F_n) = F_{\gcd(m,n)}` reduces the result to $`F_1=1`.
 :::
 
 :::theorem "thm:inf-primes-wunderlich" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_Wunderlich")
-There are infinitely many prime numbers. Wunderlich's proof uses Fibonacci
-numbers, especially {uses "lem:fib-37-factorization"}[],
-{uses "lem:fib-prime-ge-two"}[], and
-{uses "lem:fib-coprime-distinct-primes"}[].
+There are infinitely many prime numbers.
 :::
 
 :::proof "thm:inf-primes-wunderlich"
-Assuming finitely many primes, look at Fibonacci numbers indexed by odd primes.
-They are pairwise coprime, but $`F_{37}` already has three distinct prime
-factors, contradicting the finite counting bound.
+Assuming finitely many primes, look at Fibonacci numbers indexed by odd primes,
+each at least $`2` {uses "lem:fib-prime-ge-two"}[]. They are pairwise coprime
+{uses "lem:fib-coprime-distinct-primes"}[], but $`F_{37}` already has three
+distinct prime factors {uses "lem:fib-37-factorization"}[], contradicting the
+finite counting bound.
 :::
