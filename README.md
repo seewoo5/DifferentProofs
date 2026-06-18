@@ -26,3 +26,8 @@ This project contains formalizations of different proofs of the same mathematica
 - [Using infinite descent](DifferentProofs/IrrationalSqrtTwo/Descent.lean)
 - [Using 2-adic valuations](DifferentProofs/IrrationalSqrtTwo/Valuation.lean)
 - [Using Fermat's last theorem for n = 3](DifferentProofs/IrrationalSqrtTwo/FermatLastTheorem.lean)
+
+### Basel problem
+
+- [Using Parseval's identity](DifferentProofs/BaselProblem/Parseval.lean)
+- [Using Cauchy's cotangent squeeze](DifferentProofs/BaselProblem/Cauchy.lean)

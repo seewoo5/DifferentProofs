@@ -18,7 +18,7 @@ set_option linter.style.longLine false
 #doc (Manual) "Fermat's Little Theorem" =>
 
 :::group "grp:flt"
-Statements and proofs of Fermat's Little Theorem.
+Fermat's Little Theorem.
 :::
 
 :::definition "def:flt" (parent := "grp:flt") (lean := "FermatLittleTheorem")
@@ -42,9 +42,11 @@ number `((a : ZMod p).val)`, so the natural-number congruence transfers back
 through the canonical map.
 :::
 
+
+First proof uses the binomial theorem.
+
 :::theorem "thm:flt-binomial" (parent := "grp:flt") (lean := "FermatLittleTheorem_Binomial")
 For any prime $`p` and integer $`a`, one has $`a^p \equiv a \pmod p`.
-This proof uses the binomial theorem.
 :::
 
 :::proof "thm:flt-binomial"
@@ -53,9 +55,10 @@ $`(x + 1)^p = x^p + 1`. Applying this in `ZMod p` and inducting over natural
 representatives proves the congruence.
 :::
 
+Second proof uses Lagrange's theorem on groups, applied to the multiplicative group of units in $`\mathbb{Z}/p\mathbb{Z}`.
+
 :::theorem "thm:flt-lagrange" (parent := "grp:flt") (lean := "FermatLittleTheorem_Lagrange")
 For any prime $`p` and integer $`a`, one has $`a^p \equiv a \pmod p`.
-This proof uses Lagrange's theorem.
 :::
 
 :::proof "thm:flt-lagrange"
@@ -63,6 +66,8 @@ If $`a` is zero modulo $`p`, the claim is immediate. Otherwise `a` is a unit in
 $`\mathbb{Z}/p\mathbb{Z}`; by Lagrange's theorem its order divides
 $`p - 1`, so $`a^{p-1} = 1`, and multiplying by $`a` gives the result.
 :::
+
+Third proof is by Alkauskas. It is based on a formal product expansion of a certain rational function, which is used to derive the natural-number form of Fermat's Little Theorem.
 
 :::lemma_ "lem:flt-alkauskas-expansion" (parent := "grp:flt") (lean := "FermatLittleTheorem.Alkauskas.exists_intExpansion")
 Let $`g \in \mathbb{Z}[[x]]` be an integer power series of the form
@@ -80,17 +85,18 @@ $`a_{N+1}` can be chosen to match the coefficient of $`x^{N+1}`.
 
 :::theorem "thm:flt-alkauskas" (parent := "grp:flt") (lean := "FermatLittleTheorem.Alkauskas.FermatLittleTheorem_Alkauskas")
 For any prime $`p` and integer $`a`, one has $`a^p \equiv a \pmod p`.
-This proof uses Alkauskas' product expansion and depends on
-{uses "lem:flt-alkauskas-expansion"}[] and {uses "thm:flt-nat-impl-flt"}[].
 :::
 
 :::proof "thm:flt-alkauskas"
-Apply the integer formal product expansion to
-$`\frac{1-(d+1)x}{1-dx}`. Comparing the coefficient of $`x^p` in the negated
+Apply the integer formal product expansion {uses "lem:flt-alkauskas-expansion"}[]
+to $`\frac{1-(d+1)x}{1-dx}`. Comparing the coefficient of $`x^p` in the negated
 logarithmic derivative gives $`p \mid (d+1)^p - d^p - 1`. Telescoping these
-congruences over $`d` proves the natural-number form, then the reduction gives
-the integer form.
+congruences over $`d` proves the natural-number form, then the reduction
+{uses "thm:flt-nat-impl-flt"}[] gives the integer form.
 :::
+
+Fourth proof is by a dynamical argument, using the map $`T_n : [0,1] \to [0,1]`
+defined by $`T_n(x) = \{nx\}` for $`0 \le x < 1` and $`T_n(1) = 1`, and considering the fixed points of $`T_{a^p}` that are not fixed by $`T_a`.
 
 :::definition "def:T" (parent := "grp:flt") (lean := "T")
 For a natural number $`n`, define $`T_n : [0,1] \to [0,1]` by
@@ -127,6 +133,7 @@ the reduction {uses "thm:flt-nat-impl-flt"}[].
 :::
 
 :::proof "thm:flt-dynamical"
+By {uses "thm:flt-nat-impl-flt"}[], it suffices to prove the natural-number form.
 It suffices to prove the natural-number form. For $`a \ge 2`, consider the
 fixed points of $`T_{a^p}` that are not fixed by $`T_a`. Their cardinality is
 $`a^p-a`, and the action of $`T_a` partitions this set into orbits of size
