@@ -15,6 +15,15 @@ experimental.module = true
 name = "checkdecls"
 git = "https://github.com/PatrickMassot/checkdecls.git"
 
+# Pin verso to the reachable v4.30.0 tag. VersoBlueprint v4.30.0 transitively
+# pins verso to an orphaned commit (not on any branch/tag), which a normal
+# `git fetch` cannot retrieve, breaking fresh checkouts. This direct require
+# overrides that inherited pin with the equivalent tagged release.
+[[require]]
+name = "verso"
+git = "https://github.com/leanprover/verso"
+rev = "v4.30.0"
+
 [[require]]
 name = "VersoBlueprint"
 git = "https://github.com/leanprover/verso-blueprint"
