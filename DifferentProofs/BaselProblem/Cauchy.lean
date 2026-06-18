@@ -48,7 +48,7 @@ lemma sin_two_mul_add_one (n : ℕ) (θ : ℝ) :
     have hodd : Odd i := by
       rw [← Nat.not_even_iff_odd]
       rintro ⟨m, rfl⟩
-      exact hni ⟨n - m, by simp only [coe_range, Set.mem_Iio]; lia, by simp; lia⟩
+      exact hni ⟨n - m, by simp only [coe_range, Set.mem_Iio]; lia, by simp only []; lia⟩
     obtain ⟨m, rfl⟩ := hodd
     rw [show 2 * n + 1 - (2 * m + 1) = 2 * (n - m) by lia, mul_pow, ← Complex.ofReal_pow,
       I_pow_two_mul, show ((-1 : ℂ)) = ((-1 : ℝ) : ℂ) by norm_num]
@@ -222,7 +222,7 @@ lemma cotSq_lt_inv_sq (x : ℝ) (hx0 : 0 < x) (hx : x < π / 2) : Real.cot x ^ 2
   have htan : x < Real.tan x := Real.lt_tan hx0 hx
   rw [Real.tan_eq_sin_div_cos, lt_div_iff₀ hcos] at htan
   have h1 : Real.cos x / Real.sin x < 1 / x := by rw [div_lt_div_iff₀ hsin hx0]; nlinarith [htan]
-  rw [Real.cot_eq_cos_div_sin, show (1 : ℝ) / x ^ 2 = (1 / x) ^ 2 by rw [div_pow, one_pow]]
+  rw [Real.cot_eq_cos_div_sin, ← one_div_pow]
   exact pow_lt_pow_left₀ h1 (div_pos hcos hsin).le two_ne_zero
 
 /-- For `x ∈ (0, π/2)`, `1/x² < 1 + cot²x` (right half of the squeeze; `csc² = 1 + cot²`). -/
@@ -243,6 +243,22 @@ private lemma tendsto_lin_ratio (a : ℝ) :
   have h2 : (2 : ℝ) ≠ 0 := two_ne_zero
   have := tendsto_add_mul_div_add_mul_atTop_nhds a 1 2 h2
   rwa [div_self h2] at this
+
+/-- Each squeeze bound `π² · (n(2n-1)/3 + c·n) / (2n+1)²` converges to `π²/6`. -/
+private lemma tendsto_basel_bound (c : ℝ) :
+    Tendsto (fun n : ℕ ↦ π ^ 2 * ((n : ℝ) * (2 * n - 1) / 3 + c * n) / (2 * n + 1) ^ 2)
+      atTop (𝓝 (π ^ 2 / 6)) := by
+  have key : Tendsto (fun n : ℕ ↦
+      π ^ 2 / 6 * ((0 + 2 * (n : ℝ)) / (1 + 2 * n)) * (((3 * c - 1) + 2 * (n : ℝ)) / (1 + 2 * n)))
+      atTop (𝓝 (π ^ 2 / 6)) := by
+    have := ((tendsto_const_nhds (x := π ^ 2 / 6)).mul (tendsto_lin_ratio 0)).mul
+      (tendsto_lin_ratio (3 * c - 1))
+    simpa using this
+  refine key.congr' ?_
+  filter_upwards [eventually_ne_atTop 0] with n hn
+  have : (1 : ℝ) + 2 * (n : ℝ) ≠ 0 := by positivity
+  field_simp
+  ring
 
 theorem BaselProblem_Cauchy : BaselProblem := by
   have hsummable := summable_one_div_nat_pow.mpr one_lt_two
@@ -308,28 +324,8 @@ theorem BaselProblem_Cauchy : BaselProblem := by
     rw [show π ^ 2 * ((2 * (n : ℝ) + 1) ^ 2 / π ^ 2 * D n) = (2 * (n : ℝ) + 1) ^ 2 * D n by
       field_simp] at key
     nlinarith [key]
-  have htends : ∀ c : ℝ, Tendsto (fun n : ℕ ↦ π ^ 2 * ((n : ℝ) * (2 * n - 1) / 3 + c * n)
-      / (2 * n + 1) ^ 2) atTop (𝓝 (π ^ 2 / 6)) := by
-    intro c
-    have key : Tendsto (fun n : ℕ ↦
-        π ^ 2 / 6 * ((0 + 2 * (n : ℝ)) / (1 + 2 * n)) * (((3 * c - 1) + 2 * (n : ℝ)) / (1 + 2 * n)))
-        atTop (𝓝 (π ^ 2 / 6)) := by
-      have := ((tendsto_const_nhds (x := π ^ 2 / 6)).mul (tendsto_lin_ratio 0)).mul
-        (tendsto_lin_ratio (3 * c - 1))
-      simpa using this
-    refine key.congr' ?_
-    filter_upwards [eventually_ne_atTop 0] with n hn
-    have : (1 : ℝ) + 2 * (n : ℝ) ≠ 0 := by positivity
-    field_simp
-    ring
-  have hgπ : Tendsto g atTop (𝓝 (π ^ 2 / 6)) := by
-    have := htends 0
-    simp only [zero_mul, add_zero] at this
-    exact this.congr fun n ↦ by rw [hgdef]
-  have hhπ : Tendsto h atTop (𝓝 (π ^ 2 / 6)) := by
-    have := htends 1
-    simp only [one_mul] at this
-    exact this.congr fun n ↦ by rw [hhdef]
+  have hgπ : Tendsto g atTop (𝓝 (π ^ 2 / 6)) := by grind [tendsto_basel_bound 0]
+  have hhπ : Tendsto h atTop (𝓝 (π ^ 2 / 6)) := by grind [tendsto_basel_bound 1]
   have hDπ : Tendsto D atTop (𝓝 (π ^ 2 / 6)) :=
     tendsto_of_tendsto_of_tendsto_of_le_of_le hgπ hhπ hgD hDh
   change L = π ^ 2 / 6

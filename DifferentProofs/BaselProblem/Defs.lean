@@ -7,5 +7,5 @@ public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 
 open Real
 
--- 1 / 0 = 0
+/-- The **Basel problem**: `∑ 1/n² = π²/6`, where the `n = 0` term is `1 / 0 = 0` by convention. -/
 def BaselProblem : Prop := ∑' n : ℕ, (1 : ℝ) / n ^ 2 = π ^ 2 / 6

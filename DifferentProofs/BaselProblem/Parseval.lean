@@ -31,8 +31,7 @@ private lemma coeff_norm_sq (n : ℤ) :
       simp only [neg_zero, fourier_zero, one_smul]
       rw [intervalIntegral.integral_ofReal, integral_id]
       norm_num
-    rw [h0]
-    simp
+    simp [h0]
   · rw [fourierCoeffOn_of_hasDerivAt neg_pi_lt_pi hn (f' := fun _ ↦ 1)
         (fun x _ ↦ by simpa using (hasDerivAt_id x).ofReal_comp) intervalIntegrable_const,
       fourierCoeffOn_one_eq_zero neg_pi_lt_pi hn,
