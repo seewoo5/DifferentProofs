@@ -31,3 +31,21 @@ This project contains formalizations of different proofs of the same mathematica
 
 - [Using Parseval's identity](DifferentProofs/BaselProblem/Parseval.lean)
 - [Using Cauchy's cotangent squeeze](DifferentProofs/BaselProblem/Cauchy.lean)
+
+## Building and serving the blueprint locally
+
+The [blueprint](https://seewoo5.github.io/DifferentProofs/) is built with
+[Verso](https://github.com/leanprover/verso). To preview it locally:
+
+```sh
+# 1. Build the blueprint and generate the static site into _out/site
+#    (creates _out/site/html-multi/)
+./scripts/ci-pages.sh
+
+# 2. Serve over HTTP and open http://localhost:8000
+python3 -m http.server 8000 -d _out/site/html-multi
+```
+
+The site must be served over HTTP (any static server works, e.g. `npx serve`);
+opening the files directly via `file://` fails because the pages fetch
+`-verso-data/*.json`.

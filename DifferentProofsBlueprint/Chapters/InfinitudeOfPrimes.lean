@@ -3,6 +3,7 @@ import VersoManual
 import VersoBlueprint
 import DifferentProofs.InfinitudeOfPrimes.Basic
 import DifferentProofs.InfinitudeOfPrimes.Defs
+import DifferentProofs.InfinitudeOfPrimes.Dirichlet
 import DifferentProofs.InfinitudeOfPrimes.Euclid
 import DifferentProofs.InfinitudeOfPrimes.Euler
 import DifferentProofs.InfinitudeOfPrimes.Goldbach
@@ -237,4 +238,52 @@ each at least $`2` {uses "lem:fib-prime-ge-two"}[]. They are pairwise coprime
 {uses "lem:fib-coprime-distinct-primes"}[], but $`F_{37}` already has three
 distinct prime factors {uses "lem:fib-37-factorization"}[], contradicting the
 finite counting bound.
+:::
+
+The sixth set of proofs shows a stronger result: there are infinitely many primes in certain congruence classes.
+
+:::theorem "thm:inf-primes-cong-one-four" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_cong_one_four")
+There are infinitely many primes congruent to $`1` modulo $`4`.
+:::
+
+:::proof "thm:inf-primes-cong-one-four"
+Assume that there are only finitely many such primes.
+Let $`P` be the product of all such primes and consider $`N = 4P^2 + 1`.
+If we choose a prime factor $`q` of $`N`, then $`(2P)^2 \equiv -1 \pmod{q}`. Hence $`-1` is a square modulo $`q`, so $`q \equiv 1 \pmod{4}`, which contradicts
+the assumption that $`P` is the product of all such primes.
+:::
+
+:::theorem "thm:inf-primes-from-one-four" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_from_one_four")
+There are infinitely many prime numbers.
+:::
+
+:::proof "thm:inf-primes-from-one-four"
+This follows from {uses "thm:inf-primes-cong-one-four"}[].
+:::
+
+:::lemma_ "lem:nat-three-mod-four-div-of-prime-three-mod-four" (parent := "grp:inf-primes") (lean := "nat_three_mod_four_div_of_prime_three_mod_four")
+If a natural number is congruent to $`3` modulo $`4`, then it has a prime factor that is congruent to $`3` modulo $`4`.
+:::
+
+:::proof "lem:nat-three-mod-four-div-of-prime-three-mod-four"
+If every prime factor of $`n` were congruent to $`1` modulo $`4`, then $`n` would be congruent to $`1` modulo $`4`, contradicting the assumption.
+:::
+
+:::theorem "thm:inf-primes-cong-three-four" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_cong_three_four")
+There are infinitely many primes congruent to $`3` modulo $`4`.
+:::
+
+:::proof "thm:inf-primes-cong-three-four"
+Assume that there are only finitely many such primes.
+Let $`P` be the product of all such primes and consider $`N = 4P - 1`.
+Since $`N \equiv 3 \pmod{4}`, it has a prime factor $`q` with $`q \equiv 3 \pmod{4}`
+{uses "lem:nat-three-mod-four-div-of-prime-three-mod-four"}[], which contradicts the assumption that $`P` is the product of all such primes.
+:::
+
+:::theorem "thm:inf-primes-from-three-four" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_from_three_four")
+There are infinitely many prime numbers.
+:::
+
+:::proof "thm:inf-primes-from-three-four"
+This follows from {uses "thm:inf-primes-cong-three-four"}[].
 :::
