@@ -20,6 +20,7 @@ This project contains formalizations of different proofs of the same mathematica
 - [Euler's proof](DifferentProofs/InfinitudeOfPrimes/Euler.lean)
 - [Saidak's proof](DifferentProofs/InfinitudeOfPrimes/Saidak.lean)
 - [Wunderlich's proof](DifferentProofs/InfinitudeOfPrimes/Wunderlich.lean)
+- [Infinitely many primes in certain congruence classes](DifferentProofs/InfinitudeOfPrimes/Dirichlet.lean)
 
 ### Irrationality of √2
 
