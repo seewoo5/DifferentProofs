@@ -3,6 +3,7 @@ import VersoManual
 import VersoBlueprint
 import VersoBlueprint.Commands.Graph
 import VersoBlueprint.Commands.Summary
+import DifferentProofsBlueprint.Chapters.CombinatorialIdentities
 import DifferentProofsBlueprint.Chapters.FermatLittleTheorem
 import DifferentProofsBlueprint.Chapters.InfinitudeOfPrimes
 import DifferentProofsBlueprint.Chapters.IrrationalSqrtTwo
@@ -27,6 +28,7 @@ document records the informal statements, proof sketches, and dependency graph.
 {include 0 DifferentProofsBlueprint.Chapters.InfinitudeOfPrimes}
 {include 0 DifferentProofsBlueprint.Chapters.IrrationalSqrtTwo}
 {include 0 DifferentProofsBlueprint.Chapters.BaselProblem}
+{include 0 DifferentProofsBlueprint.Chapters.CombinatorialIdentities}
 
 {blueprint_graph (direction := LR) (pack := true)}
 {blueprint_summary}
