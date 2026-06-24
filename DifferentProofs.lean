@@ -11,6 +11,7 @@ public import DifferentProofs.FermatLittleTheorem.Dynamical
 public import DifferentProofs.FermatLittleTheorem.Lagrange
 public import DifferentProofs.InfinitudeOfPrimes.Basic
 public import DifferentProofs.InfinitudeOfPrimes.Defs
+public import DifferentProofs.InfinitudeOfPrimes.Dirichlet
 public import DifferentProofs.InfinitudeOfPrimes.Euclid
 public import DifferentProofs.InfinitudeOfPrimes.Euler
 public import DifferentProofs.InfinitudeOfPrimes.Goldbach
