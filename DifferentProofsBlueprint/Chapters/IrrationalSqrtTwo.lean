@@ -1,6 +1,7 @@
 import Verso
 import VersoManual
 import VersoBlueprint
+import DifferentProofsBlueprint.ProofColor
 import DifferentProofs.IrrationalSqrtTwo.Basic
 import DifferentProofs.IrrationalSqrtTwo.Defs
 import DifferentProofs.IrrationalSqrtTwo.Descent
@@ -45,7 +46,7 @@ with $`q = \mathrm{den}(r) \neq 0`.
 
 First proof is by infinite descent.
 
-:::theorem "thm:sqrt-two-descent" (parent := "grp:sqrt-two") (lean := "IrrationalSqrtTwo_Descent")
+:::theorem "thm:sqrt-two-descent" (parent := "grp:sqrt-two") (lean := "IrrationalSqrtTwo_Descent") (proofColor := "#bae6fd")
 $`\sqrt{2}` is irrational.
 :::
 
@@ -59,7 +60,7 @@ induction no solution with $`q \neq 0` exists.
 
 Second proof is by $`2`-adic valuation.
 
-:::theorem "thm:sqrt-two-valuation" (parent := "grp:sqrt-two") (lean := "IrrationalSqrtTwo_Valuation")
+:::theorem "thm:sqrt-two-valuation" (parent := "grp:sqrt-two") (lean := "IrrationalSqrtTwo_Valuation") (proofColor := "#bae6fd")
 $`\sqrt{2}` is irrational.
 :::
 
@@ -72,7 +73,7 @@ the right side has odd valuation $`1 + 2v_2(q)`, a contradiction.
 
 Third proof is by Fermat's Last Theorem for exponent $`3`.
 
-:::theorem "thm:sqrt-two-flt" (parent := "grp:sqrt-two") (lean := "IrrationalSqrtTwo_FermatLastTheorem")
+:::theorem "thm:sqrt-two-flt" (parent := "grp:sqrt-two") (lean := "IrrationalSqrtTwo_FermatLastTheorem") (proofColor := "#bae6fd")
 $`\sqrt{2}` is irrational.
 :::
 

@@ -1,8 +1,8 @@
 import Verso
 import VersoManual
 import VersoBlueprint
-import VersoBlueprint.Commands.Graph
 import VersoBlueprint.Commands.Summary
+import DifferentProofsBlueprint.Commands.Graph
 import DifferentProofsBlueprint.Chapters.CombinatorialIdentities
 import DifferentProofsBlueprint.Chapters.FermatLittleTheorem
 import DifferentProofsBlueprint.Chapters.InfinitudeOfPrimes
@@ -23,6 +23,12 @@ set_option verso.blueprint.graph.defaultPack true
 This blueprint tracks formalizations of multiple proofs of the same theorem.
 The Lean declarations live in the `DifferentProofs` library, while this Verso
 document records the informal statements, proof sketches, and dependency graph.
+
+Matching custom backgrounds in the graph identify sorry-free theorems with
+exactly the same mathematical statement, even when their blueprint and Lean
+names differ. The configured color appears only after the theorem and all its
+recorded dependencies are complete; otherwise the normal proof-status fill is
+kept.
 
 {include 0 DifferentProofsBlueprint.Chapters.FermatLittleTheorem}
 {include 0 DifferentProofsBlueprint.Chapters.InfinitudeOfPrimes}

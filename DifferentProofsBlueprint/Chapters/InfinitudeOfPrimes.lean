@@ -1,6 +1,7 @@
 import Verso
 import VersoManual
 import VersoBlueprint
+import DifferentProofsBlueprint.ProofColor
 import DifferentProofs.InfinitudeOfPrimes.Basic
 import DifferentProofs.InfinitudeOfPrimes.Defs
 import DifferentProofs.InfinitudeOfPrimes.Dirichlet
@@ -43,7 +44,7 @@ linear order to the set of natural primes.
 
 First proof is by Euclid.
 
-:::theorem "thm:inf-primes-euclid-prod-primes" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_Euclid'")
+:::theorem "thm:inf-primes-euclid-prod-primes" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_Euclid'") (proofColor := "#fed7aa")
 There are infinitely many prime numbers. This proof uses the product of the
 finite set of all primes and proves {uses "def:inf-primes"}[].
 :::
@@ -56,7 +57,7 @@ product plus one.
 
 A variant of Euclid's proof uses $`n! + 1` instead of the product of all primes.
 
-:::theorem "thm:inf-primes-euclid-factorial" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_Euclid")
+:::theorem "thm:inf-primes-euclid-factorial" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_Euclid") (proofColor := "#fed7aa")
 There are infinitely many prime numbers.
 :::
 
@@ -121,7 +122,7 @@ For $`m<n`, the number $`F_m` divides the product of the earlier Fermat
 numbers, which is coprime to $`F_n`.
 :::
 
-:::theorem "thm:inf-primes-goldbach" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_Goldbach")
+:::theorem "thm:inf-primes-goldbach" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_Goldbach") (proofColor := "#fed7aa")
 There are infinitely many prime numbers.
 :::
 
@@ -152,7 +153,7 @@ Expand each factor $`p/(p-1)` as a finite geometric sum. The resulting product
 contains terms corresponding to reciprocals of positive integers up to $`n`.
 :::
 
-:::theorem "thm:inf-primes-euler" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_Euler")
+:::theorem "thm:inf-primes-euler" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_Euler") (proofColor := "#fed7aa")
 There are infinitely many prime numbers.
 :::
 
@@ -190,7 +191,7 @@ Consecutive numbers $`a_n` and $`a_n+1` are coprime, so the prime factors of
 $`a_{n+1}` split as a disjoint union of the prime factors of the two factors.
 :::
 
-:::theorem "thm:inf-primes-saidak" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_Saidak")
+:::theorem "thm:inf-primes-saidak" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_Saidak") (proofColor := "#fed7aa")
 There are infinitely many prime numbers.
 :::
 
@@ -228,7 +229,7 @@ Distinct primes are coprime, and
 $`\gcd(F_m,F_n) = F_{\gcd(m,n)}` reduces the result to $`F_1=1`.
 :::
 
-:::theorem "thm:inf-primes-wunderlich" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_Wunderlich")
+:::theorem "thm:inf-primes-wunderlich" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_Wunderlich") (proofColor := "#fed7aa")
 There are infinitely many prime numbers.
 :::
 
@@ -253,7 +254,7 @@ If we choose a prime factor $`q` of $`N`, then $`(2P)^2 \equiv -1 \pmod{q}`. Hen
 the assumption that $`P` is the product of all such primes.
 :::
 
-:::theorem "thm:inf-primes-from-one-four" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_from_one_four")
+:::theorem "thm:inf-primes-from-one-four" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_from_one_four") (proofColor := "#fed7aa")
 There are infinitely many prime numbers.
 :::
 
@@ -280,7 +281,7 @@ Since $`N \equiv 3 \pmod{4}`, it has a prime factor $`q` with $`q \equiv 3 \pmod
 {uses "lem:nat-three-mod-four-div-of-prime-three-mod-four"}[], which contradicts the assumption that $`P` is the product of all such primes.
 :::
 
-:::theorem "thm:inf-primes-from-three-four" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_from_three_four")
+:::theorem "thm:inf-primes-from-three-four" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_from_three_four") (proofColor := "#fed7aa")
 There are infinitely many prime numbers.
 :::
 

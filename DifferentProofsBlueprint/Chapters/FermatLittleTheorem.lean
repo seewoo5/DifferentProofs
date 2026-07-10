@@ -1,6 +1,7 @@
 import Verso
 import VersoManual
 import VersoBlueprint
+import DifferentProofsBlueprint.ProofColor
 import DifferentProofs.FermatLittleTheorem.Alkauskas
 import DifferentProofs.FermatLittleTheorem.Basic
 import DifferentProofs.FermatLittleTheorem.Binomial
@@ -45,7 +46,7 @@ through the canonical map.
 
 First proof uses the binomial theorem.
 
-:::theorem "thm:flt-binomial" (parent := "grp:flt") (lean := "FermatLittleTheorem_Binomial")
+:::theorem "thm:flt-binomial" (parent := "grp:flt") (lean := "FermatLittleTheorem_Binomial") (proofColor := "#ddd6fe")
 For any prime $`p` and integer $`a`, one has $`a^p \equiv a \pmod p`.
 :::
 
@@ -57,7 +58,7 @@ representatives proves the congruence.
 
 Second proof uses Lagrange's theorem on groups, applied to the multiplicative group of units in $`\mathbb{Z}/p\mathbb{Z}`.
 
-:::theorem "thm:flt-lagrange" (parent := "grp:flt") (lean := "FermatLittleTheorem_Lagrange")
+:::theorem "thm:flt-lagrange" (parent := "grp:flt") (lean := "FermatLittleTheorem_Lagrange") (proofColor := "#ddd6fe")
 For any prime $`p` and integer $`a`, one has $`a^p \equiv a \pmod p`.
 :::
 
@@ -83,7 +84,7 @@ $`1 - a_{N+1}x^{N+1}` leaves all lower coefficients fixed, and the integer
 $`a_{N+1}` can be chosen to match the coefficient of $`x^{N+1}`.
 :::
 
-:::theorem "thm:flt-alkauskas" (parent := "grp:flt") (lean := "FermatLittleTheorem.Alkauskas.FermatLittleTheorem_Alkauskas")
+:::theorem "thm:flt-alkauskas" (parent := "grp:flt") (lean := "FermatLittleTheorem.Alkauskas.FermatLittleTheorem_Alkauskas") (proofColor := "#ddd6fe")
 For any prime $`p` and integer $`a`, one has $`a^p \equiv a \pmod p`.
 :::
 
@@ -126,7 +127,7 @@ $`0 \le j \le n-2`. Together with the endpoint $`1`, these are exactly
 $`n` fixed points.
 :::
 
-:::theorem "thm:flt-dynamical" (parent := "grp:flt") (lean := "FermatLittleTheorem_Dynamical")
+:::theorem "thm:flt-dynamical" (parent := "grp:flt") (lean := "FermatLittleTheorem_Dynamical") (proofColor := "#ddd6fe")
 For any prime $`p` and integer $`a`, one has $`a^p \equiv a \pmod p`.
 The proof uses {uses "lem:T-comp-eq-mul"}[], {uses "lem:T-num-fp-eq"}[], and
 the reduction {uses "thm:flt-nat-impl-flt"}[].

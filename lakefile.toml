@@ -8,7 +8,7 @@ autoImplicit = false
 relaxedAutoImplicit = false
 weak.linter.mathlibStandardSet = true
 weak.linter.flexible = false
-linter.style.header = false
+weak.linter.style.header = false
 experimental.module = true
 
 [[require]]

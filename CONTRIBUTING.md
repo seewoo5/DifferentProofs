@@ -91,6 +91,25 @@ Follow the existing chapter style:
 - Use `{uses "..."}[]` links to record important dependencies between blueprint
   items.
 
+### Proof-complete dependency-graph colors
+
+The project extends theorem-like blueprint directives with a `proofColor`
+option. Put the option beside each theorem in its topic chapter, using the same
+color for nodes that have exactly the same mathematical statement. A chapter
+that uses this option must import `DifferentProofsBlueprint.ProofColor`:
+
+```lean
+:::theorem "thm:flt-binomial" (lean := "FermatLittleTheorem_Binomial") (proofColor := "#ddd6fe")
+The binomial proof of Fermat's little theorem.
+:::
+```
+
+The color must have the form `#RRGGBB`. It replaces the normal green proof fill
+only when the theorem's Lean proof is sorry-free and every dependency recorded
+in the blueprint is complete. Until then, the node keeps its ordinary status
+color, and its tooltip says that the custom color is still pending. This makes
+`proofColor` safe to add while a proof is under development.
+
 Blueprint text should be mathematically accurate but concise. It should explain
 the proof idea and the role of important intermediate lemmas, not reproduce
 every line of the Lean proof.
