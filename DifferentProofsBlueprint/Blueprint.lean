@@ -1,8 +1,8 @@
 import Verso
 import VersoManual
 import VersoBlueprint
-import VersoBlueprint.Commands.Graph
 import VersoBlueprint.Commands.Summary
+import DifferentProofsBlueprint.Commands.Graph
 import DifferentProofsBlueprint.Chapters.CombinatorialIdentities
 import DifferentProofsBlueprint.Chapters.FermatLittleTheorem
 import DifferentProofsBlueprint.Chapters.InfinitudeOfPrimes
@@ -20,9 +20,7 @@ set_option verso.blueprint.graph.defaultPack true
 
 #doc (Manual) "Different Proofs" =>
 
-This blueprint tracks formalizations of multiple proofs of the same theorem.
-The Lean declarations live in the `DifferentProofs` library, while this Verso
-document records the informal statements, proof sketches, and dependency graph.
+This project formalizes different proofs of the same theorem(s).
 
 {include 0 DifferentProofsBlueprint.Chapters.FermatLittleTheorem}
 {include 0 DifferentProofsBlueprint.Chapters.InfinitudeOfPrimes}
