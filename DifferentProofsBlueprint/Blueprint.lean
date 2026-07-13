@@ -20,7 +20,7 @@ set_option verso.blueprint.graph.defaultPack true
 
 #doc (Manual) "Different Proofs" =>
 
-This project formalizes different proofs of the same theorem(s).
+Each theorem deserves many proofs.
 
 {include 0 DifferentProofsBlueprint.Chapters.FermatLittleTheorem}
 {include 0 DifferentProofsBlueprint.Chapters.InfinitudeOfPrimes}
