@@ -28,6 +28,13 @@ This project contains formalizations of different proofs of the same mathematica
 - [Using 2-adic valuations](DifferentProofs/IrrationalSqrtTwo/Valuation.lean)
 - [Using Fermat's last theorem for n = 3](DifferentProofs/IrrationalSqrtTwo/FermatLastTheorem.lean)
 
+### Fermat's theorem on sums of two squares
+
+- [Using quadratic reciprocity](DifferentProofs/SumOfTwoSquares/QuadraticReciprocity.lean)
+- [Using Wilson's theorem](DifferentProofs/SumOfTwoSquares/Wilson.lean)
+- [Zagier's one-sentence proof](DifferentProofs/SumOfTwoSquares/Zagier.lean)
+- [Alpoge's proof via Jacobi sums](DifferentProofs/SumOfTwoSquares/Jacobi.lean)
+
 ### Basel problem
 
 - [Using Parseval's identity](DifferentProofs/BaselProblem/Parseval.lean)
