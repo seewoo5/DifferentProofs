@@ -14,9 +14,8 @@ quartic character `χ₄`) says that `-1` is a square modulo an odd prime `p` ex
 
 @[expose] public section
 
-theorem FermatSumOfTwoSquares_QuadraticReciprocity : FermatSumOfTwoSquares := by
-  intro p hp hp4
+/-- Fermat's theorem on sums of two squares, via the first supplement to quadratic
+reciprocity. -/
+theorem FermatSumOfTwoSquares_QuadraticReciprocity : FermatSumOfTwoSquares := fun p hp hp4 =>
   have : Fact p.Prime := ⟨hp⟩
-  refine sq_add_sq_of_isSquare_neg_one hp ?_
-  rw [ZMod.exists_sq_eq_neg_one_iff]
-  omega
+  sq_add_sq_of_isSquare_neg_one hp <| ZMod.exists_sq_eq_neg_one_iff.mpr <| by omega
