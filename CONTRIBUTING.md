@@ -21,13 +21,13 @@ and blueprint where appropriate.
 ## Formalizations that may belong in mathlib
 
 Sometimes a proof may require a useful fact that is not yet available in
-mathlib, but is general enough that it could eventually be upstreamed. There
-are no such formalizations in this project at the moment.
+mathlib, but is general enough that it could eventually be upstreamed. The
+current examples are indexed by the root module `DifferentProofsForMathlib.lean`.
 
-When such material appears, put it under a new `DifferentProofsForMathlib/`
-directory instead of burying it inside a theorem-specific folder. This directory
-is for reusable supporting results that are useful beyond this project, not for
-lemmas whose statements are tailored only to one proof here.
+Put such material under the `DifferentProofsForMathlib/` directory instead of
+burying it inside a theorem-specific folder. This directory is for reusable
+supporting results that are useful beyond this project, not for lemmas whose
+statements are tailored only to one proof here.
 
 The directory structure should mirror the corresponding mathlib location as
 closely as possible. For example, material that would ideally live in

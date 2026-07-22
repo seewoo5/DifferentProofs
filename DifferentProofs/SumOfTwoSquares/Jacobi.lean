@@ -1,6 +1,7 @@
 module
 
 public import DifferentProofs.SumOfTwoSquares.Defs
+public import DifferentProofsForMathlib.RingTheory.RootsOfUnity.Complex
 public import Mathlib.NumberTheory.JacobiSum.Basic
 public import Mathlib.NumberTheory.Zsqrtd.GaussianInt
 
@@ -24,11 +25,6 @@ with `a, b ∈ ℤ` yields `a² + b² = p`.
 open Complex
 
 namespace SumOfTwoSquares.Jacobi
-
-/-- `I` is a primitive fourth root of unity. -/
-private lemma isPrimitiveRoot_I : IsPrimitiveRoot I 4 :=
-  IsPrimitiveRoot.mk_of_lt I four_pos I_pow_four fun l hl0 hl4 ↦ by
-    interval_cases l <;> norm_num [Complex.ext_iff, I_sq, I_pow_three]
 
 /-- The values of a character `χ` with `χ ^ 4 = 1` are Gaussian integers: every nonzero value
 is a fourth root of unity, hence a power of `I`. -/

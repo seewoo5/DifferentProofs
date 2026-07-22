@@ -1,8 +1,8 @@
 module
 
 public import DifferentProofs.SumOfTwoSquares.Defs
+public import DifferentProofsForMathlib.Combinatorics.Enumerative.Involution
 public import Mathlib.Tactic
-public import Mathlib.Data.ZMod.Basic
 public import Mathlib.Data.Int.Interval
 
 /-!
@@ -25,32 +25,6 @@ simple involution `(x, y, z) ↦ (x, z, y)` also has a fixed point, i.e. some `(
 @[expose] public section
 
 namespace SumOfTwoSquares.Zagier
-
-/-! ### A parity lemma for involutions on finite sets -/
-
-/-- A fixed-point-free involution on a finite set has an even number of elements: summing
-`1 : ZMod 2` over the pairing `t ↦ f t` shows the cardinality vanishes mod `2`. -/
-private lemma even_card_of_fpf {β : Type*} {f : β → β} {s : Finset β} (hmaps : ∀ t ∈ s, f t ∈ s)
-    (hinv : ∀ t ∈ s, f (f t) = t) (hfpf : ∀ t ∈ s, f t ≠ t) : Even s.card := by
-  have h : ∑ _t ∈ s, (1 : ZMod 2) = 0 :=
-    Finset.sum_involution (fun a _ ↦ f a) (fun _ _ ↦ by decide) (fun a ha _ ↦ hfpf a ha)
-      hmaps hinv
-  rw [Finset.sum_const, nsmul_eq_mul, mul_one, ZMod.natCast_eq_zero_iff] at h
-  exact ⟨s.card / 2, by lia⟩
-
-/-- For an involution on a finite set, the cardinality of the set and of its fixed-point set
-have the same parity. -/
-private lemma card_modEq_filter_fixed {β : Type*} [DecidableEq β] (s : Finset β) (f : β → β)
-    (hmaps : ∀ t ∈ s, f t ∈ s) (hinv : ∀ t ∈ s, f (f t) = t) :
-    (s.filter fun t ↦ f t = t).card ≡ s.card [MOD 2] := by
-  have hsplit := Finset.card_filter_add_card_filter_not (s := s) (fun t ↦ f t = t)
-  obtain ⟨k, hk⟩ : Even (s.filter fun t ↦ ¬ f t = t).card := by
-    refine even_card_of_fpf (fun t ht ↦ ?_) (fun t ht ↦ hinv t (Finset.mem_filter.mp ht).1)
-      fun t ht ↦ (Finset.mem_filter.mp ht).2
-    rw [Finset.mem_filter] at ht ⊢
-    exact ⟨hmaps t ht.1, by rw [hinv t ht.1]; exact Ne.symm ht.2⟩
-  change _ % 2 = _ % 2
-  lia
 
 /-! ### The windmill set and its two involutions -/
 
@@ -160,11 +134,11 @@ private lemma wind_fixed {p : ℕ} (hp : p.Prime) (hp4 : p % 4 = 1) :
 /-- **Zagier's one-sentence proof** of Fermat's theorem on sums of two squares. -/
 theorem FermatSumOfTwoSquares_Zagier : FermatSumOfTwoSquares := by
   intro p hp hp4
-  have hpar1 : 1 % 2 = (S p).card % 2 := by
-    have h := card_modEq_filter_fixed (S p) wind (wind_mem hp hp4) wind_invol
+  have hpar1 : (S p).card % 2 = 1 % 2 := by
+    have h := Finset.card_modEq_card_filter_fixed (wind_mem hp hp4) wind_invol
     rwa [wind_fixed hp hp4, Finset.card_singleton] at h
-  have hpar2 : ((S p).filter fun t ↦ swp t = t).card % 2 = (S p).card % 2 :=
-    card_modEq_filter_fixed (S p) swp swp_mem fun t _ ↦ swp_invol t
+  have hpar2 : (S p).card % 2 = ((S p).filter fun t ↦ swp t = t).card % 2 :=
+    Finset.card_modEq_card_filter_fixed swp_mem fun t _ ↦ swp_invol t
   have hpos : 0 < ((S p).filter fun t ↦ swp t = t).card := by lia
   obtain ⟨⟨x, y, z⟩, hmem⟩ := Finset.card_pos.mp hpos
   rw [Finset.mem_filter, swp_eq, mem_S] at hmem
