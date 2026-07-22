@@ -20,7 +20,7 @@ open scoped Nat in
 `(p-1)! ≡ -1 (mod p)` shows that `(p/2)!` is a square root of `-1` when `p ≡ 1 (mod 4)`. -/
 theorem FermatSumOfTwoSquares_Wilson : FermatSumOfTwoSquares := by
   intro p hp hp4
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   set w := p / 2 with hw
   refine sq_add_sq_of_isSquare_neg_one hp ⟨(w ! : ZMod p), ?_⟩
   have hfac : ∀ j ∈ Ico 1 (w + 1), ((p - j : ℕ) : ZMod p) = -(j : ZMod p) := by

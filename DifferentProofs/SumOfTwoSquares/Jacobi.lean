@@ -41,7 +41,7 @@ private lemma isPrimitiveRoot_I : IsPrimitiveRoot I 4 :=
 character on `ZMod p` is a Gaussian integer of norm `p` (Alpoge's proof). -/
 theorem FermatSumOfTwoSquares_Jacobi : FermatSumOfTwoSquares := by
   intro p hp hp4
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨χ, hord⟩ := MulChar.exists_mulChar_orderOf (ZMod p) (R := ℂ) (n := 4)
     (by rw [ZMod.card]; omega) isPrimitiveRoot_I
   have hχ4 : χ ^ 4 = 1 := hord ▸ pow_orderOf_eq_one χ
