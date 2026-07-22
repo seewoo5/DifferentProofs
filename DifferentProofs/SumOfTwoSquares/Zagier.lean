@@ -33,43 +33,43 @@ namespace SumOfTwoSquares.Zagier
 private lemma even_card_of_fpf {β : Type*} {f : β → β} {s : Finset β} (hmaps : ∀ t ∈ s, f t ∈ s)
     (hinv : ∀ t ∈ s, f (f t) = t) (hfpf : ∀ t ∈ s, f t ≠ t) : Even s.card := by
   have h : ∑ _t ∈ s, (1 : ZMod 2) = 0 :=
-    Finset.sum_involution (fun a _ => f a) (fun _ _ => by decide)
-      (fun a ha _ => hfpf a ha) (fun a ha => hmaps a ha) fun a ha => hinv a ha
+    Finset.sum_involution (fun a _ ↦ f a) (fun _ _ ↦ by decide) (fun a ha _ ↦ hfpf a ha)
+      hmaps hinv
   rw [Finset.sum_const, nsmul_eq_mul, mul_one, ZMod.natCast_eq_zero_iff] at h
-  exact ⟨s.card / 2, by omega⟩
+  exact ⟨s.card / 2, by lia⟩
 
 /-- For an involution on a finite set, the cardinality of the set and of its fixed-point set
 have the same parity. -/
 private lemma card_modEq_filter_fixed {β : Type*} [DecidableEq β] (s : Finset β) (f : β → β)
     (hmaps : ∀ t ∈ s, f t ∈ s) (hinv : ∀ t ∈ s, f (f t) = t) :
-    (s.filter fun t => f t = t).card ≡ s.card [MOD 2] := by
-  have hsplit := Finset.card_filter_add_card_filter_not (s := s) (fun t => f t = t)
-  obtain ⟨k, hk⟩ : Even (s.filter fun t => ¬ f t = t).card := by
-    refine even_card_of_fpf (fun t ht => ?_) (fun t ht => hinv t (Finset.mem_filter.mp ht).1)
-      fun t ht => (Finset.mem_filter.mp ht).2
+    (s.filter fun t ↦ f t = t).card ≡ s.card [MOD 2] := by
+  have hsplit := Finset.card_filter_add_card_filter_not (s := s) (fun t ↦ f t = t)
+  obtain ⟨k, hk⟩ : Even (s.filter fun t ↦ ¬ f t = t).card := by
+    refine even_card_of_fpf (fun t ht ↦ ?_) (fun t ht ↦ hinv t (Finset.mem_filter.mp ht).1)
+      fun t ht ↦ (Finset.mem_filter.mp ht).2
     rw [Finset.mem_filter] at ht ⊢
-    exact ⟨hmaps t ht.1, by rw [hinv t ht.1]; exact fun h => ht.2 h.symm⟩
+    exact ⟨hmaps t ht.1, by rw [hinv t ht.1]; exact Ne.symm ht.2⟩
   change _ % 2 = _ % 2
-  omega
+  lia
 
 /-! ### The windmill set and its two involutions -/
 
 /-- Zagier's windmill set `{(x, y, z) | x, y, z > 0, x² + 4yz = p}`, cut out of a box. -/
 private noncomputable def S (p : ℕ) : Finset (ℤ × ℤ × ℤ) :=
   ((Finset.Icc 1 (p : ℤ)) ×ˢ (Finset.Icc 1 (p : ℤ)) ×ˢ (Finset.Icc 1 (p : ℤ))).filter
-    (fun t => t.1 ^ 2 + 4 * t.2.1 * t.2.2 = (p : ℤ))
+    (fun t ↦ t.1 ^ 2 + 4 * t.2.1 * t.2.2 = (p : ℤ))
 
 private lemma mem_S {p : ℕ} {x y z : ℤ} :
     (x, y, z) ∈ S p ↔ 0 < x ∧ 0 < y ∧ 0 < z ∧ x ^ 2 + 4 * y * z = (p : ℤ) := by
   simp only [S, Finset.mem_filter, Finset.mem_product, Finset.mem_Icc]
   constructor
   · rintro ⟨⟨⟨hx1, _⟩, ⟨hy1, _⟩, ⟨hz1, _⟩⟩, heq⟩
-    exact ⟨by omega, by omega, by omega, heq⟩
+    exact ⟨by lia, by lia, by lia, heq⟩
   · rintro ⟨hx, hy, hz, heq⟩
-    refine ⟨⟨⟨by omega, ?_⟩, ⟨by omega, ?_⟩, ⟨by omega, ?_⟩⟩, heq⟩
-    · nlinarith [heq, mul_pos hy hz, mul_nonneg (by omega : (0:ℤ) ≤ x - 1) (by omega : (0:ℤ) ≤ x)]
-    · nlinarith [heq, sq_nonneg x, mul_nonneg (by omega : (0:ℤ) ≤ y) (by omega : (0:ℤ) ≤ 4 * z - 1)]
-    · nlinarith [heq, sq_nonneg x, mul_nonneg (by omega : (0:ℤ) ≤ z) (by omega : (0:ℤ) ≤ 4 * y - 1)]
+    refine ⟨⟨⟨by lia, ?_⟩, ⟨by lia, ?_⟩, ⟨by lia, ?_⟩⟩, heq⟩
+    · nlinarith [heq, mul_pos hy hz, mul_nonneg (by lia : (0:ℤ) ≤ x - 1) (by lia : (0:ℤ) ≤ x)]
+    · nlinarith [heq, sq_nonneg x, mul_nonneg (by lia : (0:ℤ) ≤ y) (by lia : (0:ℤ) ≤ 4 * z - 1)]
+    · nlinarith [heq, sq_nonneg x, mul_nonneg (by lia : (0:ℤ) ≤ z) (by lia : (0:ℤ) ≤ 4 * y - 1)]
 
 /-- On `S`, a prime `p` cannot satisfy `x = y - z` (else `p = (y+z)²`) nor `x = 2y`
 (else `4 ∣ p`). -/
@@ -81,10 +81,10 @@ private lemma S_ne {p : ℕ} (hp : p.Prime) (hp4 : p % 4 = 1) {x y z : ℤ}
   · rintro rfl
     have hsq : (p : ℤ) = (y + z) * (y + z) := by linear_combination -heq
     rcases (Nat.prime_iff_prime_int.mp hp).irreducible.isUnit_or_isUnit hsq with h1 | h1 <;>
-      rw [Int.isUnit_iff] at h1 <;> omega
+      rw [Int.isUnit_iff] at h1 <;> lia
   · rintro rfl
     have hdvd : (4 : ℤ) ∣ (p : ℤ) := ⟨y * (y + z), by linear_combination -heq⟩
-    omega
+    lia
 
 /-- The windmill involution. -/
 private def wind (t : ℤ × ℤ × ℤ) : ℤ × ℤ × ℤ :=
@@ -107,8 +107,7 @@ private lemma swp_invol (t : ℤ × ℤ × ℤ) : swp (swp t) = t := rfl
 
 private lemma swp_mem {p : ℕ} : ∀ t ∈ S p, swp t ∈ S p := by
   rintro ⟨x, y, z⟩ ht
-  rw [mem_S] at ht
-  rw [swp_eq, mem_S]
+  simp only [swp_eq, mem_S] at ht ⊢
   exact ⟨ht.1, ht.2.2.1, ht.2.1, by linear_combination ht.2.2.2⟩
 
 private lemma wind_mem {p : ℕ} (hp : p.Prime) (hp4 : p % 4 = 1) : ∀ t ∈ S p, wind t ∈ S p := by
@@ -118,7 +117,7 @@ private lemma wind_mem {p : ℕ} (hp : p.Prime) (hp4 : p % 4 = 1) : ∀ t ∈ S 
   obtain ⟨hx, hy, hz, heq⟩ := ht
   rw [wind_eq]
   split_ifs with h1 h2 <;> rw [mem_S] <;>
-    exact ⟨by omega, by omega, by omega, by linear_combination heq⟩
+    exact ⟨by lia, by lia, by lia, by linear_combination heq⟩
 
 private lemma wind_invol {p : ℕ} : ∀ t ∈ S p, wind (wind t) = t := by
   rintro ⟨x, y, z⟩ ht
@@ -126,11 +125,11 @@ private lemma wind_invol {p : ℕ} : ∀ t ∈ S p, wind (wind t) = t := by
   obtain ⟨hx, hy, hz, -⟩ := ht
   rw [wind_eq x y z]
   split_ifs with h1 h2 <;>
-    rw [wind_eq] <;> split_ifs <;> rw [Prod.mk.injEq, Prod.mk.injEq] <;> omega
+    rw [wind_eq] <;> split_ifs <;> rw [Prod.mk.injEq, Prod.mk.injEq] <;> lia
 
 /-- The windmill involution has a unique fixed point on `S`, namely `(1, 1, (p-1)/4)`. -/
 private lemma wind_fixed {p : ℕ} (hp : p.Prime) (hp4 : p % 4 = 1) :
-    (S p).filter (fun t => wind t = t) = {(1, 1, ((p : ℤ) - 1) / 4)} := by
+    (S p).filter (fun t ↦ wind t = t) = {(1, 1, ((p : ℤ) - 1) / 4)} := by
   have h2 := hp.two_le
   ext ⟨x, y, z⟩
   simp only [Finset.mem_filter, Finset.mem_singleton, Prod.mk.injEq]
@@ -140,24 +139,23 @@ private lemma wind_fixed {p : ℕ} (hp : p.Prime) (hp4 : p % 4 = 1) :
     obtain ⟨hx, hy, hz, heq⟩ := hS
     rw [wind_eq] at hfix
     split_ifs at hfix with h1 hm
-    · simp only [Prod.mk.injEq] at hfix; omega
+    · simp only [Prod.mk.injEq] at hfix; lia
     · simp only [Prod.mk.injEq] at hfix
-      have hxy : x = y := by omega
+      have hxy : x = y := by lia
       have hxz : x * (x + 4 * z) = (p : ℤ) := by rw [hxy] at heq ⊢; linear_combination heq
       obtain h | h := (Nat.prime_iff_prime_int.mp hp).irreducible.isUnit_or_isUnit hxz.symm <;>
         rw [Int.isUnit_iff] at h
-      · obtain rfl : x = 1 := by omega
-        rw [one_mul] at hxz
-        omega
-      · omega
-    · simp only [Prod.mk.injEq] at hfix; omega
+      · obtain rfl : x = 1 := by lia
+        lia
+      · lia
+    · simp only [Prod.mk.injEq] at hfix; lia
   · rintro ⟨rfl, rfl, rfl⟩
-    have h4z : (4 : ℤ) * (((p : ℤ) - 1) / 4) = (p : ℤ) - 1 := by omega
+    have h4z : (4 : ℤ) * (((p : ℤ) - 1) / 4) = (p : ℤ) - 1 := by lia
     refine ⟨?_, ?_⟩
     · rw [mem_S]
-      exact ⟨one_pos, one_pos, by omega, by linear_combination h4z⟩
+      exact ⟨one_pos, one_pos, by lia, by linear_combination h4z⟩
     · rw [wind_eq]
-      split_ifs <;> rw [Prod.mk.injEq, Prod.mk.injEq] <;> omega
+      split_ifs <;> rw [Prod.mk.injEq, Prod.mk.injEq] <;> lia
 
 /-! ### Assembling the proof -/
 
@@ -167,18 +165,16 @@ theorem FermatSumOfTwoSquares_Zagier : FermatSumOfTwoSquares := by
   have hpar1 : 1 % 2 = (S p).card % 2 := by
     have h := card_modEq_filter_fixed (S p) wind (wind_mem hp hp4) wind_invol
     rwa [wind_fixed hp hp4, Finset.card_singleton] at h
-  have hpar2 : ((S p).filter fun t => swp t = t).card % 2 = (S p).card % 2 :=
-    card_modEq_filter_fixed (S p) swp swp_mem fun t _ => swp_invol t
-  have hpos : 0 < ((S p).filter fun t => swp t = t).card := by omega
+  have hpar2 : ((S p).filter fun t ↦ swp t = t).card % 2 = (S p).card % 2 :=
+    card_modEq_filter_fixed (S p) swp swp_mem fun t _ ↦ swp_invol t
+  have hpos : 0 < ((S p).filter fun t ↦ swp t = t).card := by lia
   obtain ⟨⟨x, y, z⟩, hmem⟩ := Finset.card_pos.mp hpos
   rw [Finset.mem_filter, swp_eq, mem_S] at hmem
   obtain ⟨⟨hx, hy, hz, heq⟩, hfix⟩ := hmem
   simp only [Prod.mk.injEq] at hfix
+  obtain rfl : y = z := by lia
   refine ⟨x.natAbs, (2 * y).natAbs, ?_⟩
-  have hint : (x.natAbs : ℤ) ^ 2 + ((2 * y).natAbs : ℤ) ^ 2 = (p : ℤ) := by
-    rw [Int.natCast_natAbs, Int.natCast_natAbs, sq_abs, sq_abs]
-    obtain rfl : y = z := by omega
-    linear_combination heq
-  exact_mod_cast hint
+  zify [sq_abs]
+  linear_combination heq
 
 end SumOfTwoSquares.Zagier
