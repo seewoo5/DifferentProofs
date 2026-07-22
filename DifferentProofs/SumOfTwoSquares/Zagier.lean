@@ -145,9 +145,7 @@ private lemma wind_fixed {p : ℕ} (hp : p.Prime) (hp4 : p % 4 = 1) :
       have hxz : x * (x + 4 * z) = (p : ℤ) := by rw [hxy] at heq ⊢; linear_combination heq
       obtain h | h := (Nat.prime_iff_prime_int.mp hp).irreducible.isUnit_or_isUnit hxz.symm <;>
         rw [Int.isUnit_iff] at h
-      · obtain rfl : x = 1 := by lia
-        lia
-      · lia
+      repeat lia
     · simp only [Prod.mk.injEq] at hfix; lia
   · rintro ⟨rfl, rfl, rfl⟩
     have h4z : (4 : ℤ) * (((p : ℤ) - 1) / 4) = (p : ℤ) - 1 := by lia

@@ -31,7 +31,7 @@ theorem sq_add_sq_of_isSquare_neg_one {p : ℕ} (hp : p.Prime) (h : IsSquare (-1
     simpa using Nat.lt_succ_sqrt p
   obtain ⟨⟨s₁, t₁⟩, hmem₁, ⟨s₂, t₂⟩, hmem₂, hne, hmap⟩ :=
     Finset.exists_ne_map_eq_of_card_lt_of_maps_to hcard
-      (f := fun st : ℕ × ℕ => (st.1 : ZMod p) - u * (st.2 : ZMod p)) fun _ _ => Finset.mem_univ _
+      (f := fun st : ℕ × ℕ ↦ (st.1 : ZMod p) - u * (st.2 : ZMod p)) fun _ _ => Finset.mem_univ _
   simp only [Finset.mem_product, Finset.mem_range] at hmem₁ hmem₂
   have hdvd : (p : ℤ) ∣ ((s₁ : ℤ) - s₂) ^ 2 + ((t₁ : ℤ) - t₂) ^ 2 := by
     push_cast [← ZMod.intCast_zmod_eq_zero_iff_dvd]
@@ -41,8 +41,8 @@ theorem sq_add_sq_of_isSquare_neg_one {p : ℕ} (hp : p.Prime) (h : IsSquare (-1
   set b : ℤ := (t₁ : ℤ) - (t₂ : ℤ) with hb
   refine ⟨a.natAbs, b.natAbs, Nat.eq_of_dvd_of_lt_two_mul (fun h0 => ?_) ?_ ?_⟩
   · simp only [Nat.add_eq_zero_iff, pow_eq_zero_iff two_ne_zero, Int.natAbs_eq_zero] at h0
-    exact hne (by simp only [Prod.mk.injEq]; omega)
+    exact hne (by simp only [Prod.mk.injEq]; lia)
   · zify [sq_abs]
     exact hdvd
-  · nlinarith [Nat.pow_le_pow_left (show a.natAbs ≤ Nat.sqrt p by omega) 2,
-      Nat.pow_le_pow_left (show b.natAbs ≤ Nat.sqrt p by omega) 2]
+  · nlinarith [Nat.pow_le_pow_left (show a.natAbs ≤ Nat.sqrt p by lia) 2,
+      Nat.pow_le_pow_left (show b.natAbs ≤ Nat.sqrt p by lia) 2]
