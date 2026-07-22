@@ -1,0 +1,21 @@
+module
+
+public import DifferentProofs.SumOfTwoSquares.Basic
+public import Mathlib.NumberTheory.LegendreSymbol.Basic
+
+/-!
+# Sum of two squares via quadratic reciprocity
+
+The first supplement to quadratic reciprocity (equivalently, Euler's criterion applied to the
+quartic character `χ₄`) says that `-1` is a square modulo an odd prime `p` exactly when
+`p ≢ 3 (mod 4)`. For `p ≡ 1 (mod 4)` this hypothesis holds, and the shared descent
+`sq_add_sq_of_isSquare_neg_one` turns it into a representation `p = a² + b²`.
+-/
+
+@[expose] public section
+
+/-- Fermat's theorem on sums of two squares, via the first supplement to quadratic
+reciprocity. -/
+theorem FermatSumOfTwoSquares_QuadraticReciprocity : FermatSumOfTwoSquares := fun p hp hp4 =>
+  have : Fact p.Prime := ⟨hp⟩
+  sq_add_sq_of_isSquare_neg_one hp <| ZMod.exists_sq_eq_neg_one_iff.mpr <| by omega

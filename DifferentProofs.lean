@@ -25,3 +25,9 @@ public import DifferentProofs.IrrationalSqrtTwo.Defs
 public import DifferentProofs.IrrationalSqrtTwo.Descent
 public import DifferentProofs.IrrationalSqrtTwo.FermatLastTheorem
 public import DifferentProofs.IrrationalSqrtTwo.Valuation
+public import DifferentProofs.SumOfTwoSquares.Basic
+public import DifferentProofs.SumOfTwoSquares.Defs
+public import DifferentProofs.SumOfTwoSquares.Jacobi
+public import DifferentProofs.SumOfTwoSquares.QuadraticReciprocity
+public import DifferentProofs.SumOfTwoSquares.Wilson
+public import DifferentProofs.SumOfTwoSquares.Zagier
