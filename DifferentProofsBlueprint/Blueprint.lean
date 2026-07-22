@@ -6,6 +6,7 @@ import DifferentProofsBlueprint.Commands.Graph
 import DifferentProofsBlueprint.Chapters.CombinatorialIdentities
 import DifferentProofsBlueprint.Chapters.FermatLittleTheorem
 import DifferentProofsBlueprint.Chapters.InfinitudeOfPrimes
+import DifferentProofsBlueprint.Chapters.IntegerRectangle
 import DifferentProofsBlueprint.Chapters.IrrationalSqrtTwo
 import DifferentProofsBlueprint.Chapters.SumOfTwoSquares
 import DifferentProofsBlueprint.Chapters.BaselProblem
@@ -29,6 +30,7 @@ Each theorem deserves many proofs.
 {include 0 DifferentProofsBlueprint.Chapters.SumOfTwoSquares}
 {include 0 DifferentProofsBlueprint.Chapters.BaselProblem}
 {include 0 DifferentProofsBlueprint.Chapters.CombinatorialIdentities}
+{include 0 DifferentProofsBlueprint.Chapters.IntegerRectangle}
 
 {blueprint_graph (direction := LR) (pack := true)}
 {blueprint_summary}
