@@ -28,15 +28,13 @@ theorem sq_add_sq_of_isSquare_neg_one {p : ℕ} (hp : p.Prime) (h : IsSquare (-1
     (Nat.sqrt_le' p).lt_of_ne fun hsq => hp.prime.not_isSquare ⟨_, by rw [← hsq, pow_two]⟩
   have hcard : (Finset.univ : Finset (ZMod p)).card <
       (Finset.range (Nat.sqrt p + 1) ×ˢ Finset.range (Nat.sqrt p + 1)).card := by
-    rw [Finset.card_univ, ZMod.card, Finset.card_product, Finset.card_range]
-    exact Nat.lt_succ_sqrt p
+    simpa using Nat.lt_succ_sqrt p
   obtain ⟨⟨s₁, t₁⟩, hmem₁, ⟨s₂, t₂⟩, hmem₂, hne, hmap⟩ :=
     Finset.exists_ne_map_eq_of_card_lt_of_maps_to hcard
       (f := fun st : ℕ × ℕ => (st.1 : ZMod p) - u * (st.2 : ZMod p)) fun _ _ => Finset.mem_univ _
   simp only [Finset.mem_product, Finset.mem_range] at hmem₁ hmem₂
   have hdvd : (p : ℤ) ∣ ((s₁ : ℤ) - s₂) ^ 2 + ((t₁ : ℤ) - t₂) ^ 2 := by
-    rw [← ZMod.intCast_zmod_eq_zero_iff_dvd]
-    push_cast
+    push_cast [← ZMod.intCast_zmod_eq_zero_iff_dvd]
     linear_combination ((s₁ : ZMod p) - s₂ + u * ((t₁ : ZMod p) - t₂)) * hmap -
       ((t₁ : ZMod p) - t₂) ^ 2 * hu
   set a : ℤ := (s₁ : ℤ) - (s₂ : ℤ) with ha
@@ -46,6 +44,5 @@ theorem sq_add_sq_of_isSquare_neg_one {p : ℕ} (hp : p.Prime) (h : IsSquare (-1
     exact hne (by simp only [Prod.mk.injEq]; omega)
   · zify [sq_abs]
     exact hdvd
-  · have h1 : a.natAbs ^ 2 ≤ Nat.sqrt p ^ 2 := Nat.pow_le_pow_left (by omega) 2
-    have h2 : b.natAbs ^ 2 ≤ Nat.sqrt p ^ 2 := Nat.pow_le_pow_left (by omega) 2
-    omega
+  · nlinarith [Nat.pow_le_pow_left (show a.natAbs ≤ Nat.sqrt p by omega) 2,
+      Nat.pow_le_pow_left (show b.natAbs ≤ Nat.sqrt p by omega) 2]
