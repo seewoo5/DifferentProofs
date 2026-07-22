@@ -22,7 +22,7 @@ pairs `(s, t)` with `0 ≤ s, t ≤ r` cannot inject into `ZMod p` via `(s, t) �
 whence `0 < a² + b² < 2p` forces `a² + b² = p`. -/
 theorem sq_add_sq_of_isSquare_neg_one {p : ℕ} (hp : p.Prime) (h : IsSquare (-1 : ZMod p)) :
     ∃ a b : ℕ, a ^ 2 + b ^ 2 = p := by
-  haveI : Fact p.Prime := ⟨hp⟩
+  have : Fact p.Prime := ⟨hp⟩
   obtain ⟨u, hu⟩ := h
   have hrr : Nat.sqrt p ^ 2 < p :=
     (Nat.sqrt_le' p).lt_of_ne fun hsq => hp.prime.not_isSquare ⟨_, by rw [← hsq, pow_two]⟩
