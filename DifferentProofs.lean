@@ -20,6 +20,11 @@ public import DifferentProofs.InfinitudeOfPrimes.Euler
 public import DifferentProofs.InfinitudeOfPrimes.Goldbach
 public import DifferentProofs.InfinitudeOfPrimes.Saidak
 public import DifferentProofs.InfinitudeOfPrimes.Wunderlich
+public import DifferentProofs.IntegerRectangle.Basic
+public import DifferentProofs.IntegerRectangle.Checkerboard
+public import DifferentProofs.IntegerRectangle.ComplexIntegral
+public import DifferentProofs.IntegerRectangle.Defs
+public import DifferentProofs.IntegerRectangle.RealIntegral
 public import DifferentProofs.IrrationalSqrtTwo.Basic
 public import DifferentProofs.IrrationalSqrtTwo.Defs
 public import DifferentProofs.IrrationalSqrtTwo.Descent

@@ -40,6 +40,15 @@ This project contains formalizations of different proofs of the same mathematica
 - [Using Parseval's identity](DifferentProofs/BaselProblem/Parseval.lean)
 - [Using Cauchy's cotangent squeeze](DifferentProofs/BaselProblem/Cauchy.lean)
 
+### Tiling a rectangle
+
+A rectangle tiled by rectangles each having an integer side has an integer side
+([Stan Wagon, *Fourteen Proofs of a Result About Tiling a Rectangle*](https://www.jstor.org/stable/2322213)).
+
+- [Complex double integral (de Bruijn)](DifferentProofs/IntegerRectangle/ComplexIntegral.lean)
+- [Real double integral](DifferentProofs/IntegerRectangle/RealIntegral.lean)
+- [Checkerboard colouring](DifferentProofs/IntegerRectangle/Checkerboard.lean)
+
 ## Building and serving the blueprint locally
 
 The [blueprint](https://seewoo5.github.io/DifferentProofs/) is built with
