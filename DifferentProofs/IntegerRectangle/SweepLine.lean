@@ -1,7 +1,6 @@
 module
 
-public import DifferentProofs.IntegerRectangle.Defs
-public import Mathlib.MeasureTheory.Measure.Lebesgue.Basic
+public import DifferentProofs.IntegerRectangle.Basic
 public import Mathlib.Topology.LocallyConstant.Basic
 
 /-!
@@ -50,16 +49,6 @@ namespace IntegerRectangle.SweepLine
 
 variable {ι : Type*} {R : Rectangle} {T : ι → Rectangle} {p q r : ι → Prop}
 
-private lemma mem_toSet {S : Rectangle} {z : ℝ × ℝ} :
-    z ∈ S.toSet ↔ (S.x₀ ≤ z.1 ∧ z.1 ≤ S.x₁) ∧ (S.y₀ ≤ z.2 ∧ z.2 ≤ S.y₁) := Iff.rfl
-
-private lemma mem_interior_toSet {S : Rectangle} {z : ℝ × ℝ}
-    (h : (S.x₀ < z.1 ∧ z.1 < S.x₁) ∧ (S.y₀ < z.2 ∧ z.2 < S.y₁)) : z ∈ interior S.toSet := by
-  rw [Rectangle.toSet, interior_prod_eq, interior_Icc, interior_Icc]
-  exact h
-
-private lemma width_nonneg (S : Rectangle) : 0 ≤ S.width := sub_nonneg.mpr S.hx
-
 /-! ### Sums of tile widths -/
 
 section WidthSum
@@ -72,7 +61,7 @@ noncomputable def widthSum (T : ι → Rectangle) (p : ι → Prop) : ℝ :=
   ∑ i, if p i then (T i).width else 0
 
 private lemma widthSum_nonneg (T : ι → Rectangle) (p : ι → Prop) : 0 ≤ widthSum T p :=
-  Finset.sum_nonneg fun i _ ↦ by split_ifs <;> simp [width_nonneg]
+  Finset.sum_nonneg fun i _ ↦ by split_ifs <;> simp [Rectangle.width_nonneg]
 
 open scoped Classical in
 /-- Two width sums agree when their predicates do. -/
@@ -97,19 +86,7 @@ private lemma widthSum_isInt (h : ∀ i, p i → ∃ n : ℤ, (T i).width = n) :
 
 end WidthSum
 
-/-! ### The tiles of a tiling and their horizontal edges -/
-
-/-- Each tile of a tiling is contained in the tiled rectangle. -/
-private lemma tile_subset [Fintype ι] (hT : IsTiling R T) (i : ι) : (T i).toSet ⊆ R.toSet :=
-  (subset_iUnion (fun j ↦ (T j).toSet) i).trans hT.cover.superset
-
-private lemma le_tile_y₀ [Fintype ι] (hT : IsTiling R T) (i : ι) : R.y₀ ≤ (T i).y₀ :=
-  (mem_toSet.mp (tile_subset hT i (show ((T i).x₀, (T i).y₀) ∈ (T i).toSet from
-    mem_toSet.mpr ⟨⟨le_rfl, (T i).hx⟩, ⟨le_rfl, (T i).hy⟩⟩))).2.1
-
-private lemma tile_y₁_le [Fintype ι] (hT : IsTiling R T) (i : ι) : (T i).y₁ ≤ R.y₁ :=
-  (mem_toSet.mp (tile_subset hT i (show ((T i).x₁, (T i).y₁) ∈ (T i).toSet from
-    mem_toSet.mpr ⟨⟨(T i).hx, le_rfl⟩, ⟨(T i).hy, le_rfl⟩⟩))).2.2
+/-! ### The horizontal edges of a tiling -/
 
 /-- The set of heights at which some tile has a horizontal edge. The sweep function below is
 constant between consecutive such heights and can only jump across them. -/
@@ -156,12 +133,6 @@ private lemma slice_eq_empty {t : ℝ} {i : ι} (h : ¬((T i).y₀ < t ∧ t < (
     slice T t i = ∅ :=
   eq_empty_iff_forall_notMem.mpr fun _ hx ↦ h ⟨hx.1, hx.2.1⟩
 
-/-- Two closed intervals with disjoint interiors meet in a null set. -/
-private lemma volume_Icc_inter_Icc {a b c d : ℝ} (h : Disjoint (Ioo a b) (Ioo c d)) :
-    volume (Icc a b ∩ Icc c d) = 0 := by
-  rw [Set.Icc_inter_Icc, Real.volume_Icc, ENNReal.ofReal_eq_zero, sub_nonpos]
-  rwa [Set.disjoint_iff_inter_eq_empty, Set.Ioo_inter_Ioo, Set.Ioo_eq_empty_iff, not_lt] at h
-
 /-- **The slice lemma.** Cut a tiling along a horizontal line `y = t` that lies inside the tiled
 rectangle and misses every tile edge. The line crosses the interiors of the tiles it meets, so their
 traces on it have pairwise-disjoint interiors and cover the full width of the tiled rectangle;
@@ -176,12 +147,12 @@ theorem widthSum_slice [Fintype ι] (hT : IsTiling R T) {t : ℝ} (ht₀ : R.y�
     ext x
     simp only [mem_iUnion]
     refine ⟨fun ⟨i, hi⟩ ↦ ?_, fun hx ↦ ?_⟩
-    · exact (mem_toSet.mp (tile_subset hT i (show (x, t) ∈ (T i).toSet from
-        mem_toSet.mpr ⟨⟨hi.2.2.1, hi.2.2.2⟩, ⟨hi.1.le, hi.2.1.le⟩⟩))).1
-    · have hz : (x, t) ∈ R.toSet := mem_toSet.mpr ⟨⟨hx.1, hx.2⟩, ⟨ht₀, ht₁⟩⟩
+    · exact (Rectangle.mem_toSet.mp (hT.tile_subset i (show (x, t) ∈ (T i).toSet from
+        Rectangle.mem_toSet.mpr ⟨⟨hi.2.2.1, hi.2.2.2⟩, ⟨hi.1.le, hi.2.1.le⟩⟩))).1
+    · have hz : (x, t) ∈ R.toSet := Rectangle.mem_toSet.mpr ⟨⟨hx.1, hx.2⟩, ⟨ht₀, ht₁⟩⟩
       rw [hT.cover] at hz
       obtain ⟨i, hi⟩ := mem_iUnion.mp hz
-      obtain ⟨hxi, hti⟩ := mem_toSet.mp hi
+      obtain ⟨hxi, hti⟩ := Rectangle.mem_toSet.mp hi
       exact ⟨i, ((hcross i).mp hti).1, ((hcross i).mp hti).2, hxi.1, hxi.2⟩
   have hdisj : Pairwise (Function.onFun (AEDisjoint volume) (slice T t)) := by
     intro i j hij
@@ -189,10 +160,10 @@ theorem widthSum_slice [Fintype ι] (hT : IsTiling R T) {t : ℝ} (ht₀ : R.y�
     by_cases hi : (T i).y₀ < t ∧ t < (T i).y₁
     · by_cases hj : (T j).y₀ < t ∧ t < (T j).y₁
       · rw [slice_eq_Icc hi, slice_eq_Icc hj]
-        refine volume_Icc_inter_Icc (Set.disjoint_left.mpr fun x hx hx' ↦ ?_)
+        refine aedisjoint_Icc_of_disjoint_Ioo (Set.disjoint_left.mpr fun x hx hx' ↦ ?_)
         exact Set.disjoint_left.mp (hT.interiorDisjoint hij)
-          (mem_interior_toSet (z := (x, t)) ⟨⟨hx.1, hx.2⟩, hi⟩)
-          (mem_interior_toSet (z := (x, t)) ⟨⟨hx'.1, hx'.2⟩, hj⟩)
+          (Rectangle.mem_interior_toSet (z := (x, t)) ⟨⟨hx.1, hx.2⟩, hi⟩)
+          (Rectangle.mem_interior_toSet (z := (x, t)) ⟨⟨hx'.1, hx'.2⟩, hj⟩)
       · rw [slice_eq_empty hj, Set.inter_empty, measure_empty]
     · rw [slice_eq_empty hi, Set.empty_inter, measure_empty]
   have hnull : ∀ i, NullMeasurableSet (slice T t i) volume := fun i ↦ by
@@ -200,8 +171,9 @@ theorem widthSum_slice [Fintype ι] (hT : IsTiling R T) {t : ℝ} (ht₀ : R.y�
     · rw [slice_eq_Icc hi]; exact measurableSet_Icc.nullMeasurableSet
     · rw [slice_eq_empty hi]; exact MeasurableSet.empty.nullMeasurableSet
   have hvolR : volume (Icc R.x₀ R.x₁) = ENNReal.ofReal R.width := Real.volume_Icc
-  refine (ENNReal.ofReal_eq_ofReal_iff (widthSum_nonneg T _) (width_nonneg R)).mp ?_.symm
-  rw [widthSum, ENNReal.ofReal_sum_of_nonneg fun i _ ↦ by split_ifs <;> simp [width_nonneg],
+  refine (ENNReal.ofReal_eq_ofReal_iff (widthSum_nonneg T _) R.width_nonneg).mp ?_.symm
+  rw [widthSum,
+    ENNReal.ofReal_sum_of_nonneg fun i _ ↦ by split_ifs <;> simp [Rectangle.width_nonneg],
     ← hvolR, ← hunion, measure_iUnion₀ hdisj hnull, tsum_fintype]
   exact Finset.sum_congr rfl fun i _ ↦ by
     split_ifs with h <;> simp [slice_eq_Icc, slice_eq_empty, h, Real.volume_Icc, Rectangle.width]
@@ -276,7 +248,7 @@ private noncomputable def sweep (R : Rectangle) (T : ι → Rectangle) (t : ℝ)
 
 /-- Below the tiled rectangle the sweep function vanishes: no tile has been entered yet. -/
 private lemma sweep_eq_zero (hT : IsTiling R T) {t : ℝ} (ht : t ≤ R.y₀) : sweep R T t = 0 :=
-  widthSum_eq_zero fun i h ↦ absurd h.1 (not_lt.mpr (ht.trans (le_tile_y₀ hT i)))
+  widthSum_eq_zero fun i h ↦ absurd h.1 (not_lt.mpr (ht.trans (hT.le_tile_y₀ i)))
 
 /-- At height `c` the sweep function counts the tiles strictly straddling `c` together with those
 dying at `c`. -/
@@ -342,9 +314,9 @@ theorem exists_int_jump (hT : IsTiling R T) (hsides : ∀ i, (T i).HasIntegerSid
       push_cast; ring
     · refine ⟨0, ?_⟩
       rw [widthSum_eq_zero (p := fun i ↦ (T i).y₀ = c ∧ c < (T i).y₁ ∧ ¬ IntHeight R (T i).y₁)
-          fun i h ↦ by linarith [le_tile_y₀ hT i, h.1],
+          fun i h ↦ by linarith [hT.le_tile_y₀ i, h.1],
         widthSum_eq_zero (p := fun i ↦ (T i).y₀ < c ∧ c = (T i).y₁ ∧ ¬ IntHeight R (T i).y₁)
-          fun i h ↦ by linarith [le_tile_y₀ hT i, h.1]]
+          fun i h ↦ by linarith [hT.le_tile_y₀ i, h.1]]
       simp
 
 /-- At the top edge of a tiled rectangle of non-integer height, the sweep function has picked up
@@ -352,8 +324,8 @@ every tile touching the top, and those tiles span the full width. -/
 private lemma sweep_top (hT : IsTiling R T) (hy : R.y₀ < R.y₁) (hnint : ¬ IntHeight R R.y₁) :
     sweep R T R.y₁ = R.width := by
   have h := straddle_add_loss hT hy le_rfl
-  rw [widthSum_eq_zero fun i hi ↦ absurd hi.2 (not_lt.mpr (tile_y₁_le hT i)), zero_add] at h
-  exact (widthSum_congr fun i ↦ by have := tile_y₁_le hT i; grind).trans h
+  rw [widthSum_eq_zero fun i hi ↦ absurd hi.2 (not_lt.mpr (hT.tile_y₁_le i)), zero_add] at h
+  exact (widthSum_congr fun i ↦ by have := hT.tile_y₁_le i; grind).trans h
 
 /-! ### Constancy of the sweep function modulo `ℤ` -/
 
