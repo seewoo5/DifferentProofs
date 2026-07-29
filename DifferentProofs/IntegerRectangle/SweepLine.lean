@@ -82,7 +82,9 @@ private lemma widthSum_isInt (h : ∀ i, p i → ∃ n : ℤ, (T i).width = n) :
     ∃ n : ℤ, widthSum T p = n := by
   classical
   choose! n hn using h
-  exact ⟨∑ i, if p i then n i else 0, by push_cast; grind [widthSum]⟩
+  refine ⟨∑ i, if p i then n i else 0, ?_⟩
+  push_cast
+  grind [widthSum]
 
 end WidthSum
 
@@ -127,7 +129,8 @@ private def slice (T : ι → Rectangle) (t : ℝ) (i : ι) : Set ℝ :=
 
 private lemma slice_eq_Icc {t : ℝ} {i : ι} (h : (T i).y₀ < t ∧ t < (T i).y₁) :
     slice T t i = Icc (T i).x₀ (T i).x₁ := by
-  ext x; simp [slice, h.1, h.2, Set.mem_Icc]
+  ext x
+  simp [slice, h.1, h.2, Set.mem_Icc]
 
 private lemma slice_eq_empty {t : ℝ} {i : ι} (h : ¬((T i).y₀ < t ∧ t < (T i).y₁)) :
     slice T t i = ∅ :=
@@ -142,7 +145,7 @@ theorem widthSum_slice [Fintype ι] (hT : IsTiling R T) {t : ℝ} (ht₀ : R.y�
     widthSum T (fun i ↦ (T i).y₀ < t ∧ t < (T i).y₁) = R.width := by
   classical
   have hcross : ∀ i, ((T i).y₀ ≤ t ∧ t ≤ (T i).y₁) ↔ ((T i).y₀ < t ∧ t < (T i).y₁) := fun i ↦ by
-    have := tile_y₀_mem_edgeSet T i; have := tile_y₁_mem_edgeSet T i; grind
+    grind [tile_y₀_mem_edgeSet T i, tile_y₁_mem_edgeSet T i]
   have hunion : ⋃ i, slice T t i = Icc R.x₀ R.x₁ := by
     ext x
     simp only [mem_iUnion]
@@ -168,8 +171,10 @@ theorem widthSum_slice [Fintype ι] (hT : IsTiling R T) {t : ℝ} (ht₀ : R.y�
     · rw [slice_eq_empty hi, Set.empty_inter, measure_empty]
   have hnull : ∀ i, NullMeasurableSet (slice T t i) volume := fun i ↦ by
     by_cases hi : (T i).y₀ < t ∧ t < (T i).y₁
-    · rw [slice_eq_Icc hi]; exact measurableSet_Icc.nullMeasurableSet
-    · rw [slice_eq_empty hi]; exact MeasurableSet.empty.nullMeasurableSet
+    · rw [slice_eq_Icc hi]
+      exact measurableSet_Icc.nullMeasurableSet
+    · rw [slice_eq_empty hi]
+      exact MeasurableSet.empty.nullMeasurableSet
   have hvolR : volume (Icc R.x₀ R.x₁) = ENNReal.ofReal R.width := Real.volume_Icc
   refine (ENNReal.ofReal_eq_ofReal_iff (widthSum_nonneg T _) R.width_nonneg).mp ?_.symm
   rw [widthSum,
@@ -235,7 +240,8 @@ private lemma width_isInt (hsides : ∀ i, (T i).HasIntegerSide) {i : ι}
     (h : ¬ (IntHeight R (T i).y₀ ↔ IntHeight R (T i).y₁)) : ∃ n : ℤ, (T i).width = n :=
   (hsides i).resolve_right fun ⟨m, hm⟩ ↦ h <|
     have hm' : (T i).y₁ - (T i).y₀ = (m : ℝ) := hm
-    ⟨fun ⟨k, hk⟩ ↦ ⟨m + k, by push_cast; linarith⟩, fun ⟨k, hk⟩ ↦ ⟨k - m, by push_cast; linarith⟩⟩
+    ⟨fun ⟨k, hk⟩ ↦ ⟨m + k, by linarith [Int.cast_add (R := ℝ) m k]⟩,
+      fun ⟨k, hk⟩ ↦ ⟨k - m, by linarith [Int.cast_sub (R := ℝ) k m]⟩⟩
 
 section Sweep
 
@@ -311,7 +317,8 @@ theorem exists_int_jump (hT : IsTiling R T) (hsides : ∀ i, (T i).HasIntegerSid
         fun i h ↦ width_isInt hsides fun hiff ↦ hint (h.1 ▸ hiff.mpr h.2.2)
       refine ⟨-n, ?_⟩
       rw [hloss, ← gain_eq_loss hT hy₀ hc, hsplit, hn]
-      push_cast; ring
+      push_cast
+      ring
     · refine ⟨0, ?_⟩
       rw [widthSum_eq_zero (p := fun i ↦ (T i).y₀ = c ∧ c < (T i).y₁ ∧ ¬ IntHeight R (T i).y₁)
           fun i h ↦ by linarith [hT.le_tile_y₀ i, h.1],
@@ -325,7 +332,7 @@ private lemma sweep_top (hT : IsTiling R T) (hy : R.y₀ < R.y₁) (hnint : ¬ I
     sweep R T R.y₁ = R.width := by
   have h := straddle_add_loss hT hy le_rfl
   rw [widthSum_eq_zero fun i hi ↦ absurd hi.2 (not_lt.mpr (hT.tile_y₁_le i)), zero_add] at h
-  exact (widthSum_congr fun i ↦ by have := hT.tile_y₁_le i; grind).trans h
+  exact (widthSum_congr fun i ↦ by grind [hT.tile_y₁_le i]).trans h
 
 /-! ### Constancy of the sweep function modulo `ℤ` -/
 
@@ -352,7 +359,8 @@ private lemma isLocallyConstant_fract_sweepTrunc (hT : IsTiling R T)
     · rw [sweep_eq_of_left hgap (by grind) hle]
     · obtain ⟨n, hn⟩ := exists_int_jump hT hsides hc
       have hjump : sweep R T t = sweep R T c + (n : ℝ) := by
-        rw [sweep_above hgap hlt (by grind), sweep_at]; linarith
+        rw [sweep_above hgap hlt (by grind), sweep_at]
+        linarith
       rw [hjump, Int.fract_add_intCast]
   · obtain ⟨ε, hε, hgap⟩ := exists_gap T R.y₁
     refine ⟨ε, hε, fun {t} ht ↦ ?_⟩
