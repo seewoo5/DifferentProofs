@@ -7,6 +7,7 @@ import DifferentProofs.IntegerRectangle.Checkerboard
 import DifferentProofs.IntegerRectangle.ComplexIntegral
 import DifferentProofs.IntegerRectangle.Defs
 import DifferentProofs.IntegerRectangle.RealIntegral
+import DifferentProofs.IntegerRectangle.SweepLine
 
 open Verso.Genre
 open Verso.Genre.Manual
@@ -28,7 +29,7 @@ which has at least one integer side, then the tiled rectangle has at least one i
 *tiling* is a covering by axis-parallel rectangles with pairwise-disjoint interiors.
 :::
 
-The three analytic proofs below share one mechanism. To a rectangle $`[a,b] \times [c,d]` attach the
+The first three proofs below are analytic and share one mechanism. To a rectangle $`[a,b] \times [c,d]` attach the
 number $`\int\!\!\int g(x)\,h(y)\,dx\,dy`, which by Fubini factors as
 $`\bigl(\int_a^b g\bigr)\bigl(\int_c^d h\bigr)`. This functional is additive over a tiling because
 the tiles are pairwise almost-disjoint (their overlaps lie in null boundaries), so it is captured by
@@ -94,4 +95,76 @@ its integral over any integer-length interval is $`0`, so every tile with an int
 By the engine {uses "lem:int-rect-engine"}[] so is $`R`. But over $`[s, b]` the square wave integrates
 to the triangle wave $`\min(r, 1-r)`, with $`r` the fractional part of $`b - s`, which is nonzero
 unless $`b - s \in \mathbb{Z}`; hence $`R` has an integer side.
+:::
+
+Twelveth proof: a sweep line (Bachman–Yannakakis). This one does not use the analytic engine above.
+Instead of an integral it propagates a conserved quantity upward through the tiling, and the only
+geometry it needs is what a horizontal cut of a tiling looks like — the slice lemma below.
+
+:::lemma_ "lem:int-rect-slice" (parent := "grp:int-rect") (lean := "IntegerRectangle.SweepLine.widthSum_slice")
+Let $`T` tile $`R` and let $`t` be a height between the bottom and the top of $`R` avoiding every
+horizontal tile edge. Then the widths of the tiles crossed by the line $`y = t` add up to the width
+of $`R`.
+:::
+
+:::proof "lem:int-rect-slice"
+Because $`t` avoids the horizontal edges, a tile met by the line at all is crossed through its
+interior, and its trace on the line is the closed interval spanned by its width. The traces cover
+the full cross-section of $`R` at height $`t` because the tiles cover $`R`, and two distinct traces
+meet in a null set: an interior point of both traces would be an interior point of both tiles.
+Additivity of one-dimensional Lebesgue measure over this almost-disjoint cover gives the claim.
+:::
+
+:::lemma_ "lem:int-rect-conservation" (parent := "grp:int-rect") (lean := "IntegerRectangle.SweepLine.gain_eq_loss")
+At every height $`c` strictly between the bottom and the top of $`R`, the tiles whose bottom edge
+lies at $`c` (the tiles *born* at $`c`) have the same total width as the tiles whose top edge lies
+at $`c` (the tiles *dying* at $`c`).
+:::
+
+:::proof "lem:int-rect-conservation"
+The finitely many horizontal tile edges leave a punctured neighbourhood of $`c` edge-free, so the
+slice lemma {uses "lem:int-rect-slice"}[] applies at heights just below and just above $`c`, and
+both slices total the width of $`R`. The slice below consists of the tiles strictly straddling $`c`
+together with those dying at $`c`; the slice above, of the same straddling tiles together with those
+born at $`c`. Subtracting the common straddling part equates the gain with the loss.
+:::
+
+:::lemma_ "lem:int-rect-jump" (parent := "grp:int-rect") (lean := "IntegerRectangle.SweepLine.exists_int_jump")
+Call a height *integral* if it lies an integer distance above the base of $`R`, and suppose every
+tile has an integer side. For a height $`c` below the top of $`R`, let the *gain* $`G(c)` be the
+total width of the tiles born at $`c` whose top edge is non-integral, and the *loss* $`L(c)` the
+total width of the tiles dying at $`c` whose top edge is non-integral. Then
+$`G(c) - L(c) \in \mathbb{Z}`.
+:::
+
+:::proof "lem:int-rect-jump"
+A tile with exactly one of its two horizontal edges at integral height has non-integer height,
+hence integer width by the hypothesis, and any sum of such widths is an integer. If $`c` is
+integral then $`L(c) = 0` outright — a tile dying at $`c` has its top edge at the integral height
+$`c`, so it is not counted — while every tile counted by $`G(c)` has integral bottom and
+non-integral top, so $`G(c)` is an integer. If $`c` is not integral (in particular $`c` is strictly
+above the base), then *every* tile dying at $`c` has non-integral top, so $`L(c)` is the full dying
+width, which by conservation {uses "lem:int-rect-conservation"}[] equals the full born width; hence
+$`G(c) - L(c)` is minus the width born at $`c` with integral top, and each such tile has
+non-integral bottom and integral top — integer width again.
+:::
+
+:::theorem "thm:int-rect-sweep" (parent := "grp:int-rect") (lean := "IntegerRectangle.SweepLine.IntegerRectangleTheorem_SweepLine") (proofColor := "#fbcfe8")
+A rectangle tiled by rectangles each with an integer side has an integer side.
+:::
+
+:::proof "thm:int-rect-sweep"
+Suppose the height of $`R` is not an integer, and sweep a horizontal line up through the tiling. At
+height $`t` let $`f(t)` be the total width of the tiles the line meets — each tile taken with its
+bottom edge removed — whose top edge is at non-integral height above the base of $`R`. Below $`R`
+no tile has been entered, so $`f = 0`. At the top of $`R` exactly the tiles touching the top edge
+are counted — their top edge is at the height of $`R`, which is non-integral — and by the slice
+lemma {uses "lem:int-rect-slice"}[] applied just below the top these tiles span the full width, so
+$`f` ends at the width of $`R`. Between horizontal tile edges $`f` is constant, and crossing a
+height $`c` changes it by the gain minus the loss at $`c`, which is an integer
+{uses "lem:int-rect-jump"}[]. Rather than sorting the finitely many tile edges, this is packaged as
+local constancy of $`t \mapsto \{f(t)\}` and settled by connectedness of $`\mathbb{R}`: the
+fractional part of the width of $`R` equals the fractional part of $`f` below $`R`, namely $`0`.
+(The jump lemma stops below the top of $`R` — conservation genuinely fails there, that failure
+being the theorem — so $`f` is frozen at the top before taking fractional parts.)
 :::
