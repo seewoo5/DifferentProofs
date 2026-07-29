@@ -97,7 +97,7 @@ to the triangle wave $`\min(r, 1-r)`, with $`r` the fractional part of $`b - s`,
 unless $`b - s \in \mathbb{Z}`; hence $`R` has an integer side.
 :::
 
-Twelveth proof: a sweep line (Bachman–Yannakakis). This one does not use the analytic engine above.
+Twelfth proof: a sweep line (Bachman–Yannakakis). This one does not use the analytic engine above.
 Instead of an integral it propagates a conserved quantity upward through the tiling, and the only
 geometry it needs is what a horizontal cut of a tiling looks like — the slice lemma below.
 
