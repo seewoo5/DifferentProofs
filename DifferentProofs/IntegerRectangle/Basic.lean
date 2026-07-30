@@ -100,6 +100,13 @@ variable {ι : Type*} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
 lemma IsTiling.tile_subset (hT : IsTiling R T) (i : ι) : (T i).toSet ⊆ R.toSet :=
   (subset_iUnion (fun j ↦ (T j).toSet) i).trans hT.cover.superset
 
+/-- A tiling has at least one tile: the tiled rectangle contains its lower-left corner, and the
+tiles cover it. -/
+lemma IsTiling.nonempty_index (hT : IsTiling R T) : Nonempty ι := by
+  have h : (R.x₀, R.y₀) ∈ R.toSet := Rectangle.mem_toSet.mpr ⟨⟨le_rfl, R.hx⟩, le_rfl, R.hy⟩
+  obtain ⟨i, -⟩ := mem_iUnion.mp (hT.cover.subset h)
+  exact ⟨i⟩
+
 /-- No tile of a tiling reaches below the base of the tiled rectangle. -/
 lemma IsTiling.le_tile_y₀ (hT : IsTiling R T) (i : ι) : R.y₀ ≤ (T i).y₀ :=
   (Rectangle.mem_toSet.mp (hT.tile_subset i (show ((T i).x₀, (T i).y₀) ∈ (T i).toSet from

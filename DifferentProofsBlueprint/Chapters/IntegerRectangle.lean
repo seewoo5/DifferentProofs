@@ -6,8 +6,10 @@ import DifferentProofs.IntegerRectangle.Basic
 import DifferentProofs.IntegerRectangle.Checkerboard
 import DifferentProofs.IntegerRectangle.ComplexIntegral
 import DifferentProofs.IntegerRectangle.Defs
+import DifferentProofs.IntegerRectangle.GridRefinement
 import DifferentProofs.IntegerRectangle.Primes
 import DifferentProofs.IntegerRectangle.RealIntegral
+import DifferentProofs.IntegerRectangle.StepFunction
 import DifferentProofs.IntegerRectangle.SweepLine
 
 open Verso.Genre
@@ -98,6 +100,66 @@ to the triangle wave $`\min(r, 1-r)`, with $`r` the fractional part of $`b - s`,
 unless $`b - s \in \mathbb{Z}`; hence $`R` has an integer side.
 :::
 
+Sixth proof: prime numbers (Robinson). Wagon scales the tiling by a prime $`p` and rounds all tile
+corners to integers, which requires verifying that the rounded rectangles tile again. Instead we
+count lattice points: rounding is hidden inside a floor, and the re-tiling is replaced by the fact
+that the *half-open* cells of a tiling — each tile minus its left and bottom edges — genuinely
+partition the half-open cell of $`R`, with no null sets involved.
+
+:::lemma_ "lem:int-rect-partition" (parent := "grp:int-rect") (lean := "IntegerRectangle.IsTiling.iUnion_toSetIoc")
+The half-open cells of the tiles of a tiling are pairwise disjoint and their union is the half-open
+cell of the tiled rectangle.
+:::
+
+:::proof "lem:int-rect-partition"
+Disjointness: a point common to two half-open cells moves down-and-left — to the midpoint between
+the higher of the two lower-left corners and the point itself — into the interiors of both tiles,
+contradicting interior-disjointness. Covering: a point of the ambient half-open cell is approached
+from below-left; every such nudge stays in $`R`, hence in some tile, and since there are finitely
+many tiles one tile contains nudges arbitrarily close in. That tile is closed, so it contains the
+point, and the nudges witness the two strict inequalities of its half-open cell.
+:::
+
+:::lemma_ "lem:int-rect-count" (parent := "grp:int-rect") (lean := "IntegerRectangle.Primes.card_latticePoints_eq_sum")
+For $`p > 0`, the number of points of the lattice $`\tfrac1p\mathbb{Z} \times \tfrac1p\mathbb{Z}`
+in the half-open cell of $`R` is the sum of the numbers of such points in the half-open cells of
+the tiles. Moreover the count for a rectangle $`[x_0,x_1] \times [y_0,y_1]` is the product
+$`(\lfloor p x_1 \rfloor - \lfloor p x_0 \rfloor)(\lfloor p y_1 \rfloor - \lfloor p y_0 \rfloor)`.
+:::
+
+:::proof "lem:int-rect-count"
+A lattice point $`(a/p, b/p)` lies in the half-open cell iff $`\lfloor p x_0\rfloor < a \le
+\lfloor p x_1\rfloor` and likewise for $`b`, which gives the product formula; additivity is then
+exactly the exact-partition property {uses "lem:int-rect-partition"}[] of the half-open cells, read
+through this membership description.
+:::
+
+:::lemma_ "lem:int-rect-near" (parent := "grp:int-rect") (lean := "IntegerRectangle.Primes.exists_side_near_int")
+If every tile has an integer side, then for every prime $`p` the width or the height of $`R` is
+within $`1/p` of an integer.
+:::
+
+:::proof "lem:int-rect-near"
+A tile side of integer length $`n` contributes the floor-difference factor
+$`\lfloor p x_0 + pn\rfloor - \lfloor p x_0\rfloor = pn`, so every tile's lattice count is
+divisible by $`p`, and by additivity {uses "lem:int-rect-count"}[] so is the count of $`R`, a
+product of two floor differences. Primality forces $`p` to divide one factor, say
+$`\lfloor p x_1\rfloor - \lfloor p x_0\rfloor = pm`; then $`p(x_1 - x_0) - pm` is a difference of
+two floor remainders, each in $`[0,1)`, so $`|`width$` - m| < 1/p`.
+:::
+
+:::theorem "thm:int-rect-primes" (parent := "grp:int-rect") (lean := "IntegerRectangle.Primes.IntegerRectangleTheorem_Primes") (proofColor := "#fbcfe8")
+A rectangle tiled by rectangles each with an integer side has an integer side.
+:::
+
+:::proof "thm:int-rect-primes"
+Suppose neither side of $`R` is an integer. Each of the width and the height then keeps some fixed
+positive distance from every integer — at least the smaller of its fractional part and one minus
+it. Choosing a prime $`p` larger than the reciprocals of both distances (there are infinitely many
+primes), no side of $`R` can be within $`1/p` of an integer, contradicting the claim
+{uses "lem:int-rect-near"}[] for this $`p`.
+:::
+
 Twelfth proof: a sweep line (Bachman–Yannakakis). This one does not use the analytic engine above.
 Instead of an integral it propagates a conserved quantity upward through the tiling, and the only
 geometry it needs is what a horizontal cut of a tiling looks like — the slice lemma below.
@@ -170,62 +232,53 @@ fractional part of the width of $`R` equals the fractional part of $`f` below $`
 being the theorem — so $`f` is frozen at the top before taking fractional parts.)
 :::
 
-Sixth proof: prime numbers (Robinson). Wagon scales the tiling by a prime $`p` and rounds all tile
-corners to integers, which requires verifying that the rounded rectangles tile again. Instead we
-count lattice points: rounding is hidden inside a floor, and the re-tiling is replaced by the fact
-that the *half-open* cells of a tiling — each tile minus its left and bottom edges — genuinely
-partition the half-open cell of $`R`, with no null sets involved.
+Thirteenth proof: step functions (Hochster–Maté). Like the first three this attaches a number to
+each rectangle and rides on additivity over the tiling, but the number comes from a *step function*
+instead of an integral, and the additivity is combinatorial rather than measure-theoretic: it holds
+for the f-area built from an arbitrary function, with no regularity at all.
 
-:::lemma_ "lem:int-rect-partition" (parent := "grp:int-rect") (lean := "IntegerRectangle.IsTiling.iUnion_toSetIoc")
-The half-open cells of the tiles of a tiling are pairwise disjoint and their union is the half-open
-cell of the tiled rectangle.
+:::lemma_ "lem:int-rect-fgarea" (parent := "grp:int-rect") (lean := "IntegerRectangle.IsTiling.sum_fgArea")
+For functions $`f, g : \mathbb{R} \to \mathbb{R}` define the *f-area* of a rectangle
+$`[x_0, x_1] \times [y_0, y_1]` as $`(f(x_1) - f(x_0)) \cdot (g(y_1) - g(y_0))`. If $`T` tiles $`R`
+then the f-areas of the tiles sum to the f-area of $`R`, for arbitrary $`f` and $`g`.
 :::
 
-:::proof "lem:int-rect-partition"
-Disjointness: a point common to two half-open cells moves down-and-left — to the midpoint between
-the higher of the two lower-left corners and the point itself — into the interiors of both tiles,
-contradicting interior-disjointness. Covering: a point of the ambient half-open cell is approached
-from below-left; every such nudge stays in $`R`, hence in some tile, and since there are finitely
-many tiles one tile contains nudges arbitrarily close in. That tile is closed, so it contains the
-point, and the nudges witness the two strict inequalities of its half-open cell.
+:::proof "lem:int-rect-fgarea"
+The tile edges form a graph; extending its edges across $`R` cuts $`R` into a grid, whose vertical
+lines carry the finitely many x-coordinates of vertical tile edges and whose horizontal lines carry
+the y-coordinates of horizontal ones. No grid coordinate lies strictly inside an open grid cell, so
+a tile covering the centre of a cell has all four edges clear of it and contains the whole cell; by
+disjointness of interiors this tile is unique. Conversely the cells assigned to a tile fill out a
+full product subdivision of it, because the tile's own edges are grid lines. Summing f-areas of
+cells therefore counts every cell exactly once, tile by tile; over a product subdivision the sum
+telescopes in both coordinates to the tile's f-area, and over the whole grid it telescopes to the
+f-area of $`R`.
 :::
 
-:::lemma_ "lem:int-rect-count" (parent := "grp:int-rect") (lean := "IntegerRectangle.Primes.card_latticePoints_eq_sum")
-For $`p > 0`, the number of points of the lattice $`\tfrac1p\mathbb{Z} \times \tfrac1p\mathbb{Z}`
-in the half-open cell of $`R` is the sum of the numbers of such points in the half-open cells of
-the tiles. Moreover the count for a rectangle $`[x_0,x_1] \times [y_0,y_1]` is the product
-$`(\lfloor p x_1 \rfloor - \lfloor p x_0 \rfloor)(\lfloor p y_1 \rfloor - \lfloor p y_0 \rfloor)`.
+:::lemma_ "lem:int-rect-step-engine" (parent := "grp:int-rect") (lean := "IntegerRectangle.StepFunction.dichotomy")
+Let $`f, g : \mathbb{R} \to \mathbb{R}` be arbitrary. If $`T` tiles $`R` and every tile has a
+vanishing increment of $`f` across its width or of $`g` across its height, then the same dichotomy
+holds for $`R`.
 :::
 
-:::proof "lem:int-rect-count"
-A lattice point $`(a/p, b/p)` lies in the half-open cell iff $`\lfloor p x_0\rfloor < a \le
-\lfloor p x_1\rfloor` and likewise for $`b`, which gives the product formula; additivity is then
-exactly the exact-partition property {uses "lem:int-rect-partition"}[] of the half-open cells, read
-through this membership description.
+:::proof "lem:int-rect-step-engine"
+The f-area of every tile is a product with a vanishing factor, so by additivity of the f-area
+{uses "lem:int-rect-fgarea"}[] the f-area of $`R` vanishes, and a product of reals vanishes only if
+a factor does.
 :::
 
-:::lemma_ "lem:int-rect-near" (parent := "grp:int-rect") (lean := "IntegerRectangle.Primes.exists_side_near_int")
-If every tile has an integer side, then for every prime $`p` the width or the height of $`R` is
-within $`1/p` of an integer.
-:::
-
-:::proof "lem:int-rect-near"
-A tile side of integer length $`n` contributes the floor-difference factor
-$`\lfloor p x_0 + pn\rfloor - \lfloor p x_0\rfloor = pn`, so every tile's lattice count is
-divisible by $`p`, and by additivity {uses "lem:int-rect-count"}[] so is the count of $`R`, a
-product of two floor differences. Primality forces $`p` to divide one factor, say
-$`\lfloor p x_1\rfloor - \lfloor p x_0\rfloor = pm`; then $`p(x_1 - x_0) - pm` is a difference of
-two floor remainders, each in $`[0,1)`, so $`|`width$` - m| < 1/p`.
-:::
-
-:::theorem "thm:int-rect-primes" (parent := "grp:int-rect") (lean := "IntegerRectangle.Primes.IntegerRectangleTheorem_Primes") (proofColor := "#fbcfe8")
+:::theorem "thm:int-rect-step" (parent := "grp:int-rect") (lean := "IntegerRectangle.StepFunction.IntegerRectangleTheorem_StepFunction") (proofColor := "#fbcfe8")
 A rectangle tiled by rectangles each with an integer side has an integer side.
 :::
 
-:::proof "thm:int-rect-primes"
-Suppose neither side of $`R` is an integer. Each of the width and the height then keeps some fixed
-positive distance from every integer — at least the smaller of its fractional part and one minus
-it. Choosing a prime $`p` larger than the reciprocals of both distances (there are infinitely many
-primes), no side of $`R` can be within $`1/p` of an integer, contradicting the claim
-{uses "lem:int-rect-near"}[] for this $`p`.
+:::proof "thm:int-rect-step"
+Take $`f = g = \{\cdot\}`, the sawtooth $`\{x\} = x - \lfloor x\rfloor` — the identity minus a
+step function. Its increment $`\{b\} - \{a\}` vanishes if and only if $`b - a \in \mathbb{Z}`, so a
+tile with an integer side satisfies the hypothesis of the engine
+{uses "lem:int-rect-step-engine"}[], which returns a vanishing sawtooth increment for $`R` in one
+of the two directions — an integer side. The criterion is an exact "integer difference" statement,
+so unlike the checkerboard proof, whose triangle wave is symmetric about the half-integers, this
+argument needs no standard-position hypothesis. (The sawtooth increment is also the signed mass of
+$`(a, b]` under Lebesgue measure minus the counting measure of the integers, giving an alternative
+measure-theoretic route to the additivity.)
 :::
