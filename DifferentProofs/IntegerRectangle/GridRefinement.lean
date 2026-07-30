@@ -252,17 +252,12 @@ private lemma existsUnique_openCell_subset (hT : IsTiling R T) {j k : ℕ}
       (Rectangle.mem_interior_toSet ⟨⟨hjx₀.trans_lt hzx.1, hzx.2.trans_le hjx₁⟩,
         hky₀.trans_lt hzy.1, hzy.2.trans_le hky₁⟩)
 
-private lemma nonempty_index (hT : IsTiling R T) : Nonempty ι := by
-  have h : (R.x₀, R.y₀) ∈ R.toSet := Rectangle.mem_toSet.mpr ⟨⟨le_rfl, R.hx⟩, le_rfl, R.hy⟩
-  obtain ⟨i, -⟩ := mem_iUnion.mp (hT.cover.subset h)
-  exact ⟨i⟩
-
 open scoped Classical in
 /-- The tile whose interior contains a given open grid cell (junk value out of range). -/
 private noncomputable def cellTile (hT : IsTiling R T) (p : ℕ × ℕ) : ι :=
   if h : p.1 + 1 < (gridX R T).sort.length ∧ p.2 + 1 < (gridY R T).sort.length then
     (existsUnique_openCell_subset hT h.1 h.2).exists.choose
-  else (nonempty_index hT).some
+  else hT.nonempty_index.some
 
 private lemma openCell_subset_cellTile (hT : IsTiling R T) {p : ℕ × ℕ}
     (h₁ : p.1 + 1 < (gridX R T).sort.length) (h₂ : p.2 + 1 < (gridY R T).sort.length) :
