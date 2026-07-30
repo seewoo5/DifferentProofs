@@ -6,6 +6,7 @@ import DifferentProofs.IntegerRectangle.Basic
 import DifferentProofs.IntegerRectangle.Checkerboard
 import DifferentProofs.IntegerRectangle.ComplexIntegral
 import DifferentProofs.IntegerRectangle.Defs
+import DifferentProofs.IntegerRectangle.GridRefinement
 import DifferentProofs.IntegerRectangle.RealIntegral
 import DifferentProofs.IntegerRectangle.StepFunction
 import DifferentProofs.IntegerRectangle.SweepLine
@@ -172,33 +173,37 @@ being the theorem — so $`f` is frozen at the top before taking fractional part
 
 Thirteenth proof: step functions (Hochster–Maté). Like the first three this attaches a number to
 each rectangle and rides on additivity over the tiling, but the number comes from a *step function*
-instead of an integral. Wagon proves the additivity combinatorially, with an arbitrary function in
-place of the sawtooth: the tile edges form a graph, extending it across the rectangle refines the
-tiling into a grid whose every cell lies in exactly one tile, and the sum over a grid telescopes in
-both coordinates. The formalization keeps his functional and the integer-side criterion but
-replaces this re-subdivision by the exact partition of a tiling into half-open cells, which makes
-every plane measure — not just Lebesgue measure — additive over a tiling. The price is stating the
-engine for a difference of two monotone right-continuous functions rather than for an arbitrary
-one — a special case still wide enough for the sawtooth.
+instead of an integral, and the additivity is combinatorial rather than measure-theoretic: it holds
+for the f-area built from an arbitrary function, with no regularity at all.
+
+:::lemma_ "lem:int-rect-farea" (parent := "grp:int-rect") (lean := "IntegerRectangle.IsTiling.sum_fArea")
+For functions $`f, g : \mathbb{R} \to \mathbb{R}` define the *f-area* of a rectangle
+$`[x_0, x_1] \times [y_0, y_1]` as $`(f(x_1) - f(x_0)) \cdot (g(y_1) - g(y_0))`. If $`T` tiles $`R`
+then the f-areas of the tiles sum to the f-area of $`R`, for arbitrary $`f` and $`g`.
+:::
+
+:::proof "lem:int-rect-farea"
+The tile edges form a graph; extending its edges across $`R` cuts $`R` into a grid, whose vertical
+lines carry the finitely many x-coordinates of vertical tile edges and whose horizontal lines carry
+the y-coordinates of horizontal ones. No grid coordinate lies strictly inside an open grid cell, so
+a tile covering the centre of a cell has all four edges clear of it and contains the whole cell; by
+disjointness of interiors this tile is unique. Conversely the cells assigned to a tile fill out a
+full product subdivision of it, because the tile's own edges are grid lines. Summing f-areas of
+cells therefore counts every cell exactly once, tile by tile; over a product subdivision the sum
+telescopes in both coordinates to the tile's f-area, and over the whole grid it telescopes to the
+f-area of $`R`.
+:::
 
 :::lemma_ "lem:int-rect-step-engine" (parent := "grp:int-rect") (lean := "IntegerRectangle.StepFunction.dichotomy")
-Let $`f` and $`g` be Stieltjes functions, that is, monotone and right-continuous, and write
-$`\Delta_a^b = (f - g)(b) - (f - g)(a)` for the increment of $`f - g` across $`(a, b]`. If $`T` tiles
-$`R` and every tile has vanishing increment across its width or across its height, then the same
-dichotomy holds for $`R`.
+Let $`f, g : \mathbb{R} \to \mathbb{R}` be arbitrary. If $`T` tiles $`R` and every tile has a
+vanishing increment of $`f` across its width or of $`g` across its height, then the same dichotomy
+holds for $`R`.
 :::
 
 :::proof "lem:int-rect-step-engine"
-A Stieltjes function $`f` induces a measure with $`\mu_f(a, b] = f(b) - f(a)`, finite on every
-interval, so the increment $`\Delta_a^b` is the signed mass $`\mu_f(a, b] - \mu_g(a, b]`. Multiplying
-the increment across the width by the increment across the height and expanding the two differences
-writes the product as a combination of the four product measures $`\mu_f \otimes \mu_f`,
-$`\mu_f \otimes \mu_g`, $`\mu_g \otimes \mu_f`, $`\mu_g \otimes \mu_g`, each evaluated on the
-half-open cell $`(x_0, x_1] \times (y_0, y_1]` of the rectangle. Since the half-open cells of a
-tiling partition the half-open cell of the tiled rectangle exactly, every plane measure is additive
-over a tiling, so the product of the two increments is too. Each tile contributes a product with a
-vanishing factor, hence the product for $`R` vanishes, and a product of reals vanishes only if a
-factor does.
+The f-area of every tile is a product with a vanishing factor, so by additivity of the f-area
+{uses "lem:int-rect-farea"}[] the f-area of $`R` vanishes, and a product of reals vanishes only if
+a factor does.
 :::
 
 :::theorem "thm:int-rect-step" (parent := "grp:int-rect") (lean := "IntegerRectangle.StepFunction.IntegerRectangleTheorem_StepFunction") (proofColor := "#fbcfe8")
@@ -206,12 +211,13 @@ A rectangle tiled by rectangles each with an integer side has an integer side.
 :::
 
 :::proof "thm:int-rect-step"
-Take $`f(x) = x` and $`g(x) = \lfloor x \rfloor`; both are monotone and right-continuous, and their
-measures are Lebesgue measure and the counting measure of the integers. Their difference is the
-sawtooth $`\{x\} = x - \lfloor x\rfloor`, so the increment across $`(a, b]` is $`\{b\} - \{a\}`,
-which vanishes if and only if $`b - a \in \mathbb{Z}`. A tile with an integer side therefore
-satisfies the hypothesis of the engine {uses "lem:int-rect-step-engine"}[], which returns a
-vanishing increment for $`R` in one of the two directions — an integer side. The sawtooth criterion
-is an exact "integer difference" statement, so unlike the checkerboard proof, whose triangle wave is
-symmetric about the half-integers, this argument needs no standard-position hypothesis.
+Take $`f = g = \{\cdot\}`, the sawtooth $`\{x\} = x - \lfloor x\rfloor` — the identity minus a
+step function. Its increment $`\{b\} - \{a\}` vanishes if and only if $`b - a \in \mathbb{Z}`, so a
+tile with an integer side satisfies the hypothesis of the engine
+{uses "lem:int-rect-step-engine"}[], which returns a vanishing sawtooth increment for $`R` in one
+of the two directions — an integer side. The criterion is an exact "integer difference" statement,
+so unlike the checkerboard proof, whose triangle wave is symmetric about the half-integers, this
+argument needs no standard-position hypothesis. (The sawtooth increment is also the signed mass of
+$`(a, b]` under Lebesgue measure minus the counting measure of the integers, giving an alternative
+measure-theoretic route to the additivity.)
 :::
