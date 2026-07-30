@@ -13,10 +13,10 @@ Wagon's step-function proof rides on an additivity lemma stated for an *arbitrar
 functions `f, g : ℝ → ℝ`, with no regularity whatsoever. Call
 
 ```
-fArea f g S = (f S.x₁ - f S.x₀) · (g S.y₁ - g S.y₀)
+fgArea f g S = (f S.x₁ - f S.x₀) · (g S.y₁ - g S.y₀)
 ```
 
-the *f-area* of a rectangle. Then the f-area is additive over a tiling: `IsTiling.sum_fArea`.
+the *f-area* of a rectangle. Then the f-area is additive over a tiling: `IsTiling.sum_fgArea`.
 
 The proof is Wagon's. The tile edges form a graph; extending its edges across `R` cuts `R` into a
 grid, whose vertical lines carry the finitely many x-coordinates of vertical tile edges
@@ -39,11 +39,12 @@ open Finset Set
 
 namespace IntegerRectangle
 
-/-- The *f-area* of a rectangle, following Wagon: the increment of `f` across the width times the
-increment of `g` across the height. For `f = g = id` it is the usual area; for
-`f = g = Int.fract` it is the quantity driving the step-function proof. Its virtue is additivity
-over a tiling (`IsTiling.sum_fArea`) for completely arbitrary `f` and `g`. -/
-noncomputable def fArea (f g : ℝ → ℝ) (S : Rectangle) : ℝ :=
+/-- The *f-area* of a rectangle in the sense of Wagon — with a separate function per axis, whence
+the name: the increment of `f` across the width times the increment of `g` across the height. For
+`f = g = id` it is the usual area; for `f = g = Int.fract` it is the quantity driving the
+step-function proof. Its virtue is additivity over a tiling (`IsTiling.sum_fgArea`) for
+completely arbitrary `f` and `g`. -/
+noncomputable def fgArea (f g : ℝ → ℝ) (S : Rectangle) : ℝ :=
   (f S.x₁ - f S.x₀) * (g S.y₁ - g S.y₀)
 
 namespace GridRefinement
@@ -378,17 +379,17 @@ open GridRefinement in
 same quantity for the tiled rectangle. The tile edges span a grid; every open grid cell lies in
 exactly one tile, the cells of a tile fill a product of index intervals, and the sum telescopes
 in both coordinates. -/
-theorem IsTiling.sum_fArea {ι : Type*} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
-    (hT : IsTiling R T) (f g : ℝ → ℝ) : ∑ i, fArea f g (T i) = fArea f g R := by
+theorem IsTiling.sum_fgArea {ι : Type*} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
+    (hT : IsTiling R T) (f g : ℝ → ℝ) : ∑ i, fgArea f g (T i) = fgArea f g R := by
   classical
   have hgrid : ∑ p ∈ range ((gridX R T).sort.length - 1) ×ˢ
         range ((gridY R T).sort.length - 1),
       (f (nth (gridX R T) (p.1 + 1)) - f (nth (gridX R T) p.1)) *
-        (g (nth (gridY R T) (p.2 + 1)) - g (nth (gridY R T) p.2)) = fArea f g R := by
+        (g (nth (gridY R T) (p.2 + 1)) - g (nth (gridY R T) p.2)) = fgArea f g R := by
     rw [Finset.range_eq_Ico, Finset.range_eq_Ico]
     refine (sum_product_sub (fun j ↦ f (nth (gridX R T) j)) (fun k ↦ g (nth (gridY R T) k))
       (Nat.zero_le _) (Nat.zero_le _)).trans ?_
-    rw [nth_gridX_zero hT, nth_gridX_last hT, nth_gridY_zero hT, nth_gridY_last hT, fArea]
+    rw [nth_gridX_zero hT, nth_gridX_last hT, nth_gridY_zero hT, nth_gridY_last hT, fgArea]
   rw [← hgrid, ← Finset.sum_fiberwise _ (cellTile hT)
     (fun p ↦ (f (nth (gridX R T) (p.1 + 1)) - f (nth (gridX R T) p.1)) *
       (g (nth (gridY R T) (p.2 + 1)) - g (nth (gridY R T) p.2)))]
@@ -398,6 +399,6 @@ theorem IsTiling.sum_fArea {ι : Type*} [Fintype ι] {R : Rectangle} {T : ι →
     (le_of_nth_le_nth (idxL_lt i) (((nth_idxL i).le.trans (T i).hx).trans (nth_idxR i).ge))
     (le_of_nth_le_nth (idxB_lt i)
       (((nth_idxB i).le.trans (T i).hy).trans (nth_idxT i).ge))).trans ?_).symm
-  rw [nth_idxL, nth_idxR, nth_idxB, nth_idxT, fArea]
+  rw [nth_idxL, nth_idxR, nth_idxB, nth_idxT, fgArea]
 
 end IntegerRectangle

@@ -176,13 +176,13 @@ each rectangle and rides on additivity over the tiling, but the number comes fro
 instead of an integral, and the additivity is combinatorial rather than measure-theoretic: it holds
 for the f-area built from an arbitrary function, with no regularity at all.
 
-:::lemma_ "lem:int-rect-farea" (parent := "grp:int-rect") (lean := "IntegerRectangle.IsTiling.sum_fArea")
+:::lemma_ "lem:int-rect-fgarea" (parent := "grp:int-rect") (lean := "IntegerRectangle.IsTiling.sum_fgArea")
 For functions $`f, g : \mathbb{R} \to \mathbb{R}` define the *f-area* of a rectangle
 $`[x_0, x_1] \times [y_0, y_1]` as $`(f(x_1) - f(x_0)) \cdot (g(y_1) - g(y_0))`. If $`T` tiles $`R`
 then the f-areas of the tiles sum to the f-area of $`R`, for arbitrary $`f` and $`g`.
 :::
 
-:::proof "lem:int-rect-farea"
+:::proof "lem:int-rect-fgarea"
 The tile edges form a graph; extending its edges across $`R` cuts $`R` into a grid, whose vertical
 lines carry the finitely many x-coordinates of vertical tile edges and whose horizontal lines carry
 the y-coordinates of horizontal ones. No grid coordinate lies strictly inside an open grid cell, so
@@ -202,7 +202,7 @@ holds for $`R`.
 
 :::proof "lem:int-rect-step-engine"
 The f-area of every tile is a product with a vanishing factor, so by additivity of the f-area
-{uses "lem:int-rect-farea"}[] the f-area of $`R` vanishes, and a product of reals vanishes only if
+{uses "lem:int-rect-fgarea"}[] the f-area of $`R` vanishes, and a product of reals vanishes only if
 a factor does.
 :::
 

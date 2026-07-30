@@ -12,10 +12,10 @@ Maté. To a rectangle `S = [a, b] × [c, d]` the proof attaches the number
 Φ(S) = ({b} - {a}) · ({d} - {c}),      {x} = x - ⌊x⌋,
 ```
 
-the f-area of `S` (`IntegerRectangle.fArea`) for the sawtooth `Int.fract` — the identity minus a
+the f-area of `S` (`IntegerRectangle.fgArea`) for the sawtooth `Int.fract` — the identity minus a
 step function — in both coordinates. The sawtooth increment `{b} - {a}` vanishes exactly when
 `b - a ∈ ℤ`, so `Φ(S) = 0` says precisely that `S` has an integer side. The f-area of an
-arbitrary pair of functions is additive over a tiling (`IsTiling.sum_fArea`: refine the tiling
+arbitrary pair of functions is additive over a tiling (`IsTiling.sum_fgArea`: refine the tiling
 along the graph formed by the tile edges into a grid and telescope, following Wagon). Every tile
 contributes `0`, hence `Φ(R) = 0` and `R` has an integer side.
 
@@ -40,7 +40,7 @@ height, then the same dichotomy holds for `R`. This is the discrete counterpart 
 theorem dichotomy (hT : IsTiling R T) (f g : ℝ → ℝ)
     (htile : ∀ i, f (T i).x₁ - f (T i).x₀ = 0 ∨ g (T i).y₁ - g (T i).y₀ = 0) :
     f R.x₁ - f R.x₀ = 0 ∨ g R.y₁ - g R.y₀ = 0 :=
-  mul_eq_zero.mp <| (hT.sum_fArea f g).symm.trans <|
+  mul_eq_zero.mp <| (hT.sum_fgArea f g).symm.trans <|
     Finset.sum_eq_zero fun i _ ↦ mul_eq_zero.mpr (htile i)
 
 /-- **The one-dimensional criterion.** The sawtooth increment across `[a, b]` vanishes exactly
