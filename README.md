@@ -45,11 +45,14 @@ This project contains formalizations of different proofs of the same mathematica
 A rectangle tiled by rectangles each having an integer side has an integer side
 ([Stan Wagon, *Fourteen Proofs of a Result About Tiling a Rectangle*](https://www.jstor.org/stable/2322213)).
 
-- [Complex double integral (de Bruijn)](DifferentProofs/IntegerRectangle/ComplexIntegral.lean)
-- [Real double integral](DifferentProofs/IntegerRectangle/RealIntegral.lean)
-- [Checkerboard colouring](DifferentProofs/IntegerRectangle/Checkerboard.lean)
-- [Sweep line (Bachman–Yannakakis)](DifferentProofs/IntegerRectangle/SweepLine.lean)
-- [Step functions (Hochster–Maté)](DifferentProofs/IntegerRectangle/StepFunction.lean)
+Listed in the paper's order, keeping its numbering so the gaps show which of the
+fourteen proofs are still to come.
+
+- Proof 1: [Complex double integral (de Bruijn)](DifferentProofs/IntegerRectangle/ComplexIntegral.lean)
+- Proof 2: [Real double integral](DifferentProofs/IntegerRectangle/RealIntegral.lean)
+- Proof 3: [Checkerboard colouring (Rochberg–Stein)](DifferentProofs/IntegerRectangle/Checkerboard.lean)
+- Proof 12: [Sweep line (Bachman–Yannakakis)](DifferentProofs/IntegerRectangle/SweepLine.lean)
+- Proof 13: [Step functions (Hochster–Maté)](DifferentProofs/IntegerRectangle/StepFunction.lean)
 
 ## Building and serving the blueprint locally
 
