@@ -172,9 +172,14 @@ being the theorem — so $`f` is frozen at the top before taking fractional part
 
 Thirteenth proof: step functions (Hochster–Maté). Like the first three this attaches a number to
 each rectangle and rides on additivity over the tiling, but the number comes from a *step function*
-instead of an integral. Correspondingly the mechanism is not almost-everywhere disjointness of the
-tiles but the exact partition of a tiling into half-open cells, which makes every plane measure —
-not just Lebesgue measure — additive over a tiling.
+instead of an integral. Wagon proves the additivity combinatorially, with an arbitrary function in
+place of the sawtooth: the tile edges form a graph, extending it across the rectangle refines the
+tiling into a grid whose every cell lies in exactly one tile, and the sum over a grid telescopes in
+both coordinates. The formalization keeps his functional and the integer-side criterion but
+replaces this re-subdivision by the exact partition of a tiling into half-open cells, which makes
+every plane measure — not just Lebesgue measure — additive over a tiling. The price is stating the
+engine for a difference of two monotone right-continuous functions rather than for an arbitrary
+one — a special case still wide enough for the sawtooth.
 
 :::lemma_ "lem:int-rect-step-engine" (parent := "grp:int-rect") (lean := "IntegerRectangle.StepFunction.dichotomy")
 Let $`f` and $`g` be Stieltjes functions, that is, monotone and right-continuous, and write

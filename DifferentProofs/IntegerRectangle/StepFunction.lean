@@ -20,16 +20,27 @@ an integer side. This criterion is sharper than the checkerboard proof's triangl
 why no "standard position" hypothesis appears here. Granting that `Φ` is *additive* over a tiling,
 every tile contributes `0`, hence `Φ(R) = 0` and `R` has an integer side.
 
-Additivity is what the step function buys. Both `x` and `⌊x⌋` are monotone and right-continuous,
-hence Stieltjes functions (`StieltjesFunction.id` and `StieltjesFunction.floor`), whose measures are
-Lebesgue measure and the counting measure of the integers. So `{b} - {a}` is the *signed* mass
+Additivity is where this file departs from Wagon's text. There the argument is combinatorial and
+needs no regularity at all, holding with an arbitrary `f : ℝ → ℝ` in place of the sawtooth: the
+tile edges form a graph, extending it across `R` refines the tiling into a grid, every grid cell
+lands inside exactly one tile, the cells inside a tile form a product subdivision of it, and the
+sum of `(f(b) - f(a)) · (f(d) - f(c))` over a product subdivision telescopes in both coordinates.
+Formalizing that route means constructing the refinement and proving that it subdivides each
+tile — the re-tiling verification that the half-open-cell partition exists to avoid.
+
+Instead additivity is bought from measure theory, at the price of regularity the sawtooth happens
+to have. Both `x` and `⌊x⌋` are monotone and right-continuous, hence Stieltjes functions
+(`StieltjesFunction.id` and `StieltjesFunction.floor`), whose measures are Lebesgue measure and
+the counting measure of the integers. So `{b} - {a}` is the *signed* mass
 `λ (a, b] - #(ℤ ∩ (a, b])`, and expanding the product `Φ(S)` turns it into a combination of four
 honest plane measures of the half-open cell of `S`. Each of those is additive over a tiling by
-`IsTiling.measure_toSetIoc`, and `dichotomy` assembles them.
+`IsTiling.measure_toSetIoc`, and `dichotomy` assembles them; the engine is accordingly stated for
+a difference of two Stieltjes functions — a special case of Wagon's arbitrary-`f` lemma, still
+general enough for the sawtooth.
 
-This is the discrete counterpart of the integral engine of `Basic.lean`, and it is stated for an
-arbitrary difference of two Stieltjes functions. No integration and no null sets are involved: the
-whole proof rides on the exact partition of a tiling into half-open cells.
+This is the discrete counterpart of the integral engine of `Basic.lean`. No integration and no
+null sets are involved: the whole proof rides on the exact partition of a tiling into half-open
+cells.
 -/
 
 @[expose] public section
