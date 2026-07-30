@@ -44,13 +44,9 @@ private lemma mem_latticePoints {p : ℕ} (hp : 0 < p) {S : Rectangle} {ab : ℤ
 private lemma card_latticePoints (p : ℕ) (S : Rectangle) :
     ((latticePoints p S).card : ℤ)
       = (⌊S.x₁ * p⌋ - ⌊S.x₀ * p⌋) * (⌊S.y₁ * p⌋ - ⌊S.y₀ * p⌋) := by
-  have hx : ⌊S.x₀ * p⌋ ≤ ⌊S.x₁ * p⌋ :=
-    Int.floor_le_floor (mul_le_mul_of_nonneg_right S.hx (by positivity))
-  have hy : ⌊S.y₀ * p⌋ ≤ ⌊S.y₁ * p⌋ :=
-    Int.floor_le_floor (mul_le_mul_of_nonneg_right S.hy (by positivity))
-  rw [latticePoints, Finset.card_product, Int.card_Ioc, Int.card_Ioc, Nat.cast_mul,
-    Int.toNat_of_nonneg (by lia : (0:ℤ) ≤ ⌊S.x₁ * p⌋ - ⌊S.x₀ * p⌋),
-    Int.toNat_of_nonneg (by lia : (0:ℤ) ≤ ⌊S.y₁ * p⌋ - ⌊S.y₀ * p⌋)]
+  have hx := Int.floor_mono (mul_le_mul_of_nonneg_right S.hx p.cast_nonneg)
+  have hy := Int.floor_mono (mul_le_mul_of_nonneg_right S.hy p.cast_nonneg)
+  simp [latticePoints, Int.card_Ioc, hx, hy]
 
 variable {ι : Type*} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
 
@@ -61,13 +57,22 @@ all corners" is replaced by counting, with no auxiliary re-tiling. -/
 theorem card_latticePoints_eq_sum (hT : IsTiling R T) {p : ℕ} (hp : 0 < p) :
     (latticePoints p R).card = ∑ i, (latticePoints p (T i)).card := by
   classical
-  rw [show latticePoints p R = Finset.univ.biUnion (fun i ↦ latticePoints p (T i)) from ?_,
+  rw [show latticePoints p R = Finset.univ.biUnion (fun i ↦ latticePoints p (T i)) from
+      Finset.ext fun ab ↦ by
+        simp only [Finset.mem_biUnion, Finset.mem_univ, true_and, mem_latticePoints hp,
+          ← Set.mem_iUnion, hT.iUnion_toSetIoc],
     Finset.card_biUnion fun i _ j _ hij ↦ Finset.disjoint_left.mpr fun ab hai haj ↦
       Set.disjoint_left.mp (hT.pairwiseDisjoint_toSetIoc hij)
         ((mem_latticePoints hp).mp hai) ((mem_latticePoints hp).mp haj)]
-  ext ab
-  simp only [Finset.mem_biUnion, Finset.mem_univ, true_and, mem_latticePoints hp,
-    ← Set.mem_iUnion, hT.iUnion_toSetIoc]
+
+/-- The one-dimensional core: a side of integer length `n`, scaled by `p`, ends at an integer
+shift `n·p` of its start, and the shift passes through `⌊·⌋`, leaving floor difference `p·n`. -/
+private lemma floor_sub_floor_of_int {p : ℕ} {a b : ℝ} {n : ℤ} (h : b - a = n) :
+    ⌊b * p⌋ - ⌊a * p⌋ = p * n := by
+  have hb : b * (p:ℝ) = a * p + ((p * n : ℤ) : ℝ) := by
+    push_cast
+    linear_combination (p:ℝ) * h
+  rw [hb, Int.floor_add_intCast, add_sub_cancel_left]
 
 /-- A tile with an integer side has lattice count divisible by `p`: an integer side of length `n`
 contributes the floor-difference factor `⌊x·p + n·p⌋ - ⌊x·p⌋ = n·p`. -/
@@ -75,26 +80,14 @@ private lemma dvd_card_latticePoints {p : ℕ} (S : Rectangle) (h : S.HasInteger
     (p : ℤ) ∣ ((latticePoints p S).card : ℤ) := by
   rw [card_latticePoints]
   obtain ⟨n, hn⟩ | ⟨n, hn⟩ := h
-  · have hn' : S.x₁ - S.x₀ = (n : ℝ) := hn
-    have hx : S.x₁ * (p:ℝ) = S.x₀ * p + ((n * p : ℤ) : ℝ) := by
-      push_cast
-      linear_combination (p:ℝ) * hn'
-    refine Dvd.dvd.mul_right ⟨n, ?_⟩ _
-    rw [hx, Int.floor_add_intCast]
-    ring
-  · have hn' : S.y₁ - S.y₀ = (n : ℝ) := hn
-    have hy : S.y₁ * (p:ℝ) = S.y₀ * p + ((n * p : ℤ) : ℝ) := by
-      push_cast
-      linear_combination (p:ℝ) * hn'
-    refine Dvd.dvd.mul_left ⟨n, ?_⟩ _
-    rw [hy, Int.floor_add_intCast]
-    ring
+  · exact Dvd.dvd.mul_right ⟨n, floor_sub_floor_of_int hn⟩ _
+  · exact Dvd.dvd.mul_left ⟨n, floor_sub_floor_of_int hn⟩ _
 
 /-- A side whose floor-difference factor is `p·m` has length within `1/p` of `m`: scaled by `p`,
 the difference is a difference of two floor remainders, each in `[0, 1)`. -/
 private lemma abs_sub_lt_of_floor_sub_floor {x₀ x₁ : ℝ} {p : ℕ} (hp : 0 < p) {m : ℤ}
     (h : ⌊x₁ * p⌋ - ⌊x₀ * p⌋ = p * m) : |x₁ - x₀ - m| < 1 / p := by
-  have hp' : (0:ℝ) < p := by positivity
+  have hp' : (0:ℝ) < p := Nat.cast_pos.mpr hp
   have h' : (⌊x₁ * p⌋ : ℝ) - ⌊x₀ * p⌋ = p * m := by exact_mod_cast h
   rw [lt_div_iff₀ hp', ← abs_of_pos hp', ← abs_mul, abs_lt]
   constructor <;>
@@ -111,27 +104,14 @@ theorem exists_side_near_int (hT : IsTiling R T) (hsides : ∀ i, (T i).HasInteg
     push_cast
     exact Finset.dvd_sum fun i _ ↦ dvd_card_latticePoints (T i) (hsides i)
   rw [card_latticePoints] at hdvd
-  rcases (Nat.prime_iff_prime_int.mp hp).dvd_mul.mp hdvd with ⟨m, hm⟩ | ⟨m, hm⟩
-  · exact Or.inl ⟨m, abs_sub_lt_of_floor_sub_floor hp.pos hm⟩
-  · exact Or.inr ⟨m, abs_sub_lt_of_floor_sub_floor hp.pos hm⟩
+  exact ((Nat.prime_iff_prime_int.mp hp).dvd_mul.mp hdvd).imp
+    (fun ⟨m, hm⟩ ↦ ⟨m, abs_sub_lt_of_floor_sub_floor hp.pos hm⟩)
+    fun ⟨m, hm⟩ ↦ ⟨m, abs_sub_lt_of_floor_sub_floor hp.pos hm⟩
 
 /-- A real number that is not an integer keeps a fixed positive distance from every integer. -/
 private lemma exists_forall_le_abs_sub {x : ℝ} (h : ¬∃ n : ℤ, x = n) :
-    ∃ δ > 0, ∀ n : ℤ, δ ≤ |x - n| := by
-  refine ⟨min (Int.fract x) (1 - Int.fract x), lt_min (Int.fract_pos.mpr fun heq ↦ h ⟨⌊x⌋, heq⟩)
-    (by linarith [Int.fract_lt_one x]), fun n ↦ ?_⟩
-  have h₁ := Int.fract_nonneg x
-  have h₂ := Int.fract_lt_one x
-  have hfl : x - Int.fract x = (⌊x⌋ : ℤ) := by rw [Int.self_sub_fract]
-  rcases le_or_gt (n : ℝ) (x - Int.fract x) with hn | hn
-  · rw [abs_of_nonneg (by linarith)]
-    have : (n : ℝ) ≤ ⌊x⌋ := hfl ▸ hn
-    exact (min_le_left _ _).trans (by linarith)
-  · have : (⌊x⌋ : ℝ) + 1 ≤ n := by
-      have := hfl ▸ hn
-      exact_mod_cast Int.add_one_le_iff.mpr (by exact_mod_cast this)
-    rw [abs_of_neg (by linarith)]
-    exact (min_le_right _ _).trans (by linarith)
+    ∃ δ > 0, ∀ n : ℤ, δ ≤ |x - n| :=
+  ⟨|x - round x|, abs_sub_pos.mpr fun heq ↦ h ⟨round x, heq⟩, round_le x⟩
 
 /-- **Prime-numbers proof** (Robinson) of the integer-rectangle tiling theorem. -/
 theorem IntegerRectangleTheorem_Primes : IntegerRectangleTheorem := by
