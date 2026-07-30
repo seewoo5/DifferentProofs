@@ -16,7 +16,9 @@ functions `f, g : ℝ → ℝ`, with no regularity whatsoever. Call
 fgArea f g S = (f S.x₁ - f S.x₀) · (g S.y₁ - g S.y₀)
 ```
 
-the *f-area* of a rectangle. Then the f-area is additive over a tiling: `IsTiling.sum_fgArea`.
+the *f-area* of a rectangle, Wagon's name for the `f = g` case; the Lean name `fgArea` records
+that each axis gets its own function. The f-area is additive over a tiling:
+`IsTiling.sum_fgArea`.
 
 The proof is Wagon's. The tile edges form a graph; extending its edges across `R` cuts `R` into a
 grid, whose vertical lines carry the finitely many x-coordinates of vertical tile edges
