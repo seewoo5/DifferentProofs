@@ -36,7 +36,7 @@ noncomputable def latticePoints (p : ℕ) (S : Rectangle) : Finset (ℤ × ℤ) 
 /-- Membership in `latticePoints` is membership of the lattice point in the half-open cell. -/
 private lemma mem_latticePoints {p : ℕ} (hp : 0 < p) {S : Rectangle} {ab : ℤ × ℤ} :
     ab ∈ latticePoints p S ↔ ((ab.1 / p : ℝ), (ab.2 / p : ℝ)) ∈ S.toSetIoc := by
-  have hp' : (0:ℝ) < p := by positivity
+  have hp' : (0 : ℝ) < p := by positivity
   simp only [latticePoints, Finset.mem_product, Finset.mem_Ioc, Rectangle.mem_toSetIoc,
     Int.floor_lt, Int.le_floor, lt_div_iff₀ hp', div_le_iff₀ hp']
 
@@ -69,9 +69,9 @@ theorem card_latticePoints_eq_sum (hT : IsTiling R T) {p : ℕ} (hp : 0 < p) :
 shift `n·p` of its start, and the shift passes through `⌊·⌋`, leaving floor difference `p·n`. -/
 private lemma floor_sub_floor_of_int {p : ℕ} {a b : ℝ} {n : ℤ} (h : b - a = n) :
     ⌊b * p⌋ - ⌊a * p⌋ = p * n := by
-  have hb : b * (p:ℝ) = a * p + ((p * n : ℤ) : ℝ) := by
+  have hb : b * (p : ℝ) = a * p + ((p * n : ℤ) : ℝ) := by
     push_cast
-    linear_combination (p:ℝ) * h
+    linear_combination (p : ℝ) * h
   rw [hb, Int.floor_add_intCast, add_sub_cancel_left]
 
 /-- A tile with an integer side has lattice count divisible by `p`: an integer side of length `n`
@@ -87,12 +87,12 @@ private lemma dvd_card_latticePoints {p : ℕ} (S : Rectangle) (h : S.HasInteger
 the difference is a difference of two floor remainders, each in `[0, 1)`. -/
 private lemma abs_sub_lt_of_floor_sub_floor {x₀ x₁ : ℝ} {p : ℕ} (hp : 0 < p) {m : ℤ}
     (h : ⌊x₁ * p⌋ - ⌊x₀ * p⌋ = p * m) : |x₁ - x₀ - m| < 1 / p := by
-  have hp' : (0:ℝ) < p := Nat.cast_pos.mpr hp
+  have hp' : (0 : ℝ) < p := Nat.cast_pos.mpr hp
   have h' : (⌊x₁ * p⌋ : ℝ) - ⌊x₀ * p⌋ = p * m := by exact_mod_cast h
   rw [lt_div_iff₀ hp', ← abs_of_pos hp', ← abs_mul, abs_lt]
   constructor <;>
-    nlinarith [Int.floor_le (x₁ * (p:ℝ)), Int.lt_floor_add_one (x₁ * (p:ℝ)),
-      Int.floor_le (x₀ * (p:ℝ)), Int.lt_floor_add_one (x₀ * (p:ℝ))]
+    nlinarith [Int.floor_le (x₁ * (p : ℝ)), Int.lt_floor_add_one (x₁ * (p : ℝ)),
+      Int.floor_le (x₀ * (p : ℝ)), Int.lt_floor_add_one (x₀ * (p : ℝ))]
 
 /-- **Wagon's claim.** For every prime `p`, some side of the tiled rectangle is within `1/p` of an
 integer. -/
@@ -121,12 +121,12 @@ theorem IntegerRectangleTheorem_Primes : IntegerRectangleTheorem := by
   obtain ⟨δw, hδw, hw⟩ := exists_forall_le_abs_sub hcon.1
   obtain ⟨δh, hδh, hh⟩ := exists_forall_le_abs_sub hcon.2
   obtain ⟨p, hple, hp⟩ := Nat.exists_infinite_primes (max ⌈1 / δw⌉₊ ⌈1 / δh⌉₊ + 1)
-  have hp' : (0:ℝ) < p := by exact_mod_cast hp.pos
-  have key : ∀ δ : ℝ, 0 < δ → ⌈1 / δ⌉₊ < p → 1 / (p:ℝ) < δ := fun δ hδ h₀ ↦ by
+  have hp' : (0 : ℝ) < p := by exact_mod_cast hp.pos
+  have key : ∀ δ : ℝ, 0 < δ → ⌈1 / δ⌉₊ < p → 1 / (p : ℝ) < δ := fun δ hδ h₀ ↦ by
     have h₁ : 1 / δ < p := (Nat.le_ceil _).trans_lt (by exact_mod_cast h₀)
     rw [div_lt_iff₀ hδ] at h₁
     rw [div_lt_iff₀ hp']
-    linarith [mul_comm (p:ℝ) δ]
+    linarith [mul_comm (p : ℝ) δ]
   have hpw := key δw hδw (lt_of_lt_of_le (Nat.lt_succ_of_le (le_max_left _ _)) hple)
   have hph := key δh hδh (lt_of_lt_of_le (Nat.lt_succ_of_le (le_max_right _ _)) hple)
   rcases exists_side_near_int hT hsides hp with ⟨n, hn⟩ | ⟨n, hn⟩
