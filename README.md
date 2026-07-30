@@ -49,6 +49,7 @@ A rectangle tiled by rectangles each having an integer side has an integer side
 - [Real double integral](DifferentProofs/IntegerRectangle/RealIntegral.lean)
 - [Checkerboard colouring](DifferentProofs/IntegerRectangle/Checkerboard.lean)
 - [Sweep line (Bachman–Yannakakis)](DifferentProofs/IntegerRectangle/SweepLine.lean)
+- [Step functions (Hochster–Maté)](DifferentProofs/IntegerRectangle/StepFunction.lean)
 
 ## Building and serving the blueprint locally
 

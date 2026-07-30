@@ -7,6 +7,7 @@ import DifferentProofs.IntegerRectangle.Checkerboard
 import DifferentProofs.IntegerRectangle.ComplexIntegral
 import DifferentProofs.IntegerRectangle.Defs
 import DifferentProofs.IntegerRectangle.RealIntegral
+import DifferentProofs.IntegerRectangle.StepFunction
 import DifferentProofs.IntegerRectangle.SweepLine
 
 open Verso.Genre
@@ -167,4 +168,45 @@ local constancy of $`t \mapsto \{f(t)\}` and settled by connectedness of $`\math
 fractional part of the width of $`R` equals the fractional part of $`f` below $`R`, namely $`0`.
 (The jump lemma stops below the top of $`R` — conservation genuinely fails there, that failure
 being the theorem — so $`f` is frozen at the top before taking fractional parts.)
+:::
+
+Thirteenth proof: step functions (Hochster–Maté). Like the first three this attaches a number to
+each rectangle and rides on additivity over the tiling, but the number comes from a *step function*
+instead of an integral. Correspondingly the mechanism is not almost-everywhere disjointness of the
+tiles but the exact partition of a tiling into half-open cells, which makes every plane measure —
+not just Lebesgue measure — additive over a tiling.
+
+:::lemma_ "lem:int-rect-step-engine" (parent := "grp:int-rect") (lean := "IntegerRectangle.StepFunction.dichotomy")
+Let $`f` and $`g` be Stieltjes functions, that is, monotone and right-continuous, and write
+$`\Delta_a^b = (f - g)(b) - (f - g)(a)` for the increment of $`f - g` across $`(a, b]`. If $`T` tiles
+$`R` and every tile has vanishing increment across its width or across its height, then the same
+dichotomy holds for $`R`.
+:::
+
+:::proof "lem:int-rect-step-engine"
+A Stieltjes function $`f` induces a measure with $`\mu_f(a, b] = f(b) - f(a)`, finite on every
+interval, so the increment $`\Delta_a^b` is the signed mass $`\mu_f(a, b] - \mu_g(a, b]`. Multiplying
+the increment across the width by the increment across the height and expanding the two differences
+writes the product as a combination of the four product measures $`\mu_f \otimes \mu_f`,
+$`\mu_f \otimes \mu_g`, $`\mu_g \otimes \mu_f`, $`\mu_g \otimes \mu_g`, each evaluated on the
+half-open cell $`(x_0, x_1] \times (y_0, y_1]` of the rectangle. Since the half-open cells of a
+tiling partition the half-open cell of the tiled rectangle exactly, every plane measure is additive
+over a tiling, so the product of the two increments is too. Each tile contributes a product with a
+vanishing factor, hence the product for $`R` vanishes, and a product of reals vanishes only if a
+factor does.
+:::
+
+:::theorem "thm:int-rect-step" (parent := "grp:int-rect") (lean := "IntegerRectangle.StepFunction.IntegerRectangleTheorem_StepFunction") (proofColor := "#fbcfe8")
+A rectangle tiled by rectangles each with an integer side has an integer side.
+:::
+
+:::proof "thm:int-rect-step"
+Take $`f(x) = x` and $`g(x) = \lfloor x \rfloor`; both are monotone and right-continuous, and their
+measures are Lebesgue measure and the counting measure of the integers. Their difference is the
+sawtooth $`\{x\} = x - \lfloor x\rfloor`, so the increment across $`(a, b]` is $`\{b\} - \{a\}`,
+which vanishes if and only if $`b - a \in \mathbb{Z}`. A tile with an integer side therefore
+satisfies the hypothesis of the engine {uses "lem:int-rect-step-engine"}[], which returns a
+vanishing increment for $`R` in one of the two directions — an integer side. The sawtooth criterion
+is an exact "integer difference" statement, so unlike the checkerboard proof, whose triangle wave is
+symmetric about the half-integers, this argument needs no standard-position hypothesis.
 :::
