@@ -3,6 +3,7 @@ import VersoManual
 import VersoBlueprint
 import DifferentProofsBlueprint.ProofColor
 import DifferentProofs.IntegerRectangle.Basic
+import DifferentProofs.IntegerRectangle.BipartiteGraph
 import DifferentProofs.IntegerRectangle.Checkerboard
 import DifferentProofs.IntegerRectangle.ComplexIntegral
 import DifferentProofs.IntegerRectangle.Defs
@@ -158,6 +159,64 @@ positive distance from every integer — at least the smaller of its fractional 
 it. Choosing a prime $`p` larger than the reciprocals of both distances (there are infinitely many
 primes), no side of $`R` can be within $`1/p` of an integer, contradicting the claim
 {uses "lem:int-rect-near"}[] for this $`p`.
+:::
+
+Eighth proof: a bipartite graph, Wagon's variation on Paterson's Eulerian-path proof. Place $`R`
+in standard position and join each point of the lattice $`\mathbb{Z} \times \mathbb{Z}` to the
+tiles having it as a corner; then count the edges of that graph in the two possible ways. The
+lattice used below is the one through the lower-left corner of $`R`, which replaces the standard
+position, and corners are counted with multiplicity so that degenerate tiles need no separate
+treatment.
+
+Counting the edges at a fixed lattice point requires knowing how many tiles have it as a corner.
+Wagon reads this off the local picture — a lattice point other than a corner of $`R` is a corner
+of exactly $`2` or $`4` tiles — which is a statement about how tiles fit together around a point.
+Only its parity is used, and that parity follows from the f-area additivity of the thirteenth
+proof below, with no local analysis at all.
+
+:::lemma_ "lem:int-rect-corner-parity" (parent := "grp:int-rect") (lean := "IntegerRectangle.BipartiteGraph.sum_cornerCount_mod_two")
+Let $`T` tile $`R`. At every point of the plane, the tiles have in total a number of corners
+congruent modulo $`2` to the number of corners of $`R` there. (Each rectangle has four corners,
+counted with multiplicity.)
+:::
+
+:::proof "lem:int-rect-corner-parity"
+Fix a point $`(u, v)` and take for $`f` and $`g` the indicator functions of $`\{u\}` and
+$`\{v\}`. The f-area of a rectangle is then
+$`(\mathbb{1}[x_1 = u] - \mathbb{1}[x_0 = u])(\mathbb{1}[y_1 = v] - \mathbb{1}[y_0 = v])`, the
+number of corners at $`(u, v)` with the left and bottom edges counted negatively. Being an f-area
+it is additive over the tiling {uses "lem:int-rect-fgarea"}[], and modulo $`2` subtraction and
+addition agree, so each signed count may be replaced by the corner count.
+:::
+
+:::lemma_ "lem:int-rect-double-count" (parent := "grp:int-rect") (lean := "IntegerRectangle.BipartiteGraph.even_sum_cornerCount")
+Let $`T` tile $`R`, and let $`X` and $`Y` be finite sets of abscissae and of ordinates such that
+every tile has both or neither of its vertical edges over $`X`, or both or neither of its
+horizontal edges over $`Y`. Then $`R` has an even number of corners on the grid $`X \times Y`.
+:::
+
+:::proof "lem:int-rect-double-count"
+Count the edges of the bipartite graph joining the points of $`X \times Y` to the tiles having
+them as a corner. The number of corners a rectangle has on the grid is the number of its vertical
+edges over $`X` times the number of its horizontal edges over $`Y`, so by hypothesis each tile
+contributes an even number of edges, and hence so does the whole graph. Counting them point by
+point instead, and replacing each point's count by the corresponding count for $`R`
+{uses "lem:int-rect-corner-parity"}[], leaves the parity unchanged, so the number of corners of
+$`R` on the grid is even too.
+:::
+
+:::theorem "thm:int-rect-bipartite" (parent := "grp:int-rect") (lean := "IntegerRectangle.BipartiteGraph.IntegerRectangleTheorem_BipartiteGraph") (proofColor := "#fbcfe8")
+A rectangle tiled by rectangles each with an integer side has an integer side.
+:::
+
+:::proof "thm:int-rect-bipartite"
+Take for $`X` and $`Y` the points of the lattices through the left and bottom edges of $`R` that
+lie inside $`R`. A tile of integer width has its two vertical edges an integer apart, so both or
+neither lie on the lattice, and likewise in the other direction; the hypothesis of the double
+count {uses "lem:int-rect-double-count"}[] therefore holds, and $`R` has evenly many corners on
+the grid. Its lower-left corner is one of them. If neither side of $`R` were an integer, its
+right edge would miss $`X` and its top edge would miss $`Y`, leaving that corner as the only one
+— an odd number.
 :::
 
 Twelfth proof: a sweep line (Bachman–Yannakakis). This one does not use the analytic engine above.
