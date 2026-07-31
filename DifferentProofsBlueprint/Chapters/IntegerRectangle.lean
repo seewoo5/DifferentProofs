@@ -8,6 +8,7 @@ import DifferentProofs.IntegerRectangle.Checkerboard
 import DifferentProofs.IntegerRectangle.ComplexIntegral
 import DifferentProofs.IntegerRectangle.Defs
 import DifferentProofs.IntegerRectangle.GridRefinement
+import DifferentProofs.IntegerRectangle.Polynomials
 import DifferentProofs.IntegerRectangle.Primes
 import DifferentProofs.IntegerRectangle.RealIntegral
 import DifferentProofs.IntegerRectangle.StepFunction
@@ -99,6 +100,31 @@ its integral over any integer-length interval is $`0`, so every tile with an int
 By the engine {uses "lem:int-rect-engine"}[] so is $`R`. But over $`[s, b]` the square wave integrates
 to the triangle wave $`\min(r, 1-r)`, with $`r` the fractional part of $`b - s`, which is nonzero
 unless $`b - s \in \mathbb{Z}`; hence $`R` has an integer side.
+:::
+
+Fifth proof: polynomials (Douady). Through the lower-left corner of $`R`, fix the two coordinate
+lattices and introduce a parameter $`t`. Move a vertical grid line by $`t` when its x-coordinate is
+off the x-lattice, and move a horizontal grid line by $`t` when its y-coordinate is off the
+y-lattice; leave lattice lines fixed. The f-area formalizes the resulting rectangle areas without
+separately constructing the auxiliary tiling.
+
+:::theorem "thm:int-rect-polynomials" (parent := "grp:int-rect") (lean := "IntegerRectangle.Polynomials.IntegerRectangleTheorem_Polynomials") (proofColor := "#fbcfe8")
+A rectangle tiled by rectangles each with an integer side has an integer side.
+:::
+
+:::proof "thm:int-rect-polynomials"
+Let $`\varepsilon_x(u)` be $`0` when $`u - R_x \in \mathbb{Z}` and $`1` otherwise, and similarly
+define $`\varepsilon_y`. Perturb the coordinates by
+$`\varphi_t(u) = u + t\varepsilon_x(u)` and $`\psi_t(v) = v + t\varepsilon_y(v)`. If a tile has
+integer width, its two horizontal coordinates have the same $`\varepsilon_x`-value, so the
+$`\varphi_t`-increment across that tile is constant in $`t`; if it has integer height, the analogous
+statement holds for $`\psi_t`. Thus every tile's f-area is affine in $`t`. Additivity of the f-area
+{uses "lem:int-rect-fgarea"}[] says their sum is the f-area of $`R` for every $`t`.
+If neither side of $`R` is an integer, each lower endpoint has indicator $`0` and each upper
+endpoint indicator $`1`, so the f-area of $`R` is
+$`(\operatorname{width}(R) + t)(\operatorname{height}(R) + t)`. Apply the second finite difference
+$`F(2) - 2F(1) + F(0)` to the identity: it vanishes on every affine tile term, hence on their sum,
+but equals $`2` on this quadratic expression, a contradiction.
 :::
 
 Sixth proof: prime numbers (Robinson). Wagon scales the tiling by a prime $`p` and rounds all tile

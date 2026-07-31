@@ -51,6 +51,7 @@ fourteen proofs are still to come.
 - Proof 1: [Complex double integral (de Bruijn)](DifferentProofs/IntegerRectangle/ComplexIntegral.lean)
 - Proof 2: [Real double integral](DifferentProofs/IntegerRectangle/RealIntegral.lean)
 - Proof 3: [Checkerboard colouring (Rochberg–Stein)](DifferentProofs/IntegerRectangle/Checkerboard.lean)
+- Proof 5: [Polynomials (Douady)](DifferentProofs/IntegerRectangle/Polynomials.lean)
 - Proof 6: [Prime numbers (Robinson)](DifferentProofs/IntegerRectangle/Primes.lean)
 - Proof 8: [Bipartite graph](DifferentProofs/IntegerRectangle/BipartiteGraph.lean)
 - Proof 12: [Sweep line (Bachman–Yannakakis)](DifferentProofs/IntegerRectangle/SweepLine.lean)

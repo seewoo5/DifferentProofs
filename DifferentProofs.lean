@@ -26,6 +26,7 @@ public import DifferentProofs.IntegerRectangle.Checkerboard
 public import DifferentProofs.IntegerRectangle.ComplexIntegral
 public import DifferentProofs.IntegerRectangle.Defs
 public import DifferentProofs.IntegerRectangle.GridRefinement
+public import DifferentProofs.IntegerRectangle.Polynomials
 public import DifferentProofs.IntegerRectangle.Primes
 public import DifferentProofs.IntegerRectangle.RealIntegral
 public import DifferentProofs.IntegerRectangle.StepFunction
