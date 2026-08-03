@@ -105,8 +105,8 @@ unless $`b - s \in \mathbb{Z}`; hence $`R` has an integer side.
 Fifth proof: polynomials (Douady). Through the lower-left corner of $`R`, fix the two coordinate
 lattices and introduce a parameter $`t`. Move a vertical grid line by $`t` when its x-coordinate is
 off the x-lattice, and move a horizontal grid line by $`t` when its y-coordinate is off the
-y-lattice; leave lattice lines fixed. The f-area formalizes the resulting rectangle areas without
-separately constructing the auxiliary tiling.
+y-lattice; leave lattice lines fixed. The perturbed areas become honest polynomials in $`t`; the
+f-area formalizes them without separately constructing the auxiliary tiling.
 
 :::theorem "thm:int-rect-polynomials" (parent := "grp:int-rect") (lean := "IntegerRectangle.Polynomials.IntegerRectangleTheorem_Polynomials") (proofColor := "#fbcfe8")
 A rectangle tiled by rectangles each with an integer side has an integer side.
@@ -114,17 +114,21 @@ A rectangle tiled by rectangles each with an integer side has an integer side.
 
 :::proof "thm:int-rect-polynomials"
 Let $`\varepsilon_x(u)` be $`0` when $`u - R_x \in \mathbb{Z}` and $`1` otherwise, and similarly
-define $`\varepsilon_y`. Perturb the coordinates by
-$`\varphi_t(u) = u + t\varepsilon_x(u)` and $`\psi_t(v) = v + t\varepsilon_y(v)`. If a tile has
-integer width, its two horizontal coordinates have the same $`\varepsilon_x`-value, so the
-$`\varphi_t`-increment across that tile is constant in $`t`; if it has integer height, the analogous
-statement holds for $`\psi_t`. Thus every tile's f-area is affine in $`t`. Additivity of the f-area
-{uses "lem:int-rect-fgarea"}[] says their sum is the f-area of $`R` for every $`t`.
-If neither side of $`R` is an integer, each lower endpoint has indicator $`0` and each upper
-endpoint indicator $`1`, so the f-area of $`R` is
-$`(\operatorname{width}(R) + t)(\operatorname{height}(R) + t)`. Apply the second finite difference
-$`F(2) - 2F(1) + F(0)` to the identity: it vanishes on every affine tile term, hence on their sum,
-but equals $`2` on this quadratic expression, a contradiction.
+define $`\varepsilon_y`; perturb the coordinates by $`\varphi_t(u) = u + t\varepsilon_x(u)` and
+$`\psi_t(v) = v + t\varepsilon_y(v)`. The perturbed area of a rectangle $`S` is then the value at
+$`t` of the polynomial $`P_S = (\Delta\varepsilon_x X + w)(\Delta\varepsilon_y X + h)`, with
+$`w, h` the sides of $`S` and $`\Delta\varepsilon` the indicator increments across them; its
+quadratic coefficient is the f-area of the indicator pair. If a tile has an integer side, the two
+endpoints of that side have the same indicator, the corresponding factor is constant, and the
+quadratic coefficient vanishes: the tile's perturbed area is linear or constant in $`t`, as in
+Wagon's text. Additivity of the f-area {uses "lem:int-rect-fgarea"}[] equates $`\sum_i P_{T_i}`
+with $`P_R` at every real $`t` — Wagon needs $`t` small so that the moved segments still bound a
+tiling, the algebraic identity does not — hence $`\sum_i P_{T_i} = P_R` as polynomials. If neither
+side of $`R` is an integer, each lower endpoint has indicator $`0` and each upper endpoint $`1`,
+so the quadratic coefficient of $`P_R` is $`1`; comparing $`X^2`-coefficients yields $`0 = 1`, a
+contradiction. (A polynomial-free variant of the same computation: each tile's term is affine in
+$`t`, so the second finite difference $`F(2) - 2F(1) + F(0)` of the identity vanishes tile by
+tile, while it equals $`2` on $`(w + t)(h + t)`.)
 :::
 
 Sixth proof: prime numbers (Robinson). Wagon scales the tiling by a prime $`p` and rounds all tile
