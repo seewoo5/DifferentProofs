@@ -6,6 +6,7 @@ import DifferentProofs.IntegerRectangle.Basic
 import DifferentProofs.IntegerRectangle.BipartiteGraph
 import DifferentProofs.IntegerRectangle.Checkerboard
 import DifferentProofs.IntegerRectangle.ComplexIntegral
+import DifferentProofs.IntegerRectangle.CountingSquares
 import DifferentProofs.IntegerRectangle.Defs
 import DifferentProofs.IntegerRectangle.GridRefinement
 import DifferentProofs.IntegerRectangle.Polynomials
@@ -100,6 +101,52 @@ its integral over any integer-length interval is $`0`, so every tile with an int
 By the engine {uses "lem:int-rect-engine"}[] so is $`R`. But over $`[s, b]` the square wave integrates
 to the triangle wave $`\min(r, 1-r)`, with $`r` the fractional part of $`b - s`, which is nonzero
 unless $`b - s \in \mathbb{Z}`; hence $`R` has an integer side.
+:::
+
+Fourth proof: counting squares (Ruzsa, Gilbert). Wagon translates every grid line of the tiling
+that lies off the lattice through the corner of $`R` onto the nearest half-integer line, leaving
+lattice lines fixed; the tiling becomes a tiling of a translated rectangle all of whose
+coordinates sit on the half-unit grid, so every rectangle in it is a union of
+$`\tfrac12 \times \tfrac12` squares — the checkerboard cells of the third proof — and the argument
+is a parity count of those squares. As with the polynomial proof below, the f-area supplies the
+count without the auxiliary tiling having to be built.
+
+:::lemma_ "lem:int-rect-cell-parity" (parent := "grp:int-rect") (lean := "IntegerRectangle.CountingSquares.even_cellIndex_iff")
+Measure a coordinate $`x` from a base point $`a` by the integer
+$`c(x) = \lfloor x - a \rfloor + \lceil x - a \rceil`, twice the translated coordinate of $`x` on
+the half-unit grid based at $`a`. Then $`c(x)` is even exactly when $`x - a` is an integer.
+:::
+
+:::proof "lem:int-rect-cell-parity"
+Floor and ceiling agree at the integers and differ by one everywhere else, so $`c(x)` is
+$`2\lfloor x - a\rfloor` in the first case and $`2\lfloor x - a\rfloor + 1` in the second.
+:::
+
+:::lemma_ "lem:int-rect-cellcount" (parent := "grp:int-rect") (lean := "IntegerRectangle.CountingSquares.sum_cellCount")
+The number of half-unit squares covered by the translation of a rectangle — the product of the
+increments of the two grid coordinates across it — is additive over a tiling.
+:::
+
+:::proof "lem:int-rect-cellcount"
+That number is by definition the f-area of the pair of grid coordinate functions, so this is
+f-area additivity {uses "lem:int-rect-fgarea"}[], read back in the integers. It is what Wagon gets
+from the auxiliary tiling, here without having to check that the translated tiles tile the
+translated rectangle.
+:::
+
+:::theorem "thm:int-rect-counting" (parent := "grp:int-rect") (lean := "IntegerRectangle.CountingSquares.IntegerRectangleTheorem_CountingSquares") (proofColor := "#fbcfe8")
+A rectangle tiled by rectangles each with an integer side has an integer side.
+:::
+
+:::proof "thm:int-rect-counting"
+Base the half-unit grid at the lower-left corner of $`R`. The endpoints of a side of integer
+length $`n` are $`n` apart, so the translation moves them equally and the increment of the grid
+coordinate across that side is $`2n`: every tile covers an even number of squares, and hence
+{uses "lem:int-rect-cellcount"}[] so does $`R`. The corner of $`R` has grid coordinate $`0`, so
+that count is the product of the grid coordinates of the far edges of $`R`, and one of the two
+factors is even — which says {uses "lem:int-rect-cell-parity"}[] that the corresponding side of
+$`R` has integer length. (Wagon phrases the last step as a contradiction: a translated rectangle
+with no integer side has both sides equal to half an odd integer, hence an odd number of squares.)
 :::
 
 Fifth proof: polynomials (Douady). Through the lower-left corner of $`R`, fix the two coordinate
