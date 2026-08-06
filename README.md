@@ -54,6 +54,7 @@ fourteen proofs are still to come.
 - Proof 4: [Counting squares (Ruzsa–Gilbert)](DifferentProofs/IntegerRectangle/CountingSquares.lean)
 - Proof 5: [Polynomials (Douady)](DifferentProofs/IntegerRectangle/Polynomials.lean)
 - Proof 6: [Prime numbers (Robinson)](DifferentProofs/IntegerRectangle/Primes.lean)
+- Proof 7: [Eulerian path (Paterson)](DifferentProofs/IntegerRectangle/EulerianPath.lean)
 - Proof 8: [Bipartite graph](DifferentProofs/IntegerRectangle/BipartiteGraph.lean)
 - Proof 12: [Sweep line (Bachman–Yannakakis)](DifferentProofs/IntegerRectangle/SweepLine.lean)
 - Proof 13: [Step functions (Hochster–Maté)](DifferentProofs/IntegerRectangle/StepFunction.lean)
