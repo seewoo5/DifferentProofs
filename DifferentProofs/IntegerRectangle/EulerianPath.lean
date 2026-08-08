@@ -1,6 +1,7 @@
 module
 
 public import DifferentProofs.IntegerRectangle.CornerCount
+public import DifferentProofsForMathlib.Algebra.Order.Floor.Ring
 
 /-!
 # The integer-rectangle theorem by an Eulerian path
@@ -65,12 +66,9 @@ private lemma Adj.symm (h : Adj T p q) : Adj T q p := h.imp fun _ ↦ Or.symm
 differ by a vector with integer entries. -/
 noncomputable def fracts (p : ℝ × ℝ) : ℝ × ℝ := (Int.fract p.1, Int.fract p.2)
 
-private lemma fract_eq_fract_iff {a b : ℝ} : Int.fract a = Int.fract b ↔ ∃ n : ℤ, b - a = n :=
-  eq_comm.trans Int.fract_eq_fract
-
 private lemma fracts_eq_of_isSide {S : Rectangle} (h : IsSide S p q) : fracts p = fracts q := by
   obtain ⟨h', ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩⟩ | ⟨h', ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩⟩ := h <;>
-    simp [fracts, fract_eq_fract_iff.mpr h']
+    simp [fracts, Int.fract_eq_fract'.mpr h']
 
 private lemma fracts_eq_of_adj (h : Adj T p q) : fracts p = fracts q :=
   h.elim fun _ h ↦ h.elim fracts_eq_of_isSide fun h ↦ (fracts_eq_of_isSide h).symm
@@ -145,8 +143,8 @@ entries; whichever corner it reaches, that is an integer side of `R`. -/
 theorem IntegerRectangleTheorem_EulerianPath : IntegerRectangleTheorem := by
   intro ι _ R T hT hsides
   obtain h | h | h := exists_reachable_corner hT hsides
-  · exact .inl (fract_eq_fract_iff.mp (congrArg Prod.fst (fracts_eq_of_reachable h)))
-  · exact .inr (fract_eq_fract_iff.mp (congrArg Prod.snd (fracts_eq_of_reachable h)))
-  · exact .inl (fract_eq_fract_iff.mp (congrArg Prod.fst (fracts_eq_of_reachable h)))
+  · exact .inl (Int.fract_eq_fract'.mp (congrArg Prod.fst (fracts_eq_of_reachable h)))
+  · exact .inr (Int.fract_eq_fract'.mp (congrArg Prod.snd (fracts_eq_of_reachable h)))
+  · exact .inl (Int.fract_eq_fract'.mp (congrArg Prod.fst (fracts_eq_of_reachable h)))
 
 end IntegerRectangle.EulerianPath
