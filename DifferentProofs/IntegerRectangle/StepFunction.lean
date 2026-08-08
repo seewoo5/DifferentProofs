@@ -52,7 +52,7 @@ private lemma fract_sub_eq_zero_iff {a b : ℝ} :
 
 /-- **Step-function proof** (Hochster–Maté) of the integer-rectangle tiling theorem: the f-area
 dichotomy for the sawtooth `Int.fract` in both coordinates. -/
-theorem IntegerRectangleTheorem_StepFunction : IntegerRectangleTheorem := by
+theorem IntegerRectangleTheorem_StepFunction.{u} : IntegerRectangleTheorem.{u} := by
   intro ι _ R T hT hsides
   exact (dichotomy hT Int.fract Int.fract fun i ↦ (hsides i).imp
       fract_sub_eq_zero_iff.mpr fract_sub_eq_zero_iff.mpr).imp

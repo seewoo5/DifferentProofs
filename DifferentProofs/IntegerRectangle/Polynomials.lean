@@ -143,7 +143,7 @@ private lemma areaPoly_coeff_two (a b : ℝ) (S : Rectangle) :
 each tile is a polynomial that is linear or constant in the perturbation parameter, while a
 tiled rectangle with no integer side would have a genuinely quadratic one; comparing `X ^ 2`
 coefficients in the polynomial identity supplied by f-area additivity gives `0 = 1`. -/
-theorem IntegerRectangleTheorem_Polynomials : IntegerRectangleTheorem := by
+theorem IntegerRectangleTheorem_Polynomials.{u} : IntegerRectangleTheorem.{u} := by
   intro ι _ R T hT hsides
   by_contra hcon
   rw [Rectangle.HasIntegerSide, not_or] at hcon
