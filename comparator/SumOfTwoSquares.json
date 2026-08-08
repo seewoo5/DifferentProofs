@@ -1,0 +1,12 @@
+{
+  "challenge_module": "DifferentProofsChallenge.SumOfTwoSquares",
+  "solution_module": "DifferentProofs",
+  "theorem_names": [
+    "FermatSumOfTwoSquares_QuadraticReciprocity",
+    "FermatSumOfTwoSquares_Wilson",
+    "SumOfTwoSquares.Zagier.FermatSumOfTwoSquares_Zagier",
+    "SumOfTwoSquares.Jacobi.FermatSumOfTwoSquares_Jacobi"
+  ],
+  "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"],
+  "enable_nanoda": false
+}

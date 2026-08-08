@@ -59,6 +59,17 @@ fourteen proofs are still to come.
 - Proof 12: [Sweep line (Bachman–Yannakakis)](DifferentProofs/IntegerRectangle/SweepLine.lean)
 - Proof 13: [Step functions (Hochster–Maté)](DifferentProofs/IntegerRectangle/StepFunction.lean)
 
+## Verifying that the proofs prove the same thing
+
+Because the point of the project is that these proofs establish *the same*
+result, CI runs [Comparator](https://github.com/leanprover/comparator) over
+them. For each theorem it re-checks, without trusting the proof file, that the
+proof establishes exactly the statement recorded in
+[`DifferentProofsChallenge/`](DifferentProofsChallenge), that it uses no axioms
+beyond `propext`, `Quot.sound`, and `Classical.choice`, and that the proof term
+is accepted by a fresh run of the Lean kernel. See
+[comparator/README.md](comparator/README.md).
+
 ## Building and serving the blueprint locally
 
 The [blueprint](https://seewoo5.github.io/DifferentProofs/) is built with

@@ -1,0 +1,12 @@
+{
+  "challenge_module": "DifferentProofsChallenge.FermatLittleTheorem",
+  "solution_module": "DifferentProofs",
+  "theorem_names": [
+    "FermatLittleTheorem_Binomial",
+    "FermatLittleTheorem.Alkauskas.FermatLittleTheorem_Alkauskas",
+    "FermatLittleTheorem_Lagrange",
+    "FermatLittleTheorem_Dynamical"
+  ],
+  "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"],
+  "enable_nanoda": false
+}
