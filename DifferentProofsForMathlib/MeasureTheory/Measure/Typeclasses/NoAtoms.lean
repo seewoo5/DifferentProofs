@@ -5,7 +5,7 @@ Authors: Seewoo Lee
 -/
 module
 
-public import Mathlib.MeasureTheory.Measure.Typeclasses.NoAtoms
+public import Mathlib.MeasureTheory.Measure.Typeclasses.NullSingletonClass
 
 /-!
 # Almost-everywhere disjointness of closed intervals
@@ -25,8 +25,8 @@ namespace MeasureTheory
 
 open Set
 
-variable {α : Type*} {m0 : MeasurableSpace α} {μ : Measure α} [NoAtoms μ] [PartialOrder α]
-  {a b c d : α}
+variable {α : Type*} {m0 : MeasurableSpace α} {μ : Measure α} [NullSingletonClass μ]
+  [PartialOrder α] {a b c d : α}
 
 /-- Closed intervals whose open counterparts are disjoint are almost everywhere disjoint: they can
 meet only in endpoints, and an atomless measure gives those no mass. -/

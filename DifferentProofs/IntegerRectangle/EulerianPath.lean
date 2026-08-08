@@ -76,8 +76,8 @@ private lemma fracts_eq_of_adj (h : Adj T p q) : fracts p = fracts q :=
 /-- **A walk in `Γ` moves by a vector with integer entries.** Each of its edges is a side of a
 tile whose length is an integer, and which is parallel to an axis. -/
 theorem fracts_eq_of_reachable (h : Reachable T p q) : fracts p = fracts q :=
-  Relation.reflTransGen_of_equivalence (r := fun p q ↦ fracts p = fracts q)
-    ⟨fun _ ↦ rfl, Eq.symm, Eq.trans⟩ (fun _ _ ↦ fracts_eq_of_adj) h
+  Relation.reflTransGen_le_of_equivalence_of_le (r := fun p q ↦ fracts p = fracts q)
+    ⟨fun _ ↦ rfl, Eq.symm, Eq.trans⟩ (fun _ _ ↦ fracts_eq_of_adj) p q h
 
 /-! ### The component of the lower-left corner -/
 
