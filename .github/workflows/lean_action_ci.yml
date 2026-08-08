@@ -18,3 +18,10 @@ jobs:
           echo "mk_all reported changes"
           echo 'Please run `lake exe mk_all --lib DifferentProofs --module` to fix'
           exit 1
+      - name: Run mk_all on the Comparator challenge and error if changed
+        if: github.event_name == 'pull_request'
+        run: |
+          lake exe mk_all --lib DifferentProofsChallenge --module && exit 0
+          echo "mk_all reported changes"
+          echo 'Please run `lake exe mk_all --lib DifferentProofsChallenge --module` to fix'
+          exit 1

@@ -1,0 +1,18 @@
+{
+  "challenge_module": "DifferentProofsChallenge.InfinitudeOfPrimes",
+  "solution_module": "DifferentProofs",
+  "theorem_names": [
+    "InfinitudeOfPrimes_Euclid",
+    "InfinitudeOfPrimes_Euclid'",
+    "InfinitudeOfPrimes_Goldbach",
+    "InfinitudeOfPrimes_Euler",
+    "InfinitudeOfPrimes_Saidak",
+    "InfinitudeOfPrimes_Wunderlich"
+  ],
+  "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ],
+  "enable_nanoda": false
+}

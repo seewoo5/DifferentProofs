@@ -18,6 +18,14 @@ When adding a new proof, please make the Lean statement match the intended
 mathematics carefully, add the relevant imports, and update the project index
 and blueprint where appropriate.
 
+Also record the new theorem in the Comparator challenge, so that CI checks it
+proves the intended statement and nothing weaker. This means adding the
+statement to `DifferentProofsChallenge/<Topic>.lean` and the theorem's fully
+qualified name to `comparator/<Topic>.json`. See
+[comparator/README.md](comparator/README.md) for what the check guarantees and
+how to run it locally. A proof that still contains a `sorry` cannot be listed
+yet; leave it out of the config and note it in the coverage table there.
+
 ## Formalizations that may belong in mathlib
 
 Sometimes a proof may require a useful fact that is not yet available in
@@ -156,3 +164,13 @@ lake build
 
 For changes that affect the blueprint, also check that the blueprint still
 builds and renders correctly.
+
+If you added or restated a theorem, check that the challenge statements still
+elaborate:
+
+```sh
+lake build DifferentProofsChallenge
+```
+
+Running Comparator itself is optional locally — CI runs it on every pull
+request — but [comparator/README.md](comparator/README.md) explains how.
