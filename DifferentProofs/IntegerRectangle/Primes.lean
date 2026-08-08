@@ -114,7 +114,7 @@ private lemma exists_forall_le_abs_sub {x : ℝ} (h : ¬∃ n : ℤ, x = n) :
   ⟨|x - round x|, abs_sub_pos.mpr fun heq ↦ h ⟨round x, heq⟩, round_le x⟩
 
 /-- **Prime-numbers proof** (Robinson) of the integer-rectangle tiling theorem. -/
-theorem IntegerRectangleTheorem_Primes : IntegerRectangleTheorem := by
+theorem IntegerRectangleTheorem_Primes.{u} : IntegerRectangleTheorem.{u} := by
   intro ι _ R T hT hsides
   by_contra hcon
   rw [Rectangle.HasIntegerSide, not_or] at hcon

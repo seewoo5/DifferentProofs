@@ -58,11 +58,12 @@ for example `IntegerRectangle.Polynomials.IntegerRectangleTheorem_Polynomials`, 
 form that appears in the source file.
 
 Comparator compares signatures syntactically, universe parameter *names* included. That only
-bites for a statement that is universe-polymorphic — currently just `IntegerRectangleTheorem` —
-where the auto-bound name depends on whether a `variable {ι : Type*}` line precedes the theorem
-in its proof file. `DifferentProofsChallenge/IntegerRectangle.lean` writes those universes out
-explicitly and explains the rule; if a statement mismatch is reported for a theorem whose type
-looks identical, this is why.
+matters for a universe-polymorphic statement — currently just `IntegerRectangleTheorem` — where
+an auto-bound name would otherwise depend on incidental file layout, since a preceding
+`variable {ι : Type*}` line claims `u_1` and pushes the theorem to `u_2`. Both the proof files
+and the challenge therefore write `.{u}` out explicitly. Keep doing that for any new
+universe-polymorphic statement; if a statement mismatch is reported for a theorem whose type
+looks identical, a universe name is the first thing to check.
 
 ## Running it locally
 

@@ -86,7 +86,7 @@ half-unit grid at the lower-left corner of `R`. Every tile has an integer side, 
 even number of squares, and therefore so does `R`. The corner of `R` has grid coordinate `0`, so
 the square count of `R` is the product of the grid coordinates of its two far edges; one of them
 is even, which says that the corresponding side of `R` has integer length. -/
-theorem IntegerRectangleTheorem_CountingSquares : IntegerRectangleTheorem := by
+theorem IntegerRectangleTheorem_CountingSquares.{u} : IntegerRectangleTheorem.{u} := by
   intro ι _ R T hT hsides
   have hR : Even (cellCount R.x₀ R.y₀ R) := by
     rw [← sum_cellCount hT]

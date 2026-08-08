@@ -135,7 +135,7 @@ private lemma integral_Icc_checker_self_eq_zero_iff {b s : ℝ} (hsb : s ≤ b) 
   exact absurd hzero (integral_checker_pos hr0 hr1).ne'
 
 /-- **Checkerboard proof** (Rochberg–Stein) of the integer-rectangle tiling theorem. -/
-theorem IntegerRectangleTheorem_Checkerboard : IntegerRectangleTheorem := by
+theorem IntegerRectangleTheorem_Checkerboard.{u} : IntegerRectangleTheorem.{u} := by
   intro ι _ R T hT hsides
   exact (hT.prod_integral_dichotomy (integrableOn_checker_prod R) fun i ↦ (hsides i).imp
       (integral_Icc_checker_eq_zero_of_int (T i).hx R.x₀)

@@ -58,7 +58,7 @@ private lemma integral_Icc_sinShift_self_eq_zero_iff {b s : ℝ} (hsb : s ≤ b)
     rw [mul_comm (2 * π) (b - s), mul_left_inj' two_pi_pos.ne', eq_comm]
 
 /-- **Real double-integral proof** of the integer-rectangle tiling theorem. -/
-theorem IntegerRectangleTheorem_RealIntegral : IntegerRectangleTheorem := by
+theorem IntegerRectangleTheorem_RealIntegral.{u} : IntegerRectangleTheorem.{u} := by
   intro ι _ R T hT hsides
   have hint : IntegrableOn (fun z : ℝ × ℝ ↦ sinShift R.x₀ z.1 * sinShift R.y₀ z.2) R.toSet volume :=
     R.integrableOn_of_continuous
