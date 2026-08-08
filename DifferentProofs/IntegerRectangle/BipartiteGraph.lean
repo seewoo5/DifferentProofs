@@ -1,93 +1,33 @@
 module
 
-public import DifferentProofs.IntegerRectangle.GridRefinement
+public import DifferentProofs.IntegerRectangle.CornerCount
 public import DifferentProofsForMathlib.Algebra.BigOperators.Ring.Finset
-public import Mathlib.Data.ZMod.Basic
 
 /-!
 # The integer-rectangle theorem via a bipartite graph
 
-Wagon's eighth proof. Place `R` in standard position and form the bipartite graph joining each
-lattice point of `ℤ × ℤ` to the tiles having it as a corner. Counting the edges from the tile
-side, a tile with an integer side has `0`, `2` or `4` lattice corners, so their total is even.
-Counting from the lattice side, the origin is a corner of exactly one tile, while a lattice point
-that is not a corner of `R` is a corner of `2` or `4` tiles — so a further corner of `R` must be
-a lattice point too, and that is an integer side.
+Wagon's eighth proof, his variation on Paterson's Eulerian-path proof. Place `R` in standard
+position and form the bipartite graph joining each lattice point of `ℤ × ℤ` to the tiles having it
+as a corner. Counting the edges from the tile side, a tile with an integer side has `0`, `2` or `4`
+lattice corners, so their total is even. Counting from the lattice side, the origin is a corner of
+exactly one tile, while a lattice point that is not a corner of `R` is a corner of `2` or `4` tiles
+— so a further corner of `R` must be a lattice point too, and that is an integer side.
 
 Here `R` is not put in standard position; instead the lattice used is the one through the
 lower-left corner of `R`, and rather than the tile corners we sum over *all* its points in `R`
 (`latticeIcc`), which changes nothing since a non-corner contributes `0` on both sides. Corners
 are counted with multiplicity (`cornerCount`), so degenerate tiles need no separate treatment.
 
-Wagon's local claim — a lattice point is a corner of `2` or `4` tiles unless it is a corner of
-`R` — is what needs care: it is a statement about how tiles fit together around a point. We do
-not prove it in that form. Instead `sum_cornerCount_mod_two` gives the exact parity statement it
-is used for,
-
-> at every point of the plane the tiles have, in total, as many corners as `R` does, mod `2`,
-
-and derives it from additivity of the f-area (`IsTiling.sum_fgArea`) applied to the indicator
-functions of the two coordinate lines through the point. For those the f-area of a rectangle is
-its corner count at the point with the left and bottom edges counted negatively (`cornerSign`),
-which is additive over a tiling for free and which mod `2` is the corner count itself.
+The double count itself is `IsTiling.even_sum_cornerCount`, shared with the seventh proof: the
+grid `X ×ˢ Y` here plays the part played there by a connected component of the graph of tile
+sides.
 -/
 
 @[expose] public section
 
 namespace IntegerRectangle.BipartiteGraph
 
-/-! ### Counting corners at a point -/
-
-/-- The number of vertical edges of `S` on the line `x = u`: `0` or `1`, and `2` for a rectangle
-degenerate in the horizontal direction. -/
-noncomputable def xCount (S : Rectangle) (u : ℝ) : ℕ :=
-  (if S.x₀ = u then 1 else 0) + (if S.x₁ = u then 1 else 0)
-
-/-- The number of horizontal edges of `S` on the line `y = v`. -/
-noncomputable def yCount (S : Rectangle) (v : ℝ) : ℕ :=
-  (if S.y₀ = v then 1 else 0) + (if S.y₁ = v then 1 else 0)
-
-/-- The number of corners of `S` at the point `(u, v)`, the four corners being counted with
-multiplicity: a degenerate rectangle has repeated corners. -/
-noncomputable def cornerCount (S : Rectangle) (u v : ℝ) : ℕ := xCount S u * yCount S v
-
-/-- The *signed* corner count of `S` at `(u, v)`: the f-area of `S` for the indicator functions
-of the lines `x = u` and `y = v` (`fgArea_indicator`). Reversing the sign at the lower edges is
-what makes it additive over a tiling, and mod `2` it still counts the corners
-(`cornerSign_cast`). -/
-private noncomputable def cornerSign (S : Rectangle) (u v : ℝ) : ℤ :=
-  ((if S.x₁ = u then 1 else 0) - (if S.x₀ = u then 1 else 0)) *
-    ((if S.y₁ = v then 1 else 0) - (if S.y₀ = v then 1 else 0))
-
-private lemma fgArea_indicator (S : Rectangle) (u v : ℝ) :
-    fgArea (fun x ↦ if x = u then 1 else 0) (fun y ↦ if y = v then 1 else 0) S
-      = (cornerSign S u v : ℝ) := by
-  simp [fgArea, cornerSign]
-
-private lemma cornerSign_cast (S : Rectangle) (u v : ℝ) :
-    ((cornerSign S u v : ℤ) : ZMod 2) = (cornerCount S u v : ℕ) := by
-  simp only [cornerSign, cornerCount, xCount, yCount]
-  split_ifs <;> decide
-
-/-! ### Corner parity -/
-
-variable {ι : Type*} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
-
-/-- **Corner parity of a tiling.** At every point of the plane, the tiles of a tiling have in
-total a number of corners congruent mod `2` to the number of corners of the tiled rectangle
-there. Away from the corners of `R` it says that a point is a corner of evenly many tiles, which
-is Wagon's "`2` or `4` tiles"; at a corner of `R` the count is odd.
-
-The signed corner count is the f-area for the pair of indicator functions of the coordinate lines
-through the point, hence additive over the tiling; forgetting the signs is passing to `ZMod 2`. -/
-theorem sum_cornerCount_mod_two (hT : IsTiling R T) (u v : ℝ) :
-    ((∑ i, cornerCount (T i) u v : ℕ) : ZMod 2) = (cornerCount R u v : ZMod 2) := by
-  have h := hT.sum_fgArea (fun x ↦ if x = u then 1 else 0) fun y ↦ if y = v then 1 else 0
-  simp only [fgArea_indicator] at h
-  have key : ∑ i, cornerSign (T i) u v = cornerSign R u v := by exact_mod_cast h
-  simpa [← cornerSign_cast] using congrArg (fun m : ℤ ↦ (m : ZMod 2)) key
-
-/-! ### The double count -/
+/-! ### The corners of a rectangle on a grid -/
 
 private lemma sum_xCount (S : Rectangle) (X : Finset ℝ) :
     ∑ u ∈ X, xCount S u = (if S.x₀ ∈ X then 1 else 0) + (if S.x₁ ∈ X then 1 else 0) := by
@@ -111,29 +51,22 @@ private lemma sum_cornerCount_product (S : Rectangle) (X Y : Finset ℝ) :
         ((if S.y₀ ∈ Y then 1 else 0) + (if S.y₁ ∈ Y then 1 else 0)) := by
   simp only [cornerCount, Finset.sum_product_mul, sum_xCount, sum_yCount]
 
+variable {ι : Type*} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
+
 /-- **Counting the edges of the bipartite graph.** Let `X` and `Y` be finite sets of abscissae
 and ordinates, and suppose each tile has either both or neither of its vertical edges over `X`,
 or both or neither of its horizontal edges over `Y`. Then the tiled rectangle has an even number
 of corners on the grid `X × Y`.
 
-This is the double count: the edges of the graph joining the grid points to the tiles having them
-as a corner are counted tile by tile — each tile contributes an even number by hypothesis — and
-then point by point, where corner parity (`sum_cornerCount_mod_two`) replaces each count by the
-corresponding count for `R`. -/
+Each tile contributes an even number of edges to the graph joining the grid points to the tiles
+having them as a corner, so the double count (`IsTiling.even_sum_cornerCount`) applies. -/
 theorem even_sum_cornerCount (hT : IsTiling R T) {X Y : Finset ℝ}
     (h : ∀ i, ((T i).x₀ ∈ X ↔ (T i).x₁ ∈ X) ∨ ((T i).y₀ ∈ Y ↔ (T i).y₁ ∈ Y)) :
-    Even (∑ z ∈ X ×ˢ Y, cornerCount R z.1 z.2) := by
-  rw [← ZMod.natCast_eq_zero_iff_even]
-  push_cast
-  calc ∑ z ∈ X ×ˢ Y, (cornerCount R z.1 z.2 : ZMod 2)
-      = ∑ z ∈ X ×ˢ Y, ((∑ i, cornerCount (T i) z.1 z.2 : ℕ) : ZMod 2) :=
-        Finset.sum_congr rfl fun z _ ↦ (sum_cornerCount_mod_two hT z.1 z.2).symm
-    _ = ∑ i, ((∑ z ∈ X ×ˢ Y, cornerCount (T i) z.1 z.2 : ℕ) : ZMod 2) := by
-        push_cast; exact Finset.sum_comm
-    _ = 0 := Finset.sum_eq_zero fun i _ ↦ ZMod.natCast_eq_zero_iff_even.mpr <| by
-        rw [sum_cornerCount_product]
-        exact (h i).elim (fun hi ↦ (even_ite_add_ite hi).mul_right _)
-          fun hi ↦ (even_ite_add_ite hi).mul_left _
+    Even (∑ z ∈ X ×ˢ Y, cornerCount R z.1 z.2) :=
+  hT.even_sum_cornerCount fun i ↦ by
+    rw [sum_cornerCount_product]
+    exact (h i).elim (fun hi ↦ (even_ite_add_ite hi).mul_right _)
+      fun hi ↦ (even_ite_add_ite hi).mul_left _
 
 /-! ### The lattice through a corner of the tiled rectangle -/
 

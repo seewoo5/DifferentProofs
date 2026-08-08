@@ -6,8 +6,10 @@ import DifferentProofs.IntegerRectangle.Basic
 import DifferentProofs.IntegerRectangle.BipartiteGraph
 import DifferentProofs.IntegerRectangle.Checkerboard
 import DifferentProofs.IntegerRectangle.ComplexIntegral
+import DifferentProofs.IntegerRectangle.CornerCount
 import DifferentProofs.IntegerRectangle.CountingSquares
 import DifferentProofs.IntegerRectangle.Defs
+import DifferentProofs.IntegerRectangle.EulerianPath
 import DifferentProofs.IntegerRectangle.GridRefinement
 import DifferentProofs.IntegerRectangle.Polynomials
 import DifferentProofs.IntegerRectangle.Primes
@@ -238,20 +240,24 @@ primes), no side of $`R` can be within $`1/p` of an integer, contradicting the c
 {uses "lem:int-rect-near"}[] for this $`p`.
 :::
 
-Eighth proof: a bipartite graph, Wagon's variation on Paterson's Eulerian-path proof. Place $`R`
-in standard position and join each point of the lattice $`\mathbb{Z} \times \mathbb{Z}` to the
-tiles having it as a corner; then count the edges of that graph in the two possible ways. The
-lattice used below is the one through the lower-left corner of $`R`, which replaces the standard
-position, and corners are counted with multiplicity so that degenerate tiles need no separate
-treatment.
+Seventh proof: an Eulerian path (Paterson). Let $`\Gamma` be the graph whose vertices are the
+corners of the tiles, two of them joined whenever they are the two ends of a horizontal side of a
+tile of integer width, or of a vertical side of a tile of integer height. A tile having a vertex as
+a corner contributes exactly one edge there, so the degree of a vertex is the number of tiles
+having it as a corner: $`2` or $`4` away from the corners of $`R`, while a corner of $`R` lies on
+exactly one tile and has degree $`1`. A walk that starts at a corner of $`R` and repeats no edge
+can therefore not stop before it reaches another corner of $`R`. Every edge of $`\Gamma` is a
+segment of integer length parallel to an axis, so the two corners differ by a vector with integer
+entries, and that is an integer side of $`R`.
 
-Counting the edges at a fixed lattice point requires knowing how many tiles have it as a corner.
-Wagon reads this off the local picture — a lattice point other than a corner of $`R` is a corner
-of exactly $`2` or $`4` tiles — which is a statement about how tiles fit together around a point.
-Only its parity is used, and that parity follows from the f-area additivity of the thirteenth
-proof below, with no local analysis at all.
+Of the degrees only the parity is ever used. Wagon reads it off the local picture — a point other
+than a corner of $`R` is a corner of $`2` or $`4` tiles — which is a statement about how tiles fit
+together around a point. It follows instead from the f-area additivity of the thirteenth proof
+below, with no local analysis at all, in the form of the corner parity lemma; that lemma and the
+double count following it are shared with the eighth proof. Corners are counted with multiplicity,
+so degenerate tiles need no separate treatment.
 
-:::lemma_ "lem:int-rect-corner-parity" (parent := "grp:int-rect") (lean := "IntegerRectangle.BipartiteGraph.sum_cornerCount_mod_two")
+:::lemma_ "lem:int-rect-corner-parity" (parent := "grp:int-rect") (lean := "IntegerRectangle.IsTiling.sum_cornerCount_mod_two")
 Let $`T` tile $`R`. At every point of the plane, the tiles have in total a number of corners
 congruent modulo $`2` to the number of corners of $`R` there. (Each rectangle has four corners,
 counted with multiplicity.)
@@ -266,20 +272,63 @@ it is additive over the tiling {uses "lem:int-rect-fgarea"}[], and modulo $`2` s
 addition agree, so each signed count may be replaced by the corner count.
 :::
 
-:::lemma_ "lem:int-rect-double-count" (parent := "grp:int-rect") (lean := "IntegerRectangle.BipartiteGraph.even_sum_cornerCount")
+:::lemma_ "lem:int-rect-double-count" (parent := "grp:int-rect") (lean := "IntegerRectangle.IsTiling.even_sum_cornerCount")
+Let $`T` tile $`R` and let $`Z` be a finite set of points of the plane in which every tile has an
+even number of corners. Then $`R` has an even number of corners in $`Z`.
+:::
+
+:::proof "lem:int-rect-double-count"
+Count the incidences between the points of $`Z` and the tiles having them as a corner. Tile by
+tile the total is even by hypothesis. Counting the same incidences point by point instead, and
+replacing each point's count by the corresponding count for $`R`
+{uses "lem:int-rect-corner-parity"}[], leaves the parity unchanged, so the number of corners of
+$`R` in $`Z` is even too.
+:::
+
+:::lemma_ "lem:int-rect-euler-walk" (parent := "grp:int-rect") (lean := "IntegerRectangle.EulerianPath.exists_reachable_corner")
+Let $`T` tile $`R`, every tile having an integer side. Then some walk in $`\Gamma` leads from the
+lower-left corner of $`R` to another corner of $`R`.
+:::
+
+:::proof "lem:int-rect-euler-walk"
+Take for $`Z` the connected component of the lower-left corner of $`R`, that is, the vertices a
+walk starting there reaches. An edge of $`\Gamma` has both of its ends in $`Z` or neither, and the
+sides that a tile with an integer side contributes to $`\Gamma` pair up its four corners; so every
+tile has an even number of corners in $`Z`, and by the double count
+{uses "lem:int-rect-double-count"}[] so has $`R`. The lower-left corner of $`R` is one of them,
+hence not the only one.
+:::
+
+:::theorem "thm:int-rect-euler" (parent := "grp:int-rect") (lean := "IntegerRectangle.EulerianPath.IntegerRectangleTheorem_EulerianPath") (proofColor := "#fbcfe8")
+A rectangle tiled by rectangles each with an integer side has an integer side.
+:::
+
+:::proof "thm:int-rect-euler"
+An edge of $`\Gamma` is a side of a tile, parallel to an axis and of integer length, so it leaves
+the pair of fractional parts of a point unchanged, and hence so does a walk. The walk to a second
+corner of $`R` {uses "lem:int-rect-euler-walk"}[] therefore preserves the fractional part of the
+abscissa or of the ordinate — of both, if it ends at the opposite corner — which says that the
+width or the height of $`R` is an integer.
+:::
+
+Eighth proof: a bipartite graph, Wagon's variation on the preceding proof. Place $`R` in standard
+position and join each point of the lattice $`\mathbb{Z} \times \mathbb{Z}` to the tiles having it
+as a corner; then count the edges of that graph in the two possible ways. It is the same count as
+before, taken over a lattice grid instead of a connected component of $`\Gamma`. The lattice used
+below is the one through the lower-left corner of $`R`, which replaces the standard position, and
+rather than the tile corners the count runs over all lattice points of $`R`, which changes nothing
+since a non-corner contributes $`0` on both sides.
+
+:::lemma_ "lem:int-rect-bipartite-count" (parent := "grp:int-rect") (lean := "IntegerRectangle.BipartiteGraph.even_sum_cornerCount")
 Let $`T` tile $`R`, and let $`X` and $`Y` be finite sets of abscissae and of ordinates such that
 every tile has both or neither of its vertical edges over $`X`, or both or neither of its
 horizontal edges over $`Y`. Then $`R` has an even number of corners on the grid $`X \times Y`.
 :::
 
-:::proof "lem:int-rect-double-count"
-Count the edges of the bipartite graph joining the points of $`X \times Y` to the tiles having
-them as a corner. The number of corners a rectangle has on the grid is the number of its vertical
-edges over $`X` times the number of its horizontal edges over $`Y`, so by hypothesis each tile
-contributes an even number of edges, and hence so does the whole graph. Counting them point by
-point instead, and replacing each point's count by the corresponding count for $`R`
-{uses "lem:int-rect-corner-parity"}[], leaves the parity unchanged, so the number of corners of
-$`R` on the grid is even too.
+:::proof "lem:int-rect-bipartite-count"
+The number of corners a rectangle has on the grid is the number of its vertical edges over $`X`
+times the number of its horizontal edges over $`Y`, so by hypothesis every tile has an even number
+of them, and the double count {uses "lem:int-rect-double-count"}[] applies.
 :::
 
 :::theorem "thm:int-rect-bipartite" (parent := "grp:int-rect") (lean := "IntegerRectangle.BipartiteGraph.IntegerRectangleTheorem_BipartiteGraph") (proofColor := "#fbcfe8")
@@ -289,11 +338,11 @@ A rectangle tiled by rectangles each with an integer side has an integer side.
 :::proof "thm:int-rect-bipartite"
 Take for $`X` and $`Y` the points of the lattices through the left and bottom edges of $`R` that
 lie inside $`R`. A tile of integer width has its two vertical edges an integer apart, so both or
-neither lie on the lattice, and likewise in the other direction; the hypothesis of the double
-count {uses "lem:int-rect-double-count"}[] therefore holds, and $`R` has evenly many corners on
-the grid. Its lower-left corner is one of them. If neither side of $`R` were an integer, its
-right edge would miss $`X` and its top edge would miss $`Y`, leaving that corner as the only one
-— an odd number.
+neither lie on the lattice, and likewise in the other direction; the hypothesis of the count
+{uses "lem:int-rect-bipartite-count"}[] therefore holds, and $`R` has evenly many corners on the
+grid. Its lower-left corner is one of them. If neither side of $`R` were an integer, its right
+edge would miss $`X` and its top edge would miss $`Y`, leaving that corner as the only one — an
+odd number.
 :::
 
 Twelfth proof: a sweep line (Bachman–Yannakakis). This one does not use the analytic engine above.

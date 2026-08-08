@@ -24,8 +24,10 @@ public import DifferentProofs.IntegerRectangle.Basic
 public import DifferentProofs.IntegerRectangle.BipartiteGraph
 public import DifferentProofs.IntegerRectangle.Checkerboard
 public import DifferentProofs.IntegerRectangle.ComplexIntegral
+public import DifferentProofs.IntegerRectangle.CornerCount
 public import DifferentProofs.IntegerRectangle.CountingSquares
 public import DifferentProofs.IntegerRectangle.Defs
+public import DifferentProofs.IntegerRectangle.EulerianPath
 public import DifferentProofs.IntegerRectangle.GridRefinement
 public import DifferentProofs.IntegerRectangle.Polynomials
 public import DifferentProofs.IntegerRectangle.Primes
