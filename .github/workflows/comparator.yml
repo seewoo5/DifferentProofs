@@ -1,0 +1,79 @@
+name: Comparator
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  comparator:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Check out the project
+        uses: actions/checkout@v5
+        with:
+          path: project
+
+      # Comparator's toolchain must match this project's, because the two share
+      # a Lean installation and `lean4export` has to read the project's oleans.
+      # This is the last Comparator commit on v4.30.0; bump it together with
+      # `lean-toolchain`.
+      - name: Check out Comparator
+        uses: actions/checkout@v5
+        with:
+          repository: leanprover/comparator
+          ref: 1cfc5d8ad183bf65efe7accd0efc175b6b8f25b6
+          path: comparator
+
+      - name: Check out landrun
+        uses: actions/checkout@v5
+        with:
+          repository: Zouuup/landrun
+          ref: v0.1.17
+          path: landrun
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      - name: Build landrun
+        working-directory: landrun
+        run: go build -o landrun cmd/landrun/main.go
+
+      # Installs elan and warms the Mathlib cache, so the sandboxed `lake build`
+      # calls Comparator makes are cheap.
+      - name: Build the project
+        uses: leanprover/lean-action@v1
+        with:
+          lake-package-directory: project
+
+      - name: Build Comparator and lean4export
+        working-directory: comparator
+        run: lake build lean4export comparator
+
+      - name: Compare every topic against its challenge
+        working-directory: project
+        env:
+          COMPARATOR_LANDRUN: ${{ github.workspace }}/landrun/landrun
+          COMPARATOR_LEAN4EXPORT: ${{ github.workspace }}/comparator/.lake/packages/lean4export/.lake/build/bin/lean4export
+        run: |
+          failed=()
+          echo '| Topic | Result |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| --- | --- |' >> "$GITHUB_STEP_SUMMARY"
+          for config in comparator/*.json; do
+            topic="$(basename "$config" .json)"
+            echo "::group::$topic"
+            if lake env "$GITHUB_WORKSPACE/comparator/.lake/build/bin/comparator" "$config"; then
+              echo "| $topic | ✅ verified |" >> "$GITHUB_STEP_SUMMARY"
+            else
+              failed+=("$topic")
+              echo "| $topic | ❌ rejected |" >> "$GITHUB_STEP_SUMMARY"
+              echo "::error title=Comparator::$topic did not match its challenge"
+            fi
+            echo "::endgroup::"
+          done
+          if [ ${#failed[@]} -ne 0 ]; then
+            echo "Comparator rejected: ${failed[*]}"
+            exit 1
+          fi

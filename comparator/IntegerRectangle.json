@@ -1,0 +1,18 @@
+{
+  "challenge_module": "DifferentProofsChallenge.IntegerRectangle",
+  "solution_module": "DifferentProofs",
+  "theorem_names": [
+    "IntegerRectangle.ComplexIntegral.IntegerRectangleTheorem_ComplexIntegral",
+    "IntegerRectangle.RealIntegral.IntegerRectangleTheorem_RealIntegral",
+    "IntegerRectangle.Checkerboard.IntegerRectangleTheorem_Checkerboard",
+    "IntegerRectangle.CountingSquares.IntegerRectangleTheorem_CountingSquares",
+    "IntegerRectangle.Polynomials.IntegerRectangleTheorem_Polynomials",
+    "IntegerRectangle.Primes.IntegerRectangleTheorem_Primes",
+    "IntegerRectangle.EulerianPath.IntegerRectangleTheorem_EulerianPath",
+    "IntegerRectangle.BipartiteGraph.IntegerRectangleTheorem_BipartiteGraph",
+    "IntegerRectangle.SweepLine.IntegerRectangleTheorem_SweepLine",
+    "IntegerRectangle.StepFunction.IntegerRectangleTheorem_StepFunction"
+  ],
+  "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"],
+  "enable_nanoda": false
+}
