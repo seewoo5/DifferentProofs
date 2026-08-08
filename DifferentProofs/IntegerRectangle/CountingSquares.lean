@@ -93,6 +93,7 @@ theorem IntegerRectangleTheorem_CountingSquares : IntegerRectangleTheorem := by
     refine Finset.even_sum _ fun i _ ↦ (hsides i).elim
       (fun ⟨n, hw⟩ ↦ (even_cellIndex_sub R.x₀ (by simpa [Rectangle.width] using hw)).mul_right _)
       fun ⟨n, hh⟩ ↦ (even_cellIndex_sub R.y₀ (by simpa [Rectangle.height] using hh)).mul_left _
-  simpa only [cellCount, cellIndex_self, sub_zero, Int.even_mul, even_cellIndex_iff] using hR
+  simpa only [Rectangle.HasIntegerSide, Rectangle.width, Rectangle.height, cellCount,
+    cellIndex_self, sub_zero, Int.even_mul, even_cellIndex_iff] using hR
 
 end IntegerRectangle.CountingSquares
