@@ -70,7 +70,7 @@ private lemma cornerSign_cast (S : Rectangle) (u v : ℝ) :
 
 /-! ### Corner parity -/
 
-variable {ι : Type*} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
+variable {ι : Type} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
 
 /-- **Corner parity of a tiling.** At every point of the plane, the tiles of a tiling have in
 total a number of corners congruent mod `2` to the number of corners of the tiled rectangle

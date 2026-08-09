@@ -47,7 +47,7 @@ open MeasureTheory Set
 
 namespace IntegerRectangle.SweepLine
 
-variable {ι : Type*} {R : Rectangle} {T : ι → Rectangle} {p q r : ι → Prop}
+variable {ι : Type} {R : Rectangle} {T : ι → Rectangle} {p q r : ι → Prop}
 
 /-! ### Sums of tile widths -/
 

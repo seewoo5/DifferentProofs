@@ -69,7 +69,7 @@ private lemma even_cellIndex_sub (a : ℝ) {u v : ℝ} {n : ℤ} (h : v - u = n)
   have hv : v - a = u - a + (n : ℝ) := by rw [← h]; ring
   exact ⟨n, by simp only [cellIndex, hv, Int.floor_add_intCast, Int.ceil_add_intCast]; ring⟩
 
-variable {ι : Type*} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
+variable {ι : Type} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
 
 /-- **The square count is additive over a tiling.** This is what Wagon obtains by translating the
 grid lines of the tiling into an auxiliary tiling of the translated rectangle; here it is the

@@ -31,7 +31,7 @@ Wagon's own argument and needs no measure theory.
 
 namespace IntegerRectangle.StepFunction
 
-variable {ι : Type*} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
+variable {ι : Type} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
 
 /-- **The step-function engine**: the fg-area dichotomy, for arbitrary `f, g : ℝ → ℝ`. If `T`
 tiles `R` and every tile has vanishing increment of `f` across its width or of `g` across its

@@ -137,7 +137,7 @@ private lemma sum_product_sub (F G : ℕ → ℝ) {a b c d : ℕ} (hab : a ≤ b
 
 /-! ### The grid of a tiling -/
 
-variable {ι : Type*} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
+variable {ι : Type} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
 
 open scoped Classical in
 /-- The x-coordinates of the vertical lines of the grid: the vertical edges of the tiles and of
@@ -376,7 +376,7 @@ open GridRefinement in
 same quantity for the tiled rectangle. The tile edges span a grid; every open grid cell lies in
 exactly one tile, the cells of a tile fill a product of index intervals, and the sum telescopes
 in both coordinates. -/
-theorem IsTiling.sum_fgArea {ι : Type*} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
+theorem IsTiling.sum_fgArea {ι : Type} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
     (hT : IsTiling R T) (f g : ℝ → ℝ) : ∑ i, fgArea f g (T i) = fgArea f g R := by
   classical
   have hgrid : ∑ p ∈ range ((gridX R T).sort.length - 1) ×ˢ
