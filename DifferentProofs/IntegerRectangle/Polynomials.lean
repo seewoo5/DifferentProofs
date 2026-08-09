@@ -14,24 +14,24 @@ by `t`, leaving lattice coordinates fixed. Algebraically, the perturbed coordina
 φₜ(x) = x + t ε(x),
 ```
 
-where `ε` is `0` on the lattice and `1` off it. The perturbed area of a rectangle is its f-area
+where `ε` is `0` on the lattice and `1` off it. The perturbed area of a rectangle is its fg-area
 for these two coordinate functions, and as a function of `t` it is a genuine polynomial
 
 ```
 areaPoly S = ((ε x₁ - ε x₀) X + (x₁ - x₀)) * ((ε y₁ - ε y₀) X + (y₁ - y₀))
 ```
 
-whose quadratic coefficient is the f-area of the indicator pair (`areaPoly_coeff_two`). If a
+whose quadratic coefficient is the fg-area of the indicator pair (`areaPoly_coeff_two`). If a
 tile has an integer side, the two endpoints of that side have the same lattice status, so the
 corresponding factor is constant and the quadratic coefficient vanishes: the tile's perturbed
-area is linear or constant in `t`, exactly as in Wagon's text. The f-area additivity theorem
+area is linear or constant in `t`, exactly as in Wagon's text. The fg-area additivity theorem
 (`IsTiling.sum_fgArea`) equates the sum of the tile polynomials with the polynomial of the tiled
 rectangle at every real `t` — Wagon confines `t` to a small interval `[0, ε]` so that the moved
 segments still bound a genuine tiling, but the algebraic identity needs no such restriction —
 and `Polynomial.funext` upgrades the evaluation identity to an identity of polynomials. If
 neither side of the tiled rectangle is an integer, its lower endpoints lie on their lattices and
 its upper endpoints off them, so its quadratic coefficient is `1`; comparing `X ^ 2`-coefficients
-yields `0 = 1`. This algebraic use of f-area additivity encodes Wagon's auxiliary tiling while
+yields `0 = 1`. This algebraic use of fg-area additivity encodes Wagon's auxiliary tiling while
 avoiding a separate proof that sufficiently small movements of its grid lines preserve the
 tiling.
 
@@ -42,7 +42,7 @@ original proof: each tile's perturbed area is affine in `t`, so its second finit
 difference to the additivity identity evaluated at `t = 0, 1, 2` yields `0 = 2` with no
 `Polynomial` API. Both routes extract the same number — the second finite difference is twice
 the quadratic coefficient, namely `2 * fgArea ε ε S` — so either way the argument specializes to
-the f-area dichotomy (`StepFunction.dichotomy`) at the indicator pair; the parameter `t` is
+the fg-area dichotomy (`StepFunction.dichotomy`) at the indicator pair; the parameter `t` is
 Douady's geometric packaging of that instance.
 
 For the record, the shortcut shared `nonLatticeIndicator`, `perturb`, and
@@ -117,14 +117,14 @@ private noncomputable def incPoly (a u v : ℝ) : ℝ[X] :=
 private noncomputable def areaPoly (a b : ℝ) (S : Rectangle) : ℝ[X] :=
   incPoly a S.x₀ S.x₁ * incPoly b S.y₀ S.y₁
 
-/-- Evaluating the perturbed-area polynomial at `t` recovers the f-area of the perturbed
+/-- Evaluating the perturbed-area polynomial at `t` recovers the fg-area of the perturbed
 coordinates. -/
 private lemma eval_areaPoly (a b t : ℝ) (S : Rectangle) :
     (areaPoly a b S).eval t = fgArea (perturb a t) (perturb b t) S := by
   simp only [areaPoly, incPoly, fgArea, perturb, eval_mul, eval_add, eval_C, eval_X]
   ring
 
-/-- The quadratic coefficient of the perturbed-area polynomial is the f-area of the pair of
+/-- The quadratic coefficient of the perturbed-area polynomial is the fg-area of the pair of
 off-lattice indicators. -/
 private lemma areaPoly_coeff_two (a b : ℝ) (S : Rectangle) :
     (areaPoly a b S).coeff 2 = fgArea (nonLatticeIndicator a) (nonLatticeIndicator b) S := by
@@ -142,7 +142,7 @@ private lemma areaPoly_coeff_two (a b : ℝ) (S : Rectangle) :
 /-- **Polynomial proof** (Douady) of the integer-rectangle tiling theorem. The perturbed area of
 each tile is a polynomial that is linear or constant in the perturbation parameter, while a
 tiled rectangle with no integer side would have a genuinely quadratic one; comparing `X ^ 2`
-coefficients in the polynomial identity supplied by f-area additivity gives `0 = 1`. -/
+coefficients in the polynomial identity supplied by fg-area additivity gives `0 = 1`. -/
 theorem IntegerRectangleTheorem_Polynomials : IntegerRectangleTheorem := by
   intro ι _ R T hT hsides
   by_contra hcon

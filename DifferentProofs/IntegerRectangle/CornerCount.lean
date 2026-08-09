@@ -18,9 +18,9 @@ used, and that is `IsTiling.sum_cornerCount_mod_two`:
 
 > at every point of the plane the tiles have, in total, as many corners as `R` does, mod `2`,
 
-which comes from additivity of the f-area (`IsTiling.sum_fgArea`) applied to the indicator
+which comes from additivity of the fg-area (`IsTiling.sum_fgArea`) applied to the indicator
 functions of the two coordinate lines through the point, with no local analysis at all. For those
-the f-area of a rectangle is its corner count at the point with the left and bottom edges counted
+the fg-area of a rectangle is its corner count at the point with the left and bottom edges counted
 negatively (`cornerSign`), which is additive over a tiling for free and which mod `2` is the corner
 count itself.
 
@@ -50,7 +50,7 @@ noncomputable def yCount (S : Rectangle) (v : ℝ) : ℕ :=
 multiplicity: a degenerate rectangle has repeated corners. -/
 noncomputable def cornerCount (S : Rectangle) (u v : ℝ) : ℕ := xCount S u * yCount S v
 
-/-- The *signed* corner count of `S` at `(u, v)`: the f-area of `S` for the indicator functions
+/-- The *signed* corner count of `S` at `(u, v)`: the fg-area of `S` for the indicator functions
 of the lines `x = u` and `y = v` (`fgArea_indicator`). Reversing the sign at the lower edges is
 what makes it additive over a tiling, and mod `2` it still counts the corners
 (`cornerSign_cast`). -/
@@ -77,7 +77,7 @@ total a number of corners congruent mod `2` to the number of corners of the tile
 there. Away from the corners of `R` it says that a point is a corner of evenly many tiles, which
 is Wagon's "`2` or `4` tiles"; at a corner of `R` the count is odd.
 
-The signed corner count is the f-area for the pair of indicator functions of the coordinate lines
+The signed corner count is the fg-area for the pair of indicator functions of the coordinate lines
 through the point, hence additive over the tiling; forgetting the signs is passing to `ZMod 2`. -/
 theorem IsTiling.sum_cornerCount_mod_two (hT : IsTiling R T) (u v : ℝ) :
     ((∑ i, cornerCount (T i) u v : ℕ) : ZMod 2) = (cornerCount R u v : ZMod 2) := by

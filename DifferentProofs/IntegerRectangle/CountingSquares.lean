@@ -24,10 +24,10 @@ cellIndex a x = ⌊x - a⌋ + ⌈x - a⌉,
 
 the number of half-unit steps from `a` to the translated `x`; it is even exactly when `x - a` is
 an integer (`even_cellIndex_iff`). The number of squares of a rectangle is then the product of its
-two coordinate increments of `cellIndex` (`cellCount`), that is, the f-area
+two coordinate increments of `cellIndex` (`cellCount`), that is, the fg-area
 (`IntegerRectangle.fgArea`) of the pair `cellIndex a`, `cellIndex b`. So it is additive over a
 tiling by `IsTiling.sum_fgArea` (`sum_cellCount`). This additivity is exactly what Wagon's
-auxiliary tiling delivers, and taking it from the f-area avoids constructing that tiling and
+auxiliary tiling delivers, and taking it from the fg-area avoids constructing that tiling and
 proving it is one — the same device as in the polynomial proof. As in the other proofs the grid
 is based at the lower-left corner of `R`, which replaces Wagon's "place `R` in standard position".
 
@@ -47,7 +47,7 @@ case it stays put, and `cellIndex a x` is twice the resulting offset from `a`. -
 noncomputable def cellIndex (a x : ℝ) : ℤ := ⌊x - a⌋ + ⌈x - a⌉
 
 /-- The number of squares of the half-unit grid based at `(a, b)` covered by the translation of a
-rectangle: the f-area of the pair of grid coordinates. -/
+rectangle: the fg-area of the pair of grid coordinates. -/
 noncomputable def cellCount (a b : ℝ) (S : Rectangle) : ℤ :=
   (cellIndex a S.x₁ - cellIndex a S.x₀) * (cellIndex b S.y₁ - cellIndex b S.y₀)
 
@@ -73,7 +73,7 @@ variable {ι : Type*} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
 
 /-- **The square count is additive over a tiling.** This is what Wagon obtains by translating the
 grid lines of the tiling into an auxiliary tiling of the translated rectangle; here it is the
-f-area additivity of the thirteenth proof, applied to the grid coordinates. -/
+fg-area additivity of the thirteenth proof, applied to the grid coordinates. -/
 theorem sum_cellCount (hT : IsTiling R T) (a b : ℝ) :
     ∑ i, cellCount a b (T i) = cellCount a b R := by
   have key := hT.sum_fgArea (fun x ↦ (cellIndex a x : ℝ)) fun y ↦ (cellIndex b y : ℝ)
