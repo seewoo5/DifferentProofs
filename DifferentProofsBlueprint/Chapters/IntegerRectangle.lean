@@ -110,7 +110,7 @@ that lies off the lattice through the corner of $`R` onto the nearest half-integ
 lattice lines fixed; the tiling becomes a tiling of a translated rectangle all of whose
 coordinates sit on the half-unit grid, so every rectangle in it is a union of
 $`\tfrac12 \times \tfrac12` squares — the checkerboard cells of the third proof — and the argument
-is a parity count of those squares. As with the polynomial proof below, the f-area supplies the
+is a parity count of those squares. As with the polynomial proof below, the fg-area supplies the
 count without the auxiliary tiling having to be built.
 
 :::lemma_ "lem:int-rect-cell-parity" (parent := "grp:int-rect") (lean := "IntegerRectangle.CountingSquares.even_cellIndex_iff")
@@ -130,8 +130,8 @@ increments of the two grid coordinates across it — is additive over a tiling.
 :::
 
 :::proof "lem:int-rect-cellcount"
-That number is by definition the f-area of the pair of grid coordinate functions, so this is
-f-area additivity {uses "lem:int-rect-fgarea"}[], read back in the integers. It is what Wagon gets
+That number is by definition the fg-area of the pair of grid coordinate functions, so this is
+fg-area additivity {uses "lem:int-rect-fgarea"}[], read back in the integers. It is what Wagon gets
 from the auxiliary tiling, here without having to check that the translated tiles tile the
 translated rectangle.
 :::
@@ -155,7 +155,7 @@ Fifth proof: polynomials (Douady). Through the lower-left corner of $`R`, fix th
 lattices and introduce a parameter $`t`. Move a vertical grid line by $`t` when its x-coordinate is
 off the x-lattice, and move a horizontal grid line by $`t` when its y-coordinate is off the
 y-lattice; leave lattice lines fixed. The perturbed areas become honest polynomials in $`t`; the
-f-area formalizes them without separately constructing the auxiliary tiling.
+fg-area formalizes them without separately constructing the auxiliary tiling.
 
 :::theorem "thm:int-rect-polynomials" (parent := "grp:int-rect") (lean := "IntegerRectangle.Polynomials.IntegerRectangleTheorem_Polynomials") (proofColor := "#fbcfe8")
 A rectangle tiled by rectangles each with an integer side has an integer side.
@@ -167,10 +167,10 @@ define $`\varepsilon_y`; perturb the coordinates by $`\varphi_t(u) = u + t\varep
 $`\psi_t(v) = v + t\varepsilon_y(v)`. The perturbed area of a rectangle $`S` is then the value at
 $`t` of the polynomial $`P_S = (\Delta\varepsilon_x X + w)(\Delta\varepsilon_y X + h)`, with
 $`w, h` the sides of $`S` and $`\Delta\varepsilon` the indicator increments across them; its
-quadratic coefficient is the f-area of the indicator pair. If a tile has an integer side, the two
+quadratic coefficient is the fg-area of the indicator pair. If a tile has an integer side, the two
 endpoints of that side have the same indicator, the corresponding factor is constant, and the
 quadratic coefficient vanishes: the tile's perturbed area is linear or constant in $`t`, as in
-Wagon's text. Additivity of the f-area {uses "lem:int-rect-fgarea"}[] equates $`\sum_i P_{T_i}`
+Wagon's text. Additivity of the fg-area {uses "lem:int-rect-fgarea"}[] equates $`\sum_i P_{T_i}`
 with $`P_R` at every real $`t` — Wagon needs $`t` small so that the moved segments still bound a
 tiling, the algebraic identity does not — hence $`\sum_i P_{T_i} = P_R` as polynomials. If neither
 side of $`R` is an integer, each lower endpoint has indicator $`0` and each upper endpoint $`1`,
@@ -252,7 +252,7 @@ entries, and that is an integer side of $`R`.
 
 Of the degrees only the parity is ever used. Wagon reads it off the local picture — a point other
 than a corner of $`R` is a corner of $`2` or $`4` tiles — which is a statement about how tiles fit
-together around a point. It follows instead from the f-area additivity of the thirteenth proof
+together around a point. It follows instead from the fg-area additivity of the thirteenth proof
 below, with no local analysis at all, in the form of the corner parity lemma; that lemma and the
 double count following it are shared with the eighth proof. Corners are counted with multiplicity,
 so degenerate tiles need no separate treatment.
@@ -265,9 +265,9 @@ counted with multiplicity.)
 
 :::proof "lem:int-rect-corner-parity"
 Fix a point $`(u, v)` and take for $`f` and $`g` the indicator functions of $`\{u\}` and
-$`\{v\}`. The f-area of a rectangle is then
+$`\{v\}`. The fg-area of a rectangle is then
 $`(\mathbb{1}[x_1 = u] - \mathbb{1}[x_0 = u])(\mathbb{1}[y_1 = v] - \mathbb{1}[y_0 = v])`, the
-number of corners at $`(u, v)` with the left and bottom edges counted negatively. Being an f-area
+number of corners at $`(u, v)` with the left and bottom edges counted negatively. Being an fg-area
 it is additive over the tiling {uses "lem:int-rect-fgarea"}[], and modulo $`2` subtraction and
 addition agree, so each signed count may be replaced by the corner count.
 :::
@@ -420,12 +420,12 @@ being the theorem — so $`f` is frozen at the top before taking fractional part
 Thirteenth proof: step functions (Hochster–Maté). Like the first three this attaches a number to
 each rectangle and rides on additivity over the tiling, but the number comes from a *step function*
 instead of an integral, and the additivity is combinatorial rather than measure-theoretic: it holds
-for the f-area built from an arbitrary function, with no regularity at all.
+for the fg-area built from an arbitrary function, with no regularity at all.
 
 :::lemma_ "lem:int-rect-fgarea" (parent := "grp:int-rect") (lean := "IntegerRectangle.IsTiling.sum_fgArea")
-For functions $`f, g : \mathbb{R} \to \mathbb{R}` define the *f-area* of a rectangle
+For functions $`f, g : \mathbb{R} \to \mathbb{R}` define the *fg-area* of a rectangle
 $`[x_0, x_1] \times [y_0, y_1]` as $`(f(x_1) - f(x_0)) \cdot (g(y_1) - g(y_0))`. If $`T` tiles $`R`
-then the f-areas of the tiles sum to the f-area of $`R`, for arbitrary $`f` and $`g`.
+then the fg-areas of the tiles sum to the fg-area of $`R`, for arbitrary $`f` and $`g`.
 :::
 
 :::proof "lem:int-rect-fgarea"
@@ -434,10 +434,10 @@ lines carry the finitely many x-coordinates of vertical tile edges and whose hor
 the y-coordinates of horizontal ones. No grid coordinate lies strictly inside an open grid cell, so
 a tile covering the centre of a cell has all four edges clear of it and contains the whole cell; by
 disjointness of interiors this tile is unique. Conversely the cells assigned to a tile fill out a
-full product subdivision of it, because the tile's own edges are grid lines. Summing f-areas of
+full product subdivision of it, because the tile's own edges are grid lines. Summing fg-areas of
 cells therefore counts every cell exactly once, tile by tile; over a product subdivision the sum
-telescopes in both coordinates to the tile's f-area, and over the whole grid it telescopes to the
-f-area of $`R`.
+telescopes in both coordinates to the tile's fg-area, and over the whole grid it telescopes to the
+fg-area of $`R`.
 :::
 
 :::lemma_ "lem:int-rect-step-engine" (parent := "grp:int-rect") (lean := "IntegerRectangle.StepFunction.dichotomy")
@@ -447,8 +447,8 @@ holds for $`R`.
 :::
 
 :::proof "lem:int-rect-step-engine"
-The f-area of every tile is a product with a vanishing factor, so by additivity of the f-area
-{uses "lem:int-rect-fgarea"}[] the f-area of $`R` vanishes, and a product of reals vanishes only if
+The fg-area of every tile is a product with a vanishing factor, so by additivity of the fg-area
+{uses "lem:int-rect-fgarea"}[] the fg-area of $`R` vanishes, and a product of reals vanishes only if
 a factor does.
 :::
 

@@ -7,7 +7,7 @@ public import Mathlib.Algebra.BigOperators.Intervals
 public import Mathlib.Algebra.BigOperators.Ring.Finset
 
 /-!
-# The grid refinement of a tiling, and additivity of the f-area
+# The grid refinement of a tiling, and additivity of the fg-area
 
 Wagon's step-function proof rides on an additivity lemma stated for an *arbitrary* pair of
 functions `f, g : ℝ → ℝ`, with no regularity whatsoever. Call
@@ -16,8 +16,8 @@ functions `f, g : ℝ → ℝ`, with no regularity whatsoever. Call
 fgArea f g S = (f S.x₁ - f S.x₀) · (g S.y₁ - g S.y₀)
 ```
 
-the *f-area* of a rectangle, Wagon's name for the `f = g` case; the Lean name `fgArea` records
-that each axis gets its own function. The f-area is additive over a tiling:
+the *fg-area* of a rectangle, Wagon's name for the `f = g` case; the Lean name `fgArea` records
+that each axis gets its own function. The fg-area is additive over a tiling:
 `IsTiling.sum_fgArea`.
 
 The proof is Wagon's. The tile edges form a graph; extending its edges across `R` cuts `R` into a
@@ -26,9 +26,9 @@ grid, whose vertical lines carry the finitely many x-coordinates of vertical til
 grid coordinate lies strictly inside an open grid cell, so each open cell clears the edges of any
 tile meeting its centre and lies inside a unique tile (`cellTile`); conversely the cells assigned
 to a tile fill out the product of two index intervals (`cellTile_eq_iff`), because the tile's own
-edges are grid lines. Summing the f-area of the cells therefore counts every cell exactly once,
+edges are grid lines. Summing the fg-area of the cells therefore counts every cell exactly once,
 tile by tile, and over a product of index intervals the sum telescopes in both coordinates —
-giving the tile's f-area, and, over the whole grid, the f-area of `R`.
+giving the tile's fg-area, and, over the whole grid, the fg-area of `R`.
 
 The sorting of the edge coordinates is handled by `Finset.sort`; the little `nth` layer below
 turns the sorted list into a total function `ℕ → ℝ`, so that all sums range over `Finset.range`
@@ -41,7 +41,7 @@ open Finset Set
 
 namespace IntegerRectangle
 
-/-- The *f-area* of a rectangle in the sense of Wagon — with a separate function per axis, whence
+/-- The *fg-area* of a rectangle in the sense of Wagon — with a separate function per axis, whence
 the name: the increment of `f` across the width times the increment of `g` across the height. For
 `f = g = id` it is the usual area; for `f = g = Int.fract` it is the quantity driving the
 step-function proof. Its virtue is additivity over a tiling (`IsTiling.sum_fgArea`) for
@@ -137,7 +137,7 @@ private lemma sum_product_sub (F G : ℕ → ℝ) {a b c d : ℕ} (hab : a ≤ b
 
 /-! ### The grid of a tiling -/
 
-variable {ι : Type*} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
+variable {ι : Type} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
 
 open scoped Classical in
 /-- The x-coordinates of the vertical lines of the grid: the vertical edges of the tiles and of
@@ -368,15 +368,15 @@ private lemma filter_cellTile_eq (hT : IsTiling R T) (i : ι)
 
 end GridRefinement
 
-/-! ### Additivity of the f-area -/
+/-! ### Additivity of the fg-area -/
 
 open GridRefinement in
-/-- **The f-area is additive over a tiling** (Wagon, after Hochster and Maté), for arbitrary
+/-- **The fg-area is additive over a tiling** (Wagon, after Hochster and Maté), for arbitrary
 `f, g : ℝ → ℝ`: summing `(f x₁ - f x₀) · (g y₁ - g y₀)` over the tiles of a tiling gives the
 same quantity for the tiled rectangle. The tile edges span a grid; every open grid cell lies in
 exactly one tile, the cells of a tile fill a product of index intervals, and the sum telescopes
 in both coordinates. -/
-theorem IsTiling.sum_fgArea {ι : Type*} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
+theorem IsTiling.sum_fgArea {ι : Type} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
     (hT : IsTiling R T) (f g : ℝ → ℝ) : ∑ i, fgArea f g (T i) = fgArea f g R := by
   classical
   have hgrid : ∑ p ∈ range ((gridX R T).sort.length - 1) ×ˢ

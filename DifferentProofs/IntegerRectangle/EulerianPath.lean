@@ -39,7 +39,7 @@ namespace IntegerRectangle.EulerianPath
 
 /-! ### Paterson's graph -/
 
-variable {ι : Type*} {R : Rectangle} {T : ι → Rectangle} {p q : ℝ × ℝ}
+variable {ι : Type} {R : Rectangle} {T : ι → Rectangle} {p q : ℝ × ℝ}
 
 /-- `IsSide S p q` says that `p` and `q` are the two ends of one of the two sides of `S` that
 Paterson's graph uses: the horizontal sides of `S` when its width is an integer, the vertical

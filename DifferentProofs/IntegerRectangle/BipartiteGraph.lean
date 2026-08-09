@@ -51,7 +51,7 @@ private lemma sum_cornerCount_product (S : Rectangle) (X Y : Finset ℝ) :
         ((if S.y₀ ∈ Y then 1 else 0) + (if S.y₁ ∈ Y then 1 else 0)) := by
   simp only [cornerCount, Finset.sum_product_mul, sum_xCount, sum_yCount]
 
-variable {ι : Type*} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
+variable {ι : Type} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
 
 /-- **Counting the edges of the bipartite graph.** Let `X` and `Y` be finite sets of abscissae
 and ordinates, and suppose each tile has either both or neither of its vertical edges over `X`,

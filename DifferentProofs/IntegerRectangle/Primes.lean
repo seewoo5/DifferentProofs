@@ -48,7 +48,7 @@ private lemma card_latticePoints (p : ℕ) (S : Rectangle) :
   have hy := Int.floor_mono (mul_le_mul_of_nonneg_right S.hy p.cast_nonneg)
   simp [latticePoints, Int.card_Ioc, hx, hy]
 
-variable {ι : Type*} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
+variable {ι : Type} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
 
 /-- **Additivity of the lattice count over a tiling.** The half-open cells of the tiles partition
 the half-open cell of `R` (`IsTiling.iUnion_toSetIoc`, `IsTiling.pairwiseDisjoint_toSetIoc`), and

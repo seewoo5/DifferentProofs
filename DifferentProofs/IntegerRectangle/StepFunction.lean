@@ -12,9 +12,9 @@ Maté. To a rectangle `S = [a, b] × [c, d]` the proof attaches the number
 Φ(S) = ({b} - {a}) · ({d} - {c}),      {x} = x - ⌊x⌋,
 ```
 
-the f-area of `S` (`IntegerRectangle.fgArea`) for the sawtooth `Int.fract` — the identity minus a
+the fg-area of `S` (`IntegerRectangle.fgArea`) for the sawtooth `Int.fract` — the identity minus a
 step function — in both coordinates. The sawtooth increment `{b} - {a}` vanishes exactly when
-`b - a ∈ ℤ`, so `Φ(S) = 0` says precisely that `S` has an integer side. The f-area of an
+`b - a ∈ ℤ`, so `Φ(S) = 0` says precisely that `S` has an integer side. The fg-area of an
 arbitrary pair of functions is additive over a tiling (`IsTiling.sum_fgArea`: refine the tiling
 along the graph formed by the tile edges into a grid and telescope, following Wagon). Every tile
 contributes `0`, hence `Φ(R) = 0` and `R` has an integer side.
@@ -31,9 +31,9 @@ Wagon's own argument and needs no measure theory.
 
 namespace IntegerRectangle.StepFunction
 
-variable {ι : Type*} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
+variable {ι : Type} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
 
-/-- **The step-function engine**: the f-area dichotomy, for arbitrary `f, g : ℝ → ℝ`. If `T`
+/-- **The step-function engine**: the fg-area dichotomy, for arbitrary `f, g : ℝ → ℝ`. If `T`
 tiles `R` and every tile has vanishing increment of `f` across its width or of `g` across its
 height, then the same dichotomy holds for `R`. This is the discrete counterpart of
 `IsTiling.prod_integral_dichotomy`. -/
@@ -50,7 +50,7 @@ private lemma fract_sub_eq_zero_iff {a b : ℝ} :
     Int.fract b - Int.fract a = 0 ↔ ∃ n : ℤ, b - a = n := by
   rw [sub_eq_zero, Int.fract_eq_fract]
 
-/-- **Step-function proof** (Hochster–Maté) of the integer-rectangle tiling theorem: the f-area
+/-- **Step-function proof** (Hochster–Maté) of the integer-rectangle tiling theorem: the fg-area
 dichotomy for the sawtooth `Int.fract` in both coordinates. -/
 theorem IntegerRectangleTheorem_StepFunction : IntegerRectangleTheorem := by
   intro ι _ R T hT hsides
