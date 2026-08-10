@@ -56,6 +56,7 @@ fourteen proofs are still to come.
 - Proof 6: [Prime numbers (Robinson)](DifferentProofs/IntegerRectangle/Primes.lean)
 - Proof 7: [Eulerian path (Paterson)](DifferentProofs/IntegerRectangle/EulerianPath.lean)
 - Proof 8: [Bipartite graph](DifferentProofs/IntegerRectangle/BipartiteGraph.lean)
+- Proof 10: [Induction on reducible links (Bishop–Wagon)](DifferentProofs/IntegerRectangle/ReducibleLink.lean)
 - Proof 12: [Sweep line (Bachman–Yannakakis)](DifferentProofs/IntegerRectangle/SweepLine.lean)
 - Proof 13: [Step functions (Hochster–Maté)](DifferentProofs/IntegerRectangle/StepFunction.lean)
 

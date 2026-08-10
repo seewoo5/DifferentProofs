@@ -14,6 +14,7 @@ import DifferentProofs.IntegerRectangle.GridRefinement
 import DifferentProofs.IntegerRectangle.Polynomials
 import DifferentProofs.IntegerRectangle.Primes
 import DifferentProofs.IntegerRectangle.RealIntegral
+import DifferentProofs.IntegerRectangle.ReducibleLink
 import DifferentProofs.IntegerRectangle.StepFunction
 import DifferentProofs.IntegerRectangle.SweepLine
 
@@ -343,6 +344,75 @@ neither lie on the lattice, and likewise in the other direction; the hypothesis 
 grid. Its lower-left corner is one of them. If neither side of $`R` were an integer, its right
 edge would miss $`X` and its top edge would miss $`Y`, leaving that corner as the only one — an
 odd number.
+:::
+
+Tenth proof: induction on reducible links (Richard Bishop and Wagon), Wagon's variation on
+Robinson's induction. Call a tile an *H-tile* if it is designated by its integer width and a
+*V-tile* if it is designated by its integer height. A *V-link* is a maximal stretch of a vertical
+line of the tiling that no tile crosses and that no horizontal segment cuts, and an *H-link* is
+its horizontal counterpart — so the H-links are the V-links of the transposed tiling. A link is
+*reducible* if it is a V-link with only H-tiles along one of its sides, or an H-link with only
+V-tiles along one of its sides. The proof is an induction on the number of tiles: a reducible link
+always exists, and reducing it loses a tile.
+
+:::lemma_ "lem:int-rect-link-side" (parent := "grp:int-rect") (lean := "IntegerRectangle.ReducibleLink.Link.exists_left")
+At every height of a V-link there is a tile whose right edge lies on the link, and it sticks out
+past neither end of the link.
+:::
+
+:::proof "lem:int-rect-link-side"
+Approach the point of the link at that height from below left; the tile whose half-open cell
+contains it has the line on or to the right of its own right edge. It cannot reach past the line,
+for a tile crossing the line would block a height interior to the link, and it cannot reach past
+either end of the link, because whatever blocks that end — a tile crossing the line, or a
+horizontal edge arriving at the line from both sides — would share a point with it.
+:::
+
+:::lemma_ "lem:int-rect-link-push" (parent := "grp:int-rect") (lean := "IntegerRectangle.ReducibleLink.isTiling_push")
+Let $`T` tile $`R`, let a V-link of the tiling be given, and let $`w > 0` be at most the width of
+every tile abutting the link on its right. Pushing every tile on the left of the link $`w` units
+rightwards, and paring every tile on its right back by $`w`, again tiles $`R`.
+:::
+
+:::proof "lem:int-rect-link-push"
+The tiles on either side of the link cut it into consecutive pieces
+{uses "lem:int-rect-link-side"}[], so the strip of width $`w` that the tiles on the left sweep out
+is exactly the strip that the tiles on the right vacate; no other tile can reach into it, and the
+half-open cells of the new family therefore still partition those of $`R`.
+:::
+
+:::lemma_ "lem:int-rect-link-exists" (parent := "grp:int-rect") (lean := "IntegerRectangle.ReducibleLink.exists_reducible")
+In a tiling with at least one H-tile and at least one V-tile, some link is reducible.
+:::
+
+:::proof "lem:int-rect-link-exists"
+Suppose not. Then from any H-tile one can step to an H-tile directly above or below across an
+H-link, so the H-tiles reach every height of $`R`; and from any V-tile one can step to a V-tile
+across a V-link on either side, so the V-tiles reach from the left edge of $`R` to its right edge.
+Follow the V-tiles rightwards, carrying the assertion that every H-tile overlapping the current
+V-tile in height lies to the right of it. It holds at the left edge, where there is no room on the
+left. It survives a step: an H-tile lying on the left of the V-link just crossed can be walked up
+and down along H-links to the height of the previous V-tile, staying on the left throughout, since
+a V-link blocks every H-link it meets and the H-tiles bordering an H-link do not reach past its
+ends — contradicting the assertion for the previous V-tile. But at the right edge of $`R` the
+assertion is absurd, since the H-tiles reach that height too.
+:::
+
+:::theorem "thm:int-rect-links" (parent := "grp:int-rect") (lean := "IntegerRectangle.ReducibleLink.IntegerRectangleTheorem_ReducibleLink") (proofColor := "#fbcfe8")
+A rectangle tiled by rectangles each with an integer side has an integer side.
+:::
+
+:::proof "thm:int-rect-links"
+Induct on the number of tiles. Degenerate tiles have empty half-open cells and may be discarded.
+If every tile has integer width the fg-area for the fractional part horizontally and the identity
+vertically vanishes on every tile, hence on $`R`, so $`R` has integer width; likewise if every
+tile has integer height. Otherwise some link is reducible {uses "lem:int-rect-link-exists"}[], say
+a V-link with only H-tiles on its right; take for $`w` the width of the narrowest of them and push
+{uses "lem:int-rect-link-push"}[]. Heights never change, so V-tiles stay V-tiles, and widths change
+by the integer $`w`, so H-tiles stay H-tiles; but the narrowest tile on the right is squeezed to
+nothing, so the new tiling of $`R` has fewer tiles and the induction hypothesis applies. The three
+other ways a link can be reducible are this one read in the mirror image of the tiling, in its
+transpose, and in the mirror image of its transpose.
 :::
 
 Twelfth proof: a sweep line (Bachman–Yannakakis). This one does not use the analytic engine above.
