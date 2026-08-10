@@ -1,6 +1,7 @@
 module
 
 public import DifferentProofs.IntegerRectangle.Cells
+public import DifferentProofs.IntegerRectangle.GridRefinement
 
 /-!
 # The integer-rectangle theorem by induction on reducible links
@@ -495,5 +496,531 @@ theorem exists_link (hT : IsTiling R T) (hp : Proper T) {k : ι} (hlt : (T k).x�
         · exact h ▸ y₁_mem_edgeHeights j
       linarith [hhi_min y hy hB hb']
   · exact hfree y (not_le.mp hA) (not_le.mp hB) hb
+
+/-! ### Pruning the degenerate tiles, and the two extreme cases -/
+
+/-- **Degenerate tiles may be discarded.** The half-open cell of a degenerate rectangle is empty,
+so it contributes nothing to the partition and deleting it leaves a tiling. -/
+theorem isTiling_proper (hT : IsTiling R T) (hx : R.x₀ < R.x₁) (hy : R.y₀ < R.y₁) :
+    IsTiling R fun i : {i : ι // (T i).x₀ < (T i).x₁ ∧ (T i).y₀ < (T i).y₁} ↦ T i.1 := by
+  refine isTiling_of_toSetIoc hx hy (fun i ↦ hT.tile_subset i.1)
+    (fun i j hij ↦ hT.pairwiseDisjoint_toSetIoc (Subtype.coe_ne_coe.mpr hij)) fun z hz ↦ ?_
+  obtain ⟨i, hi, -⟩ := hT.existsUnique_toSetIoc hz
+  exact Set.mem_iUnion.mpr ⟨⟨i, hi.1.1.trans_le hi.1.2, hi.2.1.trans_le hi.2.2⟩, hi⟩
+
+/-- **A tiling all of whose tiles have integer width tiles a rectangle of integer width.** The
+fg-area for the fractional part horizontally and the identity vertically vanishes on every tile,
+hence on `R`. -/
+theorem intWidth_of_forall (hT : IsTiling R T) (hy : R.y₀ < R.y₁)
+    (h : ∀ i, ∃ m : ℤ, (T i).width = m) : ∃ m : ℤ, R.width = m := by
+  have key := hT.sum_fgArea Int.fract id
+  rw [Finset.sum_eq_zero fun i _ ↦ ?_] at key
+  · rw [fgArea] at key
+    exact Int.fract_eq_fract.mp (by
+      have : Int.fract R.x₁ - Int.fract R.x₀ = 0 := by
+        rcases mul_eq_zero.mp key.symm with h' | h'
+        · exact h'
+        · simp only [id] at h'; linarith
+      linarith)
+  · obtain ⟨m, hm⟩ := h i
+    rw [fgArea, Int.fract_eq_fract.mpr ⟨m, by simpa [Rectangle.width] using hm⟩, sub_self,
+      zero_mul]
+
+/-- **A tiling all of whose tiles have integer height tiles a rectangle of integer height.** -/
+theorem intHeight_of_forall (hT : IsTiling R T) (hx : R.x₀ < R.x₁)
+    (h : ∀ i, ∃ m : ℤ, (T i).height = m) : ∃ m : ℤ, R.height = m :=
+  intWidth_of_forall hT.transpose hx h
+
+/-! ### Links on the left-hand edge of a tile -/
+
+/-- A V-link of the reflected tiling is a V-link of the original one. -/
+def Link.ofReflectX (l : Link R.reflectX fun i ↦ (T i).reflectX) : Link R T where
+  c := -l.c
+  lo := l.lo
+  hi := l.hi
+  x₀_lt := by have := l.lt_x₁; simp only [Rectangle.reflectX] at this; linarith
+  lt_x₁ := by have := l.x₀_lt; simp only [Rectangle.reflectX] at this; linarith
+  lo_lt_hi := l.lo_lt_hi
+  y₀_le := l.y₀_le
+  le_y₁ := l.le_y₁
+  free y h₁ h₂ hb := l.free y h₁ h₂ (by simpa using (blocked_reflectX T (-l.c) y).mpr hb)
+  bot := l.bot.imp id fun h ↦ (blocked_reflectX T (-l.c) l.lo).mp (by simpa using h)
+  top := l.top.imp id fun h ↦ (blocked_reflectX T (-l.c) l.hi).mp (by simpa using h)
+
+lemma isRight_ofReflectX {l : Link R.reflectX fun i ↦ (T i).reflectX} {i : ι} :
+    IsLeft l.ofReflectX i ↔ IsRight l i := by
+  simp only [IsLeft, IsRight, Link.ofReflectX, Rectangle.reflectX, neg_le_neg_iff]
+  exact and_congr ⟨fun h ↦ by linarith, fun h ↦ by linarith⟩ Iff.rfl
+
+lemma isLeft_ofReflectX {l : Link R.reflectX fun i ↦ (T i).reflectX} {i : ι} :
+    IsRight l.ofReflectX i ↔ IsLeft l i := by
+  simp only [IsLeft, IsRight, Link.ofReflectX, Rectangle.reflectX, neg_le_neg_iff]
+  exact and_congr ⟨fun h ↦ by linarith, fun h ↦ by linarith⟩ Iff.rfl
+
+lemma properReflectX (hp : Proper T) : Proper fun i ↦ (T i).reflectX := fun i ↦
+  ⟨by simpa [Rectangle.reflectX] using (hp i).1, (hp i).2⟩
+
+/-- **Every vertical tile edge interior to `R` carries a V-link straddling it**, the mirror image
+of `exists_link` for the left-hand edge of a tile. -/
+theorem exists_link_left (hT : IsTiling R T) (hp : Proper T) {k : ι} (hgt : R.x₀ < (T k).x₀) :
+    ∃ l : Link R T, l.c = (T k).x₀ ∧ l.lo ≤ (T k).y₀ ∧ (T k).y₁ ≤ l.hi := by
+  obtain ⟨l, hc, hlo, hhi⟩ := exists_link hT.reflectX (properReflectX hp) (k := k)
+    (by simpa [Rectangle.reflectX] using hgt)
+  simp only [Rectangle.reflectX] at hc hlo hhi
+  exact ⟨l.ofReflectX, by show -l.c = (T k).x₀; rw [hc, neg_neg], hlo, hhi⟩
+
+/-! ### Walking along a chain of tiles -/
+
+open scoped Classical in
+/-- The abscissae at which a tile, or the tiled rectangle, has a vertical edge. -/
+noncomputable def edgeAbscissae (R : Rectangle) (T : ι → Rectangle) : Finset ℝ :=
+  insert R.x₀ (insert R.x₁ ((Finset.univ.image fun i ↦ (T i).x₀) ∪
+    Finset.univ.image fun i ↦ (T i).x₁))
+
+lemma x₀_mem_edgeAbscissae (i : ι) : (T i).x₀ ∈ edgeAbscissae R T := by simp [edgeAbscissae]
+
+lemma x₁_mem_edgeAbscissae (i : ι) : (T i).x₁ ∈ edgeAbscissae R T := by simp [edgeAbscissae]
+
+/-- **Walking up a stack of tiles.** If from every tile of the family `P` whose top edge is below
+`top` one can step to a tile of `P` sitting directly on it, then every height up to `top` above a
+tile of `P` is met by a tile of `P`. The walk terminates because each step raises the top edge to
+a strictly higher one of the finitely many edge heights. -/
+private theorem walk_up {P : ι → Prop} {top : ℝ}
+    (hstep : ∀ s, P s → (T s).y₁ < top →
+      ∃ s', P s' ∧ (T s').y₀ = (T s).y₁ ∧ (T s).y₁ < (T s').y₁) :
+    ∀ n : ℕ, ∀ s, P s → ((edgeHeights R T).filter fun a ↦ (T s).y₁ < a ∧ a ≤ top).card ≤ n →
+      ∀ y, (T s).y₀ < y → y ≤ top → ∃ s', P s' ∧ (T s').y₀ < y ∧ y ≤ (T s').y₁ := by
+  intro n
+  induction n using Nat.strong_induction_on with
+  | _ n ih =>
+    intro s hs hcard y hy₀ hy₁
+    by_cases hcase : y ≤ (T s).y₁
+    · exact ⟨s, hs, hy₀, hcase⟩
+    push_neg at hcase
+    obtain ⟨s', hs', hy, hgt⟩ := hstep s hs (hcase.trans_le hy₁)
+    by_cases hover : top < (T s').y₁
+    · exact ⟨s', hs', by rw [hy]; exact hcase, hy₁.trans hover.le⟩
+    push_neg at hover
+    refine ih _ (lt_of_lt_of_le (Finset.card_lt_card ⟨fun a ha ↦ ?_, fun hcon ↦ ?_⟩) hcard) s' hs'
+      le_rfl y (by rw [hy]; exact hcase) hy₁
+    · obtain ⟨h₁, h₂, h₃⟩ := Finset.mem_filter.mp ha
+      exact Finset.mem_filter.mpr ⟨h₁, hgt.trans h₂, h₃⟩
+    · exact absurd (Finset.mem_filter.mp (hcon (Finset.mem_filter.mpr
+        ⟨y₁_mem_edgeHeights s', hgt, hover⟩))).2.1 (lt_irrefl _)
+
+/-- **Walking down a stack of tiles**, the mirror image of `walk_up`. -/
+private theorem walk_down {P : ι → Prop} {bot : ℝ}
+    (hstep : ∀ s, P s → bot < (T s).y₀ →
+      ∃ s', P s' ∧ (T s').y₁ = (T s).y₀ ∧ (T s').y₀ < (T s).y₀) :
+    ∀ n : ℕ, ∀ s, P s → ((edgeHeights R T).filter fun a ↦ bot ≤ a ∧ a < (T s).y₀).card ≤ n →
+      ∀ y, bot < y → y ≤ (T s).y₁ → ∃ s', P s' ∧ (T s').y₀ < y ∧ y ≤ (T s').y₁ := by
+  intro n
+  induction n using Nat.strong_induction_on with
+  | _ n ih =>
+    intro s hs hcard y hy₀ hy₁
+    by_cases hcase : (T s).y₀ < y
+    · exact ⟨s, hs, hcase, hy₁⟩
+    push_neg at hcase
+    obtain ⟨s', hs', hy, hlt⟩ := hstep s hs (hy₀.trans_le hcase)
+    by_cases hunder : (T s').y₀ < bot
+    · exact ⟨s', hs', hunder.trans hy₀, by rw [hy]; exact hcase⟩
+    push_neg at hunder
+    refine ih _ (lt_of_lt_of_le (Finset.card_lt_card ⟨fun a ha ↦ ?_, fun hcon ↦ ?_⟩) hcard) s' hs'
+      le_rfl y hy₀ (by rw [hy]; exact hcase)
+    · obtain ⟨h₁, h₂, h₃⟩ := Finset.mem_filter.mp ha
+      exact Finset.mem_filter.mpr ⟨h₁, h₂, h₃.trans hlt⟩
+    · exact absurd (Finset.mem_filter.mp (hcon (Finset.mem_filter.mpr
+        ⟨y₀_mem_edgeHeights s', hunder, hlt⟩))).2.2 (lt_irrefl _)
+
+/-- **Walking rightwards to the right-hand edge.** If from every tile of the family `P` not
+reaching the right edge of `R` one can step to a tile of `P` reaching further right, then some
+tile of `P` has its right edge on that of `R`. -/
+private theorem walk_right (hT : IsTiling R T) {P : ι → Prop}
+    (hstep : ∀ i, P i → (T i).x₁ < R.x₁ → ∃ j, P j ∧ (T i).x₁ < (T j).x₁) :
+    ∀ n : ℕ, ∀ i, P i → ((edgeAbscissae R T).filter fun a ↦ (T i).x₁ < a ∧ a ≤ R.x₁).card ≤ n →
+      ∃ u, P u ∧ (T u).x₁ = R.x₁ := by
+  intro n
+  induction n using Nat.strong_induction_on with
+  | _ n ih =>
+    intro i hi hcard
+    rcases (hT.tile_x₁_le i).lt_or_eq with hlt | heq
+    · obtain ⟨j, hj, hgt⟩ := hstep i hi hlt
+      refine ih _ (lt_of_lt_of_le (Finset.card_lt_card ⟨fun a ha ↦ ?_, fun hcon ↦ ?_⟩) hcard) j hj
+        le_rfl
+      · obtain ⟨h₁, h₂, h₃⟩ := Finset.mem_filter.mp ha
+        exact Finset.mem_filter.mpr ⟨h₁, hgt.trans h₂, h₃⟩
+      · exact absurd (Finset.mem_filter.mp (hcon (Finset.mem_filter.mpr
+          ⟨x₁_mem_edgeAbscissae j, hgt, hT.tile_x₁_le j⟩))).2.1 (lt_irrefl _)
+    · exact ⟨i, hi, heq⟩
+
+/-- **Walking leftwards to the left-hand edge**, the mirror image of `walk_right`. -/
+private theorem walk_left (hT : IsTiling R T) {P : ι → Prop}
+    (hstep : ∀ i, P i → R.x₀ < (T i).x₀ → ∃ j, P j ∧ (T j).x₀ < (T i).x₀) :
+    ∀ n : ℕ, ∀ i, P i → ((edgeAbscissae R T).filter fun a ↦ R.x₀ ≤ a ∧ a < (T i).x₀).card ≤ n →
+      ∃ u, P u ∧ (T u).x₀ = R.x₀ := by
+  intro n
+  induction n using Nat.strong_induction_on with
+  | _ n ih =>
+    intro i hi hcard
+    rcases (hT.le_tile_x₀ i).lt_or_eq with hlt | heq
+    · obtain ⟨j, hj, hlt'⟩ := hstep i hi hlt
+      refine ih _ (lt_of_lt_of_le (Finset.card_lt_card ⟨fun a ha ↦ ?_, fun hcon ↦ ?_⟩) hcard) j hj
+        le_rfl
+      · obtain ⟨h₁, h₂, h₃⟩ := Finset.mem_filter.mp ha
+        exact Finset.mem_filter.mpr ⟨h₁, h₂, h₃.trans hlt'⟩
+      · exact absurd (Finset.mem_filter.mp (hcon (Finset.mem_filter.mpr
+          ⟨x₀_mem_edgeAbscissae j, hT.le_tile_x₀ j, hlt'⟩))).2.2 (lt_irrefl _)
+    · exact ⟨i, hi, heq.symm⟩
+
+/-! ### The crossing argument -/
+
+lemma properTranspose (hp : Proper T) : Proper fun i ↦ (T i).transpose :=
+  fun i ↦ ⟨(hp i).2, (hp i).1⟩
+
+/-- A finite set of reals leaves a gap above any point. -/
+private lemma exists_gap_above (s : Finset ℝ) (e : ℝ) :
+    ∃ δ : ℝ, 0 < δ ∧ ∀ a ∈ s, e < a → e + δ ≤ a := by
+  classical
+  rcases (s.filter fun a ↦ e < a).eq_empty_or_nonempty with h | h
+  · exact ⟨1, one_pos, fun a ha hlt ↦ absurd (Finset.mem_filter.mpr ⟨ha, hlt⟩) (by simp [h])⟩
+  · refine ⟨(s.filter fun a ↦ e < a).min' h - e, ?_, fun a ha hlt ↦ ?_⟩
+    · have := (Finset.mem_filter.mp ((s.filter fun a ↦ e < a).min'_mem h)).2
+      linarith
+    · have := (s.filter fun a ↦ e < a).min'_le a (Finset.mem_filter.mpr ⟨ha, hlt⟩)
+      linarith
+
+/-- **A V-link blocks every transverse link it meets.** At a height interior to a V-link there is
+a vertical edge of the tiling on the link's line both just below and just above, so the line
+blocks the H-link at that height — which is exactly why the two chains of Wagon's argument cannot
+cross. -/
+theorem blocked_transpose (hT : IsTiling R T) (hp : Proper T) (l : Link R T) {e : ℝ}
+    (h₁ : l.lo < e) (h₂ : e < l.hi) : Blocked (fun i ↦ (T i).transpose) e l.c := by
+  obtain ⟨δ, hδ, hgap⟩ := exists_gap_above (edgeHeights R T) e
+  obtain ⟨P, -, hP₁, -, -, hP₂, hP₃⟩ := l.exists_left hT hp h₁ h₂.le
+  have hmin₁ : min δ (l.hi - e) ≤ δ := min_le_left _ _
+  have hmin₂ : min δ (l.hi - e) ≤ l.hi - e := min_le_right _ _
+  have hd : 0 < min δ (l.hi - e) := lt_min hδ (by linarith)
+  obtain ⟨Q, -, hQ₁, -, -, hQ₂, hQ₃⟩ := l.exists_left hT hp (y := e + min δ (l.hi - e))
+    (by linarith) (by linarith)
+  have hQ₀ : (T Q).y₀ ≤ e := by
+    by_contra hcon
+    have := hgap _ (y₀_mem_edgeHeights Q) (not_le.mp hcon)
+    linarith
+  have hQ₄ : e < (T Q).y₁ := by linarith
+  exact Or.inr ⟨⟨P, hP₂, hP₃, Or.inr hP₁⟩, Q, hQ₀, hQ₄, Or.inr hQ₁⟩
+
+variable {H : ι → Prop}
+
+/-- One step upwards along the chain of H-tiles on the left of a V-link. -/
+private theorem step_up_left (hT : IsTiling R T) (hp : Proper T)
+    (hC : ∀ l' : Link R.transpose fun i ↦ (T i).transpose, ∃ i, IsRight l' i ∧ H i)
+    (l : Link R T) {s : ι} (hs : H s) (hleft : (T s).x₁ ≤ l.c) (hlo : l.lo < (T s).y₁)
+    (hhi : (T s).y₁ < l.hi) :
+    ∃ s', H s' ∧ (T s').x₁ ≤ l.c ∧ (T s').y₀ = (T s).y₁ ∧ (T s).y₁ < (T s').y₁ := by
+  obtain ⟨l', hc, hlo', hhi'⟩ := exists_link hT.transpose (properTranspose hp) (k := s)
+    (show ((T s).transpose).x₁ < R.transpose.x₁ from hhi.trans_le l.le_y₁)
+  obtain ⟨s', hR', hH'⟩ := hC l'
+  have hy₀ : (T s').y₀ = (T s).y₁ := hR'.1.trans hc
+  have hhile : l'.hi ≤ l.c := by
+    refine not_lt.mp fun hcon ↦ l'.free l.c (lt_of_le_of_lt hlo' ((hp s).1.trans_le hleft)) hcon ?_
+    rw [hc]
+    exact blocked_transpose hT hp l hlo hhi
+  have hgt : (T s).y₁ < (T s').y₁ := by
+    have := (hp s').2
+    rw [hy₀] at this
+    exact this
+  exact ⟨s', hH', hR'.2.2.trans hhile, hy₀, hgt⟩
+
+/-- One step downwards along the chain of H-tiles on the left of a V-link. -/
+private theorem step_down_left (hT : IsTiling R T) (hp : Proper T)
+    (hD : ∀ l' : Link R.transpose fun i ↦ (T i).transpose, ∃ i, IsLeft l' i ∧ H i)
+    (l : Link R T) {s : ι} (hs : H s) (hleft : (T s).x₁ ≤ l.c) (hlo : l.lo < (T s).y₀)
+    (hhi : (T s).y₀ < l.hi) :
+    ∃ s', H s' ∧ (T s').x₁ ≤ l.c ∧ (T s').y₁ = (T s).y₀ ∧ (T s').y₀ < (T s).y₀ := by
+  obtain ⟨l', hc, hlo', hhi'⟩ := exists_link_left hT.transpose (properTranspose hp) (k := s)
+    (show R.transpose.x₀ < ((T s).transpose).x₀ from l.y₀_le.trans_lt hlo)
+  obtain ⟨s', hL', hH'⟩ := hD l'
+  have hy₁ : (T s').y₁ = (T s).y₀ := hL'.1.trans hc
+  have hhile : l'.hi ≤ l.c := by
+    refine not_lt.mp fun hcon ↦ l'.free l.c (lt_of_le_of_lt hlo' ((hp s).1.trans_le hleft)) hcon ?_
+    rw [hc]
+    exact blocked_transpose hT hp l hlo hhi
+  have hlt : (T s').y₀ < (T s).y₀ := by
+    have := (hp s').2
+    rw [hy₁] at this
+    exact this
+  exact ⟨s', hH', hL'.2.2.trans hhile, hy₁, hlt⟩
+
+/-- Two tiles that overlap in height and are distinct lie one strictly to the left of the
+other. -/
+private lemma dichotomy (hT : IsTiling R T) (hp : Proper T) {i j : ι} (hij : i ≠ j)
+    (h : max (T i).y₀ (T j).y₀ < min (T i).y₁ (T j).y₁) :
+    (T i).x₁ ≤ (T j).x₀ ∨ (T j).x₁ ≤ (T i).x₀ := by
+  by_contra hcon
+  push_neg at hcon
+  have ha₁ : (T i).y₀ ≤ max (T i).y₀ (T j).y₀ := le_max_left _ _
+  have ha₂ : (T j).y₀ ≤ max (T i).y₀ (T j).y₀ := le_max_right _ _
+  have hb₁ : min (T i).y₁ (T j).y₁ ≤ (T i).y₁ := min_le_left _ _
+  have hb₂ : min (T i).y₁ (T j).y₁ ≤ (T j).y₁ := min_le_right _ _
+  have hc₁ : min (T i).x₁ (T j).x₁ ≤ (T i).x₁ := min_le_left _ _
+  have hc₂ : min (T i).x₁ (T j).x₁ ≤ (T j).x₁ := min_le_right _ _
+  exact hij (hT.eq_of_mem_cell (sx := true) (sy := true)
+    (x := min (T i).x₁ (T j).x₁) (y := min (T i).y₁ (T j).y₁)
+    ⟨⟨lt_min (hp i).1 hcon.2, hc₁⟩, by linarith, hb₁⟩
+    ⟨⟨lt_min hcon.1 (hp j).1, hc₂⟩, by linarith, hb₂⟩)
+
+/-- **Wagon's crossing argument: some link is reducible.** Suppose every V-link had a V-tile on
+each side and every H-link an H-tile below and above. Walking along links, the H-tiles would then
+reach every height of `R`, and the V-tiles would reach from the left edge to the right one; but a
+V-link blocks every H-link it meets (`blocked_transpose`), so all the H-tiles met by a V-link stay
+on one side of it, and the invariant "every H-tile overlapping this V-tile in height lies to its
+right" survives each step rightwards — absurd once the right edge of `R` is reached. -/
+theorem exists_reducible (hT : IsTiling R T) (hp : Proper T)
+    (hA : ∀ l : Link R T, ∃ i, IsRight l i ∧ ¬ H i)
+    (hB : ∀ l : Link R T, ∃ i, IsLeft l i ∧ ¬ H i)
+    (hC : ∀ l : Link R.transpose fun i ↦ (T i).transpose, ∃ i, IsRight l i ∧ H i)
+    (hD : ∀ l : Link R.transpose fun i ↦ (T i).transpose, ∃ i, IsLeft l i ∧ H i)
+    {a b : ι} (ha : H a) (hb : ¬ H b) : False := by
+  -- The H-tiles reach every height of `R`.
+  have hplainUp : ∀ s, H s → (T s).y₁ < R.y₁ →
+      ∃ s', H s' ∧ (T s').y₀ = (T s).y₁ ∧ (T s).y₁ < (T s').y₁ := by
+    intro s hs hlt
+    obtain ⟨l', hc, -, -⟩ := exists_link hT.transpose (properTranspose hp) (k := s)
+      (show ((T s).transpose).x₁ < R.transpose.x₁ from hlt)
+    obtain ⟨s', hR', hH'⟩ := hC l'
+    have hy : (T s').y₀ = (T s).y₁ := hR'.1.trans hc
+    exact ⟨s', hH', hy, by have := (hp s').2; rw [hy] at this; exact this⟩
+  have hplainDown : ∀ s, H s → R.y₀ < (T s).y₀ →
+      ∃ s', H s' ∧ (T s').y₁ = (T s).y₀ ∧ (T s').y₀ < (T s).y₀ := by
+    intro s hs hlt
+    obtain ⟨l', hc, -, -⟩ := exists_link_left hT.transpose (properTranspose hp) (k := s)
+      (show R.transpose.x₀ < ((T s).transpose).x₀ from hlt)
+    obtain ⟨s', hL', hH'⟩ := hD l'
+    have hy : (T s').y₁ = (T s).y₀ := hL'.1.trans hc
+    exact ⟨s', hH', hy, by have := (hp s').2; rw [hy] at this; exact this⟩
+  have hcov : ∀ y, R.y₀ < y → y ≤ R.y₁ → ∃ s, H s ∧ (T s).y₀ < y ∧ y ≤ (T s).y₁ := by
+    intro y hy₀ hy₁
+    rcases lt_or_ge (T a).y₀ y with h | h
+    · exact walk_up (R := R) hplainUp _ a ha le_rfl y h hy₁
+    · exact walk_down (R := R) hplainDown _ a ha le_rfl y hy₀ (h.trans (T a).hy)
+  -- A V-tile abutting the left edge of `R`.
+  have hstepLeft : ∀ i, ¬ H i → R.x₀ < (T i).x₀ → ∃ j, ¬ H j ∧ (T j).x₀ < (T i).x₀ := by
+    intro i hi hlt
+    obtain ⟨l, hc, -, -⟩ := exists_link_left hT hp hlt
+    obtain ⟨j, hLj, hHj⟩ := hB l
+    have h₁ : (T j).x₁ = (T i).x₀ := hLj.1.trans hc
+    have h₂ := (hp j).1
+    exact ⟨j, hHj, by linarith⟩
+  obtain ⟨b₀, hb₀, hb₀x⟩ := walk_left hT hstepLeft _ b hb le_rfl
+  -- The invariant survives each step rightwards.
+  have hstepRight : ∀ i, (¬ H i ∧ ∀ s, H s → max (T i).y₀ (T s).y₀ < min (T i).y₁ (T s).y₁ →
+        (T i).x₁ ≤ (T s).x₀) → (T i).x₁ < R.x₁ →
+      ∃ j, (¬ H j ∧ ∀ s, H s → max (T j).y₀ (T s).y₀ < min (T j).y₁ (T s).y₁ →
+        (T j).x₁ ≤ (T s).x₀) ∧ (T i).x₁ < (T j).x₁ := by
+    intro i hi hlt
+    obtain ⟨l, hc, hlo, hhi⟩ := exists_link hT hp hlt
+    obtain ⟨j, hRj, hHj⟩ := hA l
+    have hjx : (T j).x₀ = (T i).x₁ := hRj.1.trans hc
+    refine ⟨j, ⟨hHj, fun s hs hov ↦ ?_⟩, by have := (hp j).1; linarith⟩
+    rcases dichotomy hT hp (fun h ↦ hHj (by rw [h]; exact hs)) hov with h | h
+    · exact h
+    exfalso
+    rw [hRj.1] at h
+    have hlolt : l.lo < (T s).y₁ :=
+      hRj.2.1.trans_lt (((le_max_left _ _).trans_lt hov).trans_le (min_le_right _ _))
+    have hshi : (T s).y₀ < l.hi :=
+      (((le_max_right _ _).trans_lt hov).trans_le (min_le_left _ _)).trans_le hRj.2.2
+    have hiy := (hp i).2
+    have hm₀ : (T i).y₀ < ((T i).y₀ + (T i).y₁) / 2 := by linarith
+    have hm₁ : ((T i).y₀ + (T i).y₁) / 2 < (T i).y₁ := by linarith
+    have hup : ∀ t, (H t ∧ (T t).x₁ ≤ l.c ∧ l.lo < (T t).y₁ ∧ (T t).y₀ < l.hi) →
+        (T t).y₁ < l.hi →
+        ∃ t', (H t' ∧ (T t').x₁ ≤ l.c ∧ l.lo < (T t').y₁ ∧ (T t').y₀ < l.hi) ∧
+          (T t').y₀ = (T t).y₁ ∧ (T t).y₁ < (T t').y₁ := by
+      intro t ht hlt'
+      obtain ⟨t', hH', hx', hy', hgt'⟩ := step_up_left hT hp hC l ht.1 ht.2.1 ht.2.2.1 hlt'
+      have := ht.2.2.1
+      exact ⟨t', ⟨hH', hx', by linarith, by rw [hy']; exact hlt'⟩, hy', hgt'⟩
+    have hdown : ∀ t, (H t ∧ (T t).x₁ ≤ l.c ∧ l.lo < (T t).y₁ ∧ (T t).y₀ < l.hi) →
+        l.lo < (T t).y₀ →
+        ∃ t', (H t' ∧ (T t').x₁ ≤ l.c ∧ l.lo < (T t').y₁ ∧ (T t').y₀ < l.hi) ∧
+          (T t').y₁ = (T t).y₀ ∧ (T t').y₀ < (T t).y₀ := by
+      intro t ht hlt'
+      obtain ⟨t', hH', hx', hy', hlt''⟩ := step_down_left hT hp hD l ht.1 ht.2.1 hlt' ht.2.2.2
+      have := ht.2.2.2
+      exact ⟨t', ⟨hH', hx', by rw [hy']; exact hlt', by linarith⟩, hy', hlt''⟩
+    obtain ⟨s'', hP'', hy₀'', hy₁''⟩ :
+        ∃ t, (H t ∧ (T t).x₁ ≤ l.c ∧ l.lo < (T t).y₁ ∧ (T t).y₀ < l.hi) ∧
+          (T t).y₀ < ((T i).y₀ + (T i).y₁) / 2 ∧ ((T i).y₀ + (T i).y₁) / 2 ≤ (T t).y₁ := by
+      rcases lt_or_ge (T s).y₀ (((T i).y₀ + (T i).y₁) / 2) with hcase | hcase
+      · exact walk_up (R := R) hup _ s ⟨hs, h, hlolt, hshi⟩ le_rfl _ hcase (by linarith [hm₁.le.trans hhi])
+      · exact walk_down (R := R) hdown _ s ⟨hs, h, hlolt, hshi⟩ le_rfl _ (by linarith) (hcase.trans (T s).hy)
+    have hovi : max (T i).y₀ (T s'').y₀ < min (T i).y₁ (T s'').y₁ :=
+      (max_lt hm₀ hy₀'').trans_le (le_min hm₁.le hy₁'')
+    have h₁ := hi.2 s'' hP''.1 hovi
+    have h₂ := (hp s'').1
+    have h₃ := hP''.2.1
+    linarith
+  -- The invariant holds at the left edge, hence at the right edge, which is absurd.
+  obtain ⟨u, hQu, hux⟩ := walk_right hT hstepRight _ b₀
+    ⟨hb₀, fun s hs hov ↦ by
+      rcases dichotomy hT hp (fun h ↦ hb₀ (by rw [h]; exact hs)) hov with h | h
+      · exact h
+      · exfalso
+        have h₁ := hT.le_tile_x₀ s
+        have h₂ := (hp s).1
+        rw [hb₀x] at h
+        linarith⟩ le_rfl
+  have huy := (hp u).2
+  obtain ⟨s, hs, hs₀, hs₁⟩ := hcov (((T u).y₀ + (T u).y₁) / 2)
+    (by have := hT.le_tile_y₀ u; linarith) (by have := hT.tile_y₁_le u; linarith)
+  have hov : max (T u).y₀ (T s).y₀ < min (T u).y₁ (T s).y₁ :=
+    (max_lt (by linarith) hs₀).trans_le (le_min (by linarith) hs₁)
+  have h₁ := hQu.2 s hs hov
+  have h₂ := hT.tile_x₁_le s
+  have h₃ := (hp s).1
+  rw [hux] at h₁
+  linarith
+
+/-! ### The induction -/
+
+@[simp] lemma reflectX_width (S : Rectangle) : S.reflectX.width = S.width := by
+  simp only [Rectangle.width, Rectangle.reflectX]
+  ring
+
+@[simp] lemma reflectX_height (S : Rectangle) : S.reflectX.height = S.height := rfl
+
+@[simp] lemma transpose_width (S : Rectangle) : S.transpose.width = S.height := rfl
+
+@[simp] lemma transpose_height (S : Rectangle) : S.transpose.height = S.width := rfl
+
+lemma hasIntegerSide_reflectX {S : Rectangle} :
+    S.reflectX.HasIntegerSide ↔ S.HasIntegerSide := by simp [Rectangle.HasIntegerSide]
+
+lemma hasIntegerSide_transpose {S : Rectangle} :
+    S.transpose.HasIntegerSide ↔ S.HasIntegerSide := by
+  simp [Rectangle.HasIntegerSide, or_comm]
+
+lemma isRight_reflectX {l : Link R T} {i : ι} : IsRight l.reflectX i ↔ IsLeft l i := by
+  simp only [IsLeft, IsRight, Link.reflectX, Rectangle.reflectX, neg_inj]
+
+/-- **One step of the induction.** A tiling with a V-link all of whose tiles on the right have
+integer width has an integer side, provided every tiling with fewer tiles does: push the tiles on
+the left of the link rightwards by the width `w` of the narrowest tile on its right. Heights never
+change and widths change by the integer `w`, so every tile keeps an integer side, while the
+narrowest tile on the right is squeezed to nothing and can be discarded. -/
+theorem step_of_reducible {n : ℕ}
+    (ih : ∀ m, m < n → ∀ (ι' : Type) [Fintype ι'] (R' : Rectangle) (T' : ι' → Rectangle),
+      Fintype.card ι' ≤ m → IsTiling R' T' → (∀ i, (T' i).HasIntegerSide) → R'.HasIntegerSide)
+    (hcard : Fintype.card ι ≤ n) (hT : IsTiling R T) (hp : Proper T)
+    (hRx : R.x₀ < R.x₁) (hRy : R.y₀ < R.y₁) (hsides : ∀ i, (T i).HasIntegerSide)
+    (l : Link R T) (hred : ∀ i, IsRight l i → ∃ m : ℤ, (T i).width = m) : R.HasIntegerSide := by
+  classical
+  obtain ⟨k, hk, -, -⟩ := exists_isRight hT hp l l.lo_lt_hi le_rfl
+  obtain ⟨i₀, hi₀, hmin⟩ := Finset.exists_min_image (Finset.univ.filter fun i ↦ IsRight l i)
+    (fun i ↦ (T i).width) ⟨k, by simpa using hk⟩
+  have hi₀R : IsRight l i₀ := by simpa using hi₀
+  have hw0 : 0 < (T i₀).width := sub_pos.mpr (hp i₀).1
+  have hR : ∀ i, IsRight l i → l.c + (T i₀).width ≤ (T i).x₁ := by
+    intro i hi
+    have h₁ := hmin i (by simpa using hi)
+    have h₂ : (T i).x₁ - (T i).x₀ = (T i).width := rfl
+    rw [hi.1] at h₂
+    linarith
+  obtain ⟨wm, hwm⟩ := hred i₀ hi₀R
+  set T' := push l (T i₀).width hw0.le hR with hT'def
+  have hT' : IsTiling R T' := isTiling_push hT hp hRx hRy hw0 hR
+  have hsides' : ∀ i, (T' i).HasIntegerSide := by
+    intro i
+    have hy : (T' i).height = (T i).height := by
+      simp only [Rectangle.height, hT'def, push_y₀, push_y₁]
+    by_cases hL : IsLeft l i
+    · have hx : (T' i).width = (T i).width + (T i₀).width := by
+        simp only [Rectangle.width, hT'def, push_x₀_of_isLeft hL, push_x₁_of_isLeft hL, ← hL.1]
+        ring
+      rcases hsides i with ⟨m, hm⟩ | ⟨m, hm⟩
+      · exact Or.inl ⟨m + wm, by rw [hx, hm, hwm]; push_cast; ring⟩
+      · exact Or.inr ⟨m, by rw [hy, hm]⟩
+    by_cases hRi : IsRight l i
+    · have hx : (T' i).width = (T i).width - (T i₀).width := by
+        simp only [Rectangle.width, hT'def, push_x₀_of_isRight hp hRi,
+          push_x₁_of_isRight hp hRi, ← hRi.1]
+        ring
+      obtain ⟨m, hm⟩ := hred i hRi
+      exact Or.inl ⟨m - wm, by rw [hx, hm, hwm]; push_cast; ring⟩
+    · rw [hT'def, push_of_not hL hRi]
+      exact hsides i
+  have hdeg : ¬((T' i₀).x₀ < (T' i₀).x₁ ∧ (T' i₀).y₀ < (T' i₀).y₁) := by
+    rw [hT'def, push_x₀_of_isRight hp hi₀R, push_x₁_of_isRight hp hi₀R]
+    have : (T i₀).x₁ - (T i₀).x₀ = (T i₀).width := rfl
+    rw [hi₀R.1] at this
+    rintro ⟨h, -⟩
+    linarith
+  refine ih _ (lt_of_lt_of_le (Fintype.card_subtype_lt (p := fun i ↦
+    (T' i).x₀ < (T' i).x₁ ∧ (T' i).y₀ < (T' i).y₁) hdeg) hcard) _ R _ le_rfl
+    (isTiling_proper hT' hRx hRy) fun i ↦ hsides' i.1
+
+/-- **Reducible-link proof** (Bishop–Wagon) of the integer-rectangle tiling theorem, by induction
+on the number of tiles. Degenerate tiles are discarded; if every tile has integer width, or every
+tile integer height, the fg-area settles the matter at once; otherwise some link is reducible
+(`exists_reducible`), and pushing the tiles on one of its sides loses a tile. The four ways a link
+can be reducible are the one case `step_of_reducible` treats, read in the tiling itself, its
+mirror image, its transpose, and the mirror image of its transpose. -/
+theorem IntegerRectangleTheorem_ReducibleLink : IntegerRectangleTheorem := by
+  have main : ∀ n : ℕ, ∀ (ι : Type) [Fintype ι] (R : Rectangle) (T : ι → Rectangle),
+      Fintype.card ι ≤ n → IsTiling R T → (∀ i, (T i).HasIntegerSide) → R.HasIntegerSide := by
+    intro n
+    induction n using Nat.strong_induction_on with
+    | _ n ih =>
+      intro ι _ R T hcard hT hsides
+      classical
+      rcases eq_or_lt_of_le R.hx with hRx | hRx
+      · exact Or.inl ⟨0, by simp [Rectangle.width, ← hRx]⟩
+      rcases eq_or_lt_of_le R.hy with hRy | hRy
+      · exact Or.inr ⟨0, by simp [Rectangle.height, ← hRy]⟩
+      by_cases hp : Proper T
+      · by_cases hH : ∀ i, ∃ m : ℤ, (T i).width = m
+        · exact Or.inl (intWidth_of_forall hT hRy hH)
+        by_cases hV : ∀ i, ¬ ∃ m : ℤ, (T i).width = m
+        · exact Or.inr (intHeight_of_forall hT hRx fun i ↦ (hsides i).resolve_left (hV i))
+        obtain ⟨b, hb⟩ := not_forall.mp hH
+        obtain ⟨a, ha⟩ := not_forall.mp hV
+        by_cases hA : ∀ l : Link R T, ∃ i, IsRight l i ∧ ¬ ∃ m : ℤ, (T i).width = m
+        · by_cases hB : ∀ l : Link R T, ∃ i, IsLeft l i ∧ ¬ ∃ m : ℤ, (T i).width = m
+          · by_cases hC : ∀ l : Link R.transpose fun i ↦ (T i).transpose,
+                ∃ i, IsRight l i ∧ ∃ m : ℤ, (T i).width = m
+            · by_cases hD : ∀ l : Link R.transpose fun i ↦ (T i).transpose,
+                  ∃ i, IsLeft l i ∧ ∃ m : ℤ, (T i).width = m
+              · exact absurd (exists_reducible hT hp hA hB hC hD (not_not.mp ha) hb) not_false
+              · obtain ⟨l, hl⟩ := not_forall.mp hD
+                refine hasIntegerSide_transpose.mp (hasIntegerSide_reflectX.mp
+                  (step_of_reducible ih hcard hT.transpose.reflectX
+                    (properReflectX (properTranspose hp)) ?_ ?_ ?_ l.reflectX fun i hi ↦ ?_))
+                · simpa [Rectangle.reflectX, Rectangle.transpose] using hRy
+                · simpa [Rectangle.reflectX, Rectangle.transpose] using hRx
+                · exact fun i ↦ hasIntegerSide_reflectX.mpr
+                    (hasIntegerSide_transpose.mpr (hsides i))
+                · simpa using (hsides i).resolve_left fun hcon ↦
+                    hl ⟨i, isRight_reflectX.mp hi, hcon⟩
+            · obtain ⟨l, hl⟩ := not_forall.mp hC
+              refine hasIntegerSide_transpose.mp (step_of_reducible ih hcard hT.transpose
+                (properTranspose hp) hRy hRx (fun i ↦ hasIntegerSide_transpose.mpr (hsides i)) l
+                fun i hi ↦ ?_)
+              simpa using (hsides i).resolve_left fun hcon ↦ hl ⟨i, hi, hcon⟩
+          · obtain ⟨l, hl⟩ := not_forall.mp hB
+            refine hasIntegerSide_reflectX.mp (step_of_reducible ih hcard hT.reflectX
+              (properReflectX hp) ?_ hRy (fun i ↦ hasIntegerSide_reflectX.mpr (hsides i))
+              l.reflectX fun i hi ↦ ?_)
+            · simpa [Rectangle.reflectX] using hRx
+            · simpa using not_not.mp fun hcon ↦ hl ⟨i, isRight_reflectX.mp hi, hcon⟩
+        · obtain ⟨l, hl⟩ := not_forall.mp hA
+          exact step_of_reducible ih hcard hT hp hRx hRy hsides l fun i hi ↦
+            not_not.mp fun hcon ↦ hl ⟨i, hi, hcon⟩
+      · obtain ⟨i₀, hi₀⟩ := not_forall.mp hp
+        exact ih _ (lt_of_lt_of_le (Fintype.card_subtype_lt (p := fun i ↦
+          (T i).x₀ < (T i).x₁ ∧ (T i).y₀ < (T i).y₁) hi₀) hcard) _ R _ le_rfl
+          (isTiling_proper hT hRx hRy) fun i ↦ hsides i.1
+  intro ι _ R T hT hsides
+  exact main (Fintype.card ι) ι R T le_rfl hT hsides
 
 end IntegerRectangle.ReducibleLink
