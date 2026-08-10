@@ -168,7 +168,7 @@ theorem IsTiling.existsUnique_toSetIoc (hT : IsTiling R T) {z : ℝ × ℝ} (hz 
 /-- **Each point has exactly one tile of a tiling in each quadrant.** For the four choices of a
 pair of edges to delete, a point of the corresponding cell of the tiled rectangle lies in the
 corresponding cell of exactly one tile. -/
-theorem IsTiling.existsUnique_cell' (hT : IsTiling R T) (sx sy : Bool) {x y : ℝ}
+theorem IsTiling.existsUnique_cell (hT : IsTiling R T) (sx sy : Bool) {x y : ℝ}
     (hz : ((x, y) : ℝ × ℝ) ∈ R.cell sx sy) : ∃! i, ((x, y) : ℝ × ℝ) ∈ (T i).cell sx sy := by
   cases sx <;> cases sy
   · have key : ∀ S : Rectangle, ((x, y) : ℝ × ℝ) ∈ S.cell false false ↔
@@ -192,8 +192,8 @@ theorem IsTiling.existsUnique_cell' (hT : IsTiling R T) (sx sy : Bool) {x y : �
 nondegenerate `R` whose half-open cells are pairwise disjoint and cover the half-open cell of `R`
 is a tiling of `R`: the cells sit between the interiors and the closed tiles, so they control both
 conditions at once. -/
-theorem isTiling_of_toSetIoc {R : Rectangle} {T : ι → Rectangle} (hx : R.x₀ < R.x₁)
-    (hy : R.y₀ < R.y₁) (hsub : ∀ i, (T i).toSet ⊆ R.toSet)
+theorem isTiling_of_toSetIoc (hx : R.x₀ < R.x₁) (hy : R.y₀ < R.y₁)
+    (hsub : ∀ i, (T i).toSet ⊆ R.toSet)
     (hdisj : Pairwise (Function.onFun Disjoint fun i ↦ (T i).toSetIoc))
     (hcover : R.toSetIoc ⊆ ⋃ i, (T i).toSetIoc) : IsTiling R T where
   cover := by
@@ -227,7 +227,6 @@ same choice of edges share a point are equal. -/
 theorem IsTiling.eq_of_mem_cell (hT : IsTiling R T) {sx sy : Bool} {x y : ℝ} {i j : ι}
     (hi : ((x, y) : ℝ × ℝ) ∈ (T i).cell sx sy) (hj : ((x, y) : ℝ × ℝ) ∈ (T j).cell sx sy) :
     i = j :=
-  let h := hT.existsUnique_cell' sx sy (hT.cell_subset sx sy i hi)
-  (h.unique hi hj)
+  (hT.existsUnique_cell sx sy (hT.cell_subset sx sy i hi)).unique hi hj
 
 end IntegerRectangle
