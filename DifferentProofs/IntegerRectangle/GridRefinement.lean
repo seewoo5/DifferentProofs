@@ -1,6 +1,6 @@
 module
 
-public import DifferentProofs.IntegerRectangle.Basic
+public import DifferentProofs.IntegerRectangle.Cells
 public import Mathlib.Data.Finset.Sort
 public import Mathlib.Data.List.GetD
 public import Mathlib.Algebra.BigOperators.Intervals
@@ -397,5 +397,32 @@ theorem IsTiling.sum_fgArea {ι : Type} [Fintype ι] {R : Rectangle} {T : ι →
     (le_of_nth_le_nth (idxB_lt i)
       (((nth_idxB i).le.trans (T i).hy).trans (nth_idxT i).ge))).trans ?_).symm
   rw [nth_idxL, nth_idxR, nth_idxB, nth_idxT, fgArea]
+
+/-! ### Tilings by tiles all of one designation -/
+
+/-- **A tiling all of whose tiles have integer width tiles a rectangle of integer width.** The
+fg-area for the fractional part horizontally and the identity vertically vanishes on every tile,
+hence on `R`. -/
+theorem intWidth_of_forall {ι : Type} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
+    (hT : IsTiling R T) (hy : R.y₀ < R.y₁)
+    (h : ∀ i, ∃ m : ℤ, (T i).width = m) : ∃ m : ℤ, R.width = m := by
+  have key := hT.sum_fgArea Int.fract id
+  rw [Finset.sum_eq_zero fun i _ ↦ ?_] at key
+  · rw [fgArea] at key
+    exact Int.fract_eq_fract.mp (by
+      have : Int.fract R.x₁ - Int.fract R.x₀ = 0 := by
+        rcases mul_eq_zero.mp key.symm with h' | h'
+        · exact h'
+        · simp only [id] at h'; linarith
+      linarith)
+  · obtain ⟨m, hm⟩ := h i
+    rw [fgArea, Int.fract_eq_fract.mpr ⟨m, by simpa [Rectangle.width] using hm⟩, sub_self,
+      zero_mul]
+
+/-- **A tiling all of whose tiles have integer height tiles a rectangle of integer height.** -/
+theorem intHeight_of_forall {ι : Type} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
+    (hT : IsTiling R T) (hx : R.x₀ < R.x₁)
+    (h : ∀ i, ∃ m : ℤ, (T i).height = m) : ∃ m : ℤ, R.height = m :=
+  intWidth_of_forall hT.transpose hx h
 
 end IntegerRectangle
