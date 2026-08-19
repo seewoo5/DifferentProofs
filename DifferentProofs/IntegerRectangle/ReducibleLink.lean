@@ -26,8 +26,8 @@ separately; and the right-hand side of a vertical line is the left-hand side of 
 tiling (`IsTiling.reflectX`, `Link.reflectX`, `Link.ofReflectX`), so `Link.exists_right` and
 `exists_link_left` are corollaries of `Link.exists_left` and `exists_link_right`. This is also why
 the four ways a link can be reducible cost a single proof: `step_of_reducible_right` treats a
-V-link with only H-tiles on its right, and `step_of_reducible_left`, `step_of_reducible_above`
-and `step_of_reducible_below` read it in `T.reflectX`, `T.transpose` and `T.transpose.reflectX`.
+V-link with only H-tiles on its right, `step_of_reducible` adds the left-handed case by
+reflection, and `step_of_reducible_transpose` reads both off for H-links by transposition.
 
 Two unrelated senses of "left" meet in those names. `Link.exists_left` is about the tiles abutting
 a link *on its left*, whereas `exists_link_left` is about the link carried by the *left edge* of a
@@ -206,6 +206,18 @@ omit [Fintype ι] in
 lemma not_isLeft_isRight (hp : Proper T) {l : Link R T} {i : ι} (h : IsLeft l i)
     (h' : IsRight l i) : False :=
   lt_irrefl _ (h.1 ▸ h'.1 ▸ (hp i).1)
+
+/-- A V-link is *reducible* for the tile predicate `H` when one of its sides is abutted only by
+tiles satisfying `H`: Wagon's reducible links, with `H` designating the H-tiles for a V-link of
+the tiling and the V-tiles for a V-link of the transposed one (an H-link). -/
+def Link.Reducible (l : Link R T) (H : ι → Prop) : Prop :=
+  (∀ i, IsRight l i → H i) ∨ ∀ i, IsLeft l i → H i
+
+omit [Fintype ι] in
+/-- Reducibility is monotone in the tile predicate. -/
+lemma Link.Reducible.imp {l : Link R T} {H H' : ι → Prop} (hl : l.Reducible H)
+    (h : ∀ i, H i → H' i) : l.Reducible H' :=
+  Or.imp (fun hr i hi ↦ h i (hr i hi)) (fun hr i hi ↦ h i (hr i hi)) hl
 
 /-- **The tiles on the left of a link cover it.** -/
 theorem exists_isLeft (hT : IsTiling R T) (hp : Proper T) (l : Link R T) {y : ℝ}
@@ -868,21 +880,23 @@ private theorem rightOfAll_step (hT : IsTiling R T) (hp : Proper T)
   linarith
 
 /-- **Wagon's crossing argument: some link is reducible.** In a tiling with a tile satisfying `H`
-and a tile not satisfying it, some V-link has only `H`-tiles along one of its sides, or some
-H-link — a V-link of the transposed tiling — has only non-`H`-tiles along one of its sides. For
-suppose not: every V-link has a non-`H`-tile on each side and every H-link an `H`-tile below and
-above. Walking along links, the `H`-tiles then reach every height of `R`, and the non-`H`-tiles
-reach from the left edge to the right one; the invariant `RightOfAll` holds at the left edge and
-survives every step rightwards, which is absurd once the right edge of `R` is reached. -/
+and a tile not satisfying it, some V-link is reducible for `H`, or some H-link — a V-link of the
+transposed tiling — is reducible for the complement of `H`. For suppose not: every V-link has a
+non-`H`-tile on each side and every H-link an `H`-tile below and above. Walking along links, the
+`H`-tiles then reach every height of `R`, and the non-`H`-tiles reach from the left edge to the
+right one; the invariant `RightOfAll` holds at the left edge and survives every step rightwards,
+which is absurd once the right edge of `R` is reached. -/
 theorem exists_reducible (hT : IsTiling R T) (hp : Proper T) {a b : ι} (ha : H a) (hb : ¬ H b) :
-    (∃ l : Link R T, ∀ i, IsRight l i → H i) ∨ (∃ l : Link R T, ∀ i, IsLeft l i → H i) ∨
-      (∃ l : Link R.transpose fun i ↦ (T i).transpose, ∀ i, IsRight l i → ¬ H i) ∨
-      ∃ l : Link R.transpose fun i ↦ (T i).transpose, ∀ i, IsLeft l i → ¬ H i := by
+    (∃ l : Link R T, l.Reducible H) ∨
+      ∃ l : Link R.transpose fun i ↦ (T i).transpose, l.Reducible fun i ↦ ¬ H i := by
   by_contra hcon
+  simp only [Link.Reducible] at hcon
   push Not at hcon
   -- Were no link reducible: every V-link has a non-`H`-tile abutting each side (`hA`, `hB`), and
   -- every H-link an `H`-tile abutting each side (`hC`, `hD`).
-  obtain ⟨hA, hB, hC, hD⟩ := hcon
+  obtain ⟨hAB, hCD⟩ := hcon
+  obtain ⟨hA, hB⟩ := forall_and.mp hAB
+  obtain ⟨hC, hD⟩ := forall_and.mp hCD
   -- Walk from `b` leftwards along V-links to a non-`H`-tile `b₀` on the left wall of `R`.
   obtain ⟨b₀, hb₀, hb₀x⟩ :=
     walk_left hT (fun _ _ hlt ↦ exists_lt_x₀ hT hp hB hlt) _ b hb le_rfl
@@ -997,46 +1011,37 @@ private theorem step_of_reducible_right {n : ℕ} (ih : ∀ m, m < n → IH m)
   refine ih _ (hlt.trans_le hcard) _ R _ le_rfl
     (isTiling_proper hT' hRx hRy) fun i ↦ hasIntegerSide_push hp hsides hred hwm i.1
 
-/-- `step_of_reducible_right` for a V-link with only H-tiles on its left, transported along the
-reflection in the vertical axis. -/
-private theorem step_of_reducible_left {n : ℕ} (ih : ∀ m, m < n → IH m)
+/-- **A reducible V-link loses a tile.** The right-handed case is `step_of_reducible_right`, and
+the left-handed case is its image under the reflection in the vertical axis. -/
+private theorem step_of_reducible {n : ℕ} (ih : ∀ m, m < n → IH m)
     (hcard : Fintype.card ι ≤ n) (hT : IsTiling R T) (hp : Proper T) (hRx : R.x₀ < R.x₁)
     (hRy : R.y₀ < R.y₁) (hsides : ∀ i, (T i).HasIntegerSide) (l : Link R T)
-    (hred : ∀ i, IsLeft l i → ∃ m : ℤ, (T i).width = m) : R.HasIntegerSide := by
-  refine hasIntegerSide_reflectX.mp (step_of_reducible_right ih hcard hT.reflectX
-    (properReflectX hp) ?_ hRy (fun i ↦ hasIntegerSide_reflectX.mpr (hsides i)) l.reflectX
-    fun i hi ↦ ?_)
-  · simpa [Rectangle.reflectX] using hRx
-  · simpa using hred i (isRight_reflectX.mp hi)
+    (hl : l.Reducible fun i ↦ ∃ m : ℤ, (T i).width = m) : R.HasIntegerSide := by
+  obtain hred | hred := hl
+  · exact step_of_reducible_right ih hcard hT hp hRx hRy hsides l hred
+  · refine hasIntegerSide_reflectX.mp (step_of_reducible_right ih hcard hT.reflectX
+      (properReflectX hp) ?_ hRy (fun i ↦ hasIntegerSide_reflectX.mpr (hsides i)) l.reflectX
+      fun i hi ↦ ?_)
+    · simpa [Rectangle.reflectX] using hRx
+    · simpa using hred i (isRight_reflectX.mp hi)
 
-/-- `step_of_reducible_right` for an H-link with only V-tiles above it, transported along the
-transposition: a tile with no integer width has integer height, an integer width transposed. -/
-private theorem step_of_reducible_above {n : ℕ} (ih : ∀ m, m < n → IH m)
+/-- **A reducible H-link loses a tile**: a reducible V-link of the transposed tiling, whose
+V-tiles — the tiles with no integer width — have integer width once transposed. -/
+private theorem step_of_reducible_transpose {n : ℕ} (ih : ∀ m, m < n → IH m)
     (hcard : Fintype.card ι ≤ n) (hT : IsTiling R T) (hp : Proper T) (hRx : R.x₀ < R.x₁)
     (hRy : R.y₀ < R.y₁) (hsides : ∀ i, (T i).HasIntegerSide)
     (l : Link R.transpose fun i ↦ (T i).transpose)
-    (hred : ∀ i, IsRight l i → ¬ ∃ m : ℤ, (T i).width = m) : R.HasIntegerSide := by
-  refine hasIntegerSide_transpose.mp (step_of_reducible_right ih hcard hT.transpose
+    (hl : l.Reducible fun i ↦ ¬ ∃ m : ℤ, (T i).width = m) : R.HasIntegerSide := by
+  refine hasIntegerSide_transpose.mp (step_of_reducible ih hcard hT.transpose
     (properTranspose hp) hRy hRx (fun i ↦ hasIntegerSide_transpose.mpr (hsides i)) l
-    fun i hi ↦ ?_)
-  simpa using (hsides i).resolve_left (hred i hi)
-
-/-- `step_of_reducible_left` transposed: an H-link with only V-tiles below it. -/
-private theorem step_of_reducible_below {n : ℕ} (ih : ∀ m, m < n → IH m)
-    (hcard : Fintype.card ι ≤ n) (hT : IsTiling R T) (hp : Proper T) (hRx : R.x₀ < R.x₁)
-    (hRy : R.y₀ < R.y₁) (hsides : ∀ i, (T i).HasIntegerSide)
-    (l : Link R.transpose fun i ↦ (T i).transpose)
-    (hred : ∀ i, IsLeft l i → ¬ ∃ m : ℤ, (T i).width = m) : R.HasIntegerSide := by
-  refine hasIntegerSide_transpose.mp (step_of_reducible_left ih hcard hT.transpose
-    (properTranspose hp) hRy hRx (fun i ↦ hasIntegerSide_transpose.mpr (hsides i)) l
-    fun i hi ↦ ?_)
-  simpa using (hsides i).resolve_left (hred i hi)
+    (hl.imp fun i hi ↦ ?_))
+  simpa using (hsides i).resolve_left hi
 
 /-- **Reducible-link proof** (Bishop–Wagon) of the integer-rectangle tiling theorem, by strong
 induction on the number of tiles. A degenerate `R` has a zero side; a tiling that is not proper
 loses a degenerate tile; if every tile has integer width, or every tile integer height, the
 fg-area settles the matter at once; and otherwise some link is reducible (`exists_reducible`) and
-the matching one of the four `step_of_reducible` lemmas loses a tile. -/
+reducing it (`step_of_reducible`, `step_of_reducible_transpose`) loses a tile. -/
 theorem IntegerRectangleTheorem_ReducibleLink : IntegerRectangleTheorem := by
   have main : ∀ n, IH n := by
     intro n
@@ -1061,12 +1066,10 @@ theorem IntegerRectangleTheorem_ReducibleLink : IntegerRectangleTheorem := by
       · exact Or.inr (intHeight_of_forall hT hRx fun i ↦ (hsides i).resolve_left (hV i))
       obtain ⟨b, hb⟩ := not_forall.mp hH
       obtain ⟨a, ha⟩ := not_forall.mp hV
-      obtain ⟨l, hl⟩ | ⟨l, hl⟩ | ⟨l, hl⟩ | ⟨l, hl⟩ :=
+      obtain ⟨l, hl⟩ | ⟨l, hl⟩ :=
         exists_reducible (H := fun i ↦ ∃ m : ℤ, (T i).width = m) hT hp (not_not.mp ha) hb
-      · exact step_of_reducible_right ih hcard hT hp hRx hRy hsides l hl
-      · exact step_of_reducible_left ih hcard hT hp hRx hRy hsides l hl
-      · exact step_of_reducible_above ih hcard hT hp hRx hRy hsides l hl
-      · exact step_of_reducible_below ih hcard hT hp hRx hRy hsides l hl
+      · exact step_of_reducible ih hcard hT hp hRx hRy hsides l hl
+      · exact step_of_reducible_transpose ih hcard hT hp hRx hRy hsides l hl
   intro ι _ R T hT hsides
   exact main (Fintype.card ι) ι R T le_rfl hT hsides
 
