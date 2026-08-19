@@ -40,15 +40,11 @@ structure Normalized (R : Rectangle) (T : ι → Rectangle) (H : ι → Prop) : 
 
 /-- An H-tile is one unit wide. -/
 lemma x₁_eq_of_H (hn : Normalized R T H) {k : ι} (hk : H k) : (T k).x₁ = (T k).x₀ + 1 := by
-  have := hn.width_one k hk
-  simp only [Rectangle.width] at this
-  linarith
+  simpa [Rectangle.width, sub_eq_iff_eq_add'] using hn.width_one k hk
 
 /-- A V-tile is one unit tall. -/
 lemma y₁_eq_of_not_H (hn : Normalized R T H) {j : ι} (hj : ¬ H j) : (T j).y₁ = (T j).y₀ + 1 := by
-  have := hn.height_one j hj
-  simp only [Rectangle.height] at this
-  linarith
+  simpa [Rectangle.height, sub_eq_iff_eq_add'] using hn.height_one j hj
 
 /-- A tiled rectangle is nondegenerate horizontally, since its tiles are. -/
 lemma Normalized.pos_width (hn : Normalized R T H) : R.x₀ < R.x₁ :=
@@ -167,11 +163,9 @@ private lemma exists_mem_piece (hS : S.HasIntegerSide) (hx : S.x₀ < S.x₁) (h
   obtain ⟨⟨h₁, h₂⟩, h₃, h₄⟩ := hz
   by_cases h : CutsWidth S
   · obtain ⟨j, hj, hj₁, hj₂⟩ := exists_index h₁ h₂ (add_pieceCount_width h hx)
-    exact ⟨j, hj, ⟨by rw [piece, if_pos h]; exact hj₁, by rw [piece, if_pos h]; exact hj₂⟩,
-      by rw [piece, if_pos h]; exact h₃, by rw [piece, if_pos h]; exact h₄⟩
+    exact ⟨j, hj, by rw [Rectangle.mem_toSetIoc', piece, if_pos h]; exact ⟨⟨hj₁, hj₂⟩, h₃, h₄⟩⟩
   · obtain ⟨j, hj, hj₁, hj₂⟩ := exists_index h₃ h₄ (add_pieceCount_height hS h hy)
-    exact ⟨j, hj, ⟨by rw [piece, if_neg h]; exact h₁, by rw [piece, if_neg h]; exact h₂⟩,
-      by rw [piece, if_neg h]; exact hj₁, by rw [piece, if_neg h]; exact hj₂⟩
+    exact ⟨j, hj, by rw [Rectangle.mem_toSetIoc', piece, if_neg h]; exact ⟨⟨h₁, h₂⟩, hj₁, hj₂⟩⟩
 
 /-- Distinct pieces of a tile have disjoint half-open cells. -/
 private lemma piece_disjoint {j j' : ℕ} (hjj : j ≠ j') :
@@ -266,31 +260,24 @@ private lemma mem_cutLeft {S : Rectangle} {c x y : ℝ}
     (h : ((x, y) : ℝ × ℝ) ∈ (cutLeft S c).toSetIoc) :
     ((x, y) : ℝ × ℝ) ∈ S.toSetIoc ∧ x ≤ c := by
   simp only [Rectangle.mem_toSetIoc', cutLeft] at h ⊢
-  obtain ⟨⟨h₁, h₂⟩, h₃⟩ := h
-  refine ⟨⟨⟨?_, h₂.trans (min_le_left _ _)⟩, h₃⟩, h₂.trans (min_le_right _ _)⟩
-  rcases min_cases S.x₀ c with ⟨heq, -⟩ | ⟨heq, -⟩ <;> rw [heq] at h₁ <;>
-    linarith [h₂.trans (min_le_right S.x₁ c)]
+  grind
 
 private lemma mem_cutRight {S : Rectangle} {c x y : ℝ}
     (h : ((x, y) : ℝ × ℝ) ∈ (cutRight S c).toSetIoc) :
     ((x + 1, y) : ℝ × ℝ) ∈ S.toSetIoc ∧ c < x := by
   simp only [Rectangle.mem_toSetIoc', cutRight] at h ⊢
-  obtain ⟨⟨h₁, h₂⟩, h₃⟩ := h
-  have hc : c < x := by linarith [le_max_right S.x₀ (c + 1)]
-  refine ⟨⟨⟨by linarith [le_max_left S.x₀ (c + 1)], ?_⟩, h₃⟩, hc⟩
-  rcases max_cases S.x₁ (c + 1) with ⟨heq, -⟩ | ⟨heq, -⟩ <;> rw [heq] at h₂ <;> linarith
+  grind
 
 private lemma mem_cutLeft_of_le {S : Rectangle} {c x y : ℝ} (h : ((x, y) : ℝ × ℝ) ∈ S.toSetIoc)
     (hc : x ≤ c) :
     ((x, y) : ℝ × ℝ) ∈ (cutLeft S c).toSetIoc := by
   simp only [Rectangle.mem_toSetIoc', cutLeft] at h ⊢
-  exact ⟨⟨lt_of_le_of_lt (min_le_left _ _) h.1.1, le_min h.1.2 hc⟩, h.2⟩
+  grind
 
 private lemma mem_cutRight_of_lt {S : Rectangle} {c x y : ℝ} (h : ((x + 1, y) : ℝ × ℝ) ∈ S.toSetIoc)
     (hc : c < x) : ((x, y) : ℝ × ℝ) ∈ (cutRight S c).toSetIoc := by
   simp only [Rectangle.mem_toSetIoc', cutRight] at h ⊢
-  refine ⟨⟨?_, by linarith [le_max_left S.x₁ (c + 1), h.1.2]⟩, h.2⟩
-  rcases max_cases S.x₀ (c + 1) with ⟨heq, -⟩ | ⟨heq, -⟩ <;> rw [heq] <;> linarith [h.1.1]
+  grind
 
 /-- A *staircase strip* for a tiling: `c y` is the left edge of a strip of width `1` at height
 `y`, defined for the heights in `(a, b]`. Each tile of the tiling lies to the left of the strip at
@@ -608,11 +595,9 @@ private lemma exists_level_tile (hn : Normalized R T H) {k : ι} (hk : H k) {t :
 private lemma clear_succ (hn : Normalized R T H) {k : ι} (hk : H k) {t : ℝ} (hclear : Clear T k t)
     (hle : R.y₀ ≤ t) (hlt : t < R.y₁) (hnb : ¬ BlockedAt T H k t) :
     t + 1 ≤ R.y₁ ∧ Clear T k (t + 1) := by
-  have hkw : (T k).x₁ = (T k).x₀ + 1 := x₁_eq_of_H hn hk
-  have hmid : (T k).x₀ < (T k).x₀ + 1 / 2 ∧ (T k).x₀ + 1 / 2 < (T k).x₀ + 1 := by constructor <;>
-    linarith
   refine ⟨?_, fun x hx₀ hx₁ j' hmem ↦ ?_⟩
-  · obtain ⟨j, -, -, -, -, hy₁⟩ := exists_level_tile hn hk hclear hle hlt hnb hmid.1 hmid.2
+  · obtain ⟨j, -, -, -, -, hy₁⟩ := exists_level_tile hn hk hclear hle hlt hnb
+      (by linarith : (T k).x₀ < (T k).x₀ + 1 / 2) (by linarith)
     rw [← hy₁]
     exact hn.tiling.tile_y₁_le j
   · obtain ⟨j, -, hjx₀, hjx₁, hy₀, hy₁⟩ := exists_level_tile hn hk hclear hle hlt hnb hx₀ hx₁
@@ -637,13 +622,7 @@ private lemma level (hn : Normalized R T H) {k : ι} (hk : H k) :
       lt_of_le_of_ne hle fun h ↦ hstop n (by lia) (Or.inl h)
     have hn0 : (0 : ℝ) ≤ n := Nat.cast_nonneg n
     obtain ⟨h₁, h₂⟩ := clear_succ hn hk hclear (by linarith) hlt hnb
-    constructor
-    · push_cast
-      linarith
-    · have : (T k).y₁ + ((n : ℝ) + 1) = (T k).y₁ + n + 1 := by ring
-      push_cast
-      rw [this]
-      exact h₂
+    exact ⟨by push_cast; linarith, by push_cast [← add_assoc]; exact h₂⟩
 
 /-- **The strip always stops.** It rises by one unit at each level, so it must reach the top of
 `R` or be blocked. -/
