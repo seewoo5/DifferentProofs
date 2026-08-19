@@ -37,6 +37,11 @@ structure Normalized (R : Rectangle) (T : ι → Rectangle) (H : ι → Prop) : 
   /-- V-tiles are one unit tall. -/
   height_one : ∀ i, ¬ H i → (T i).height = 1
 
+/-- A tiled rectangle is nondegenerate horizontally, since its tiles are. -/
+lemma Normalized.pos_width (hn : Normalized R T H) : R.x₀ < R.x₁ :=
+  have ⟨i⟩ := hn.tiling.nonempty_index
+  lt_of_le_of_lt (hn.tiling.le_tile_x₀ i) ((hn.proper i).1.trans_le (hn.tiling.tile_x₁_le i))
+
 /-- A tiled rectangle is nondegenerate vertically, since its tiles are. -/
 lemma Normalized.pos_height (hn : Normalized R T H) : R.y₀ < R.y₁ :=
   have ⟨i⟩ := hn.tiling.nonempty_index
@@ -545,5 +550,473 @@ theorem exists_normalized_cut (hn : Normalized R T H) (hs : Strip R T H R.y₀ R
       have hjk : j = k := congrArg Subtype.val hmem
       subst hjk
       exact absurd (width_cutPiece_of_mem_strip hn hH hkc b) (width_ne_zero_iff.mp hprop.1)
+
+/-! ### Growing the strip upwards from an H-tile -/
+
+/-- The strip of width `1` grown upwards from the H-tile `k` is *blocked* at height `t` when an
+H-tile starts there and meets the strip: that is where the staircase steps sideways. -/
+def BlockedAt (T : ι → Rectangle) (H : ι → Prop) (k : ι) (t : ℝ) : Prop :=
+  ∃ j, H j ∧ (T j).y₀ = t ∧ (T j).x₀ < (T k).x₀ + 1 ∧ (T k).x₀ < (T j).x₁
+
+/-- The strip grown upwards from `k` *stops* `n` units above it when it reaches the top of `R`
+there or is blocked there. -/
+def StopsAbove (R : Rectangle) (T : ι → Rectangle) (H : ι → Prop) (k : ι) (n : ℕ) : Prop :=
+  (T k).y₁ + n = R.y₁ ∨ BlockedAt T H k ((T k).y₁ + n)
+
+/-- The strip grown upwards from `k` is *clear* at height `t` when no tile crosses that height
+inside it. -/
+def Clear (T : ι → Rectangle) (k : ι) (t : ℝ) : Prop :=
+  ∀ x, (T k).x₀ < x → x < (T k).x₀ + 1 → ∀ j : ι,
+    ((x, t) : ℝ × ℝ) ∈ (T j).toSetIoc → (T j).y₁ = t
+
+/-- An H-tile is one unit wide. -/
+lemma x₁_eq_of_H (hn : Normalized R T H) {k : ι} (hk : H k) : (T k).x₁ = (T k).x₀ + 1 := by
+  have := hn.width_one k hk
+  simp only [Rectangle.width] at this
+  linarith
+
+/-- A V-tile is one unit tall. -/
+lemma y₁_eq_of_not_H (hn : Normalized R T H) {j : ι} (hj : ¬ H j) : (T j).y₁ = (T j).y₀ + 1 := by
+  have := hn.height_one j hj
+  simp only [Rectangle.height] at this
+  linarith
+
+/-- The strip is clear at the top edge of the H-tile it is grown from: the only tile below that
+edge inside the strip is the H-tile itself. -/
+lemma clear_top (hn : Normalized R T H) {k : ι} (hk : H k) : Clear T k (T k).y₁ := by
+  intro x hx₀ hx₁ j hmem
+  rw [hn.tiling.eq_of_mem_cell (sx := true) (sy := true) hmem
+    ⟨⟨hx₀, by rw [x₁_eq_of_H hn hk]; linarith⟩, (hn.proper k).2, le_rfl⟩]
+
+/-- **One level of the strip.** Where the strip is clear and unblocked, the tiles just above are
+V-tiles resting on that height, and each spans the whole unit level above it. -/
+lemma exists_level_tile (hn : Normalized R T H) {k : ι} (hk : H k) {t : ℝ} (hclear : Clear T k t)
+    (hle : R.y₀ ≤ t) (hlt : t < R.y₁) (hnb : ¬ BlockedAt T H k t) {x : ℝ} (hx₀ : (T k).x₀ < x)
+    (hx₁ : x < (T k).x₀ + 1) :
+    ∃ j, ¬ H j ∧ (T j).x₀ < x ∧ x ≤ (T j).x₁ ∧ (T j).y₀ = t ∧ (T j).y₁ = t + 1 := by
+  have hkx₀ : R.x₀ ≤ (T k).x₀ := hn.tiling.le_tile_x₀ k
+  have hkx₁ : (T k).x₁ ≤ R.x₁ := hn.tiling.tile_x₁_le k
+  have hkw : (T k).x₁ = (T k).x₀ + 1 := x₁_eq_of_H hn hk
+  obtain ⟨j, hj, -⟩ := hn.tiling.existsUnique_cell true false
+    (show ((x, t) : ℝ × ℝ) ∈ R.cell true false from ⟨⟨by linarith, by linarith⟩, hle, hlt⟩)
+  obtain ⟨⟨hjx₀, hjx₁⟩, hjy₀, hjy₁⟩ := hj
+  have hy₀ : (T j).y₀ = t := by
+    refine le_antisymm hjy₀ (not_lt.mp fun hcon ↦ ?_)
+    have := hclear x hx₀ hx₁ j ⟨⟨hjx₀, hjx₁⟩, hcon, hjy₁.le⟩
+    linarith
+  have hH : ¬ H j := fun hjH ↦ hnb ⟨j, hjH, hy₀, by linarith, by linarith⟩
+  exact ⟨j, hH, hjx₀, hjx₁, hy₀, by rw [y₁_eq_of_not_H hn hH, hy₀]⟩
+
+/-- The strip stays clear one level higher, and stays inside `R`. -/
+lemma clear_succ (hn : Normalized R T H) {k : ι} (hk : H k) {t : ℝ} (hclear : Clear T k t)
+    (hle : R.y₀ ≤ t) (hlt : t < R.y₁) (hnb : ¬ BlockedAt T H k t) :
+    t + 1 ≤ R.y₁ ∧ Clear T k (t + 1) := by
+  have hkw : (T k).x₁ = (T k).x₀ + 1 := x₁_eq_of_H hn hk
+  have hmid : (T k).x₀ < (T k).x₀ + 1 / 2 ∧ (T k).x₀ + 1 / 2 < (T k).x₀ + 1 := by constructor <;>
+    linarith
+  refine ⟨?_, fun x hx₀ hx₁ j' hmem ↦ ?_⟩
+  · obtain ⟨j, -, -, -, -, hy₁⟩ := exists_level_tile hn hk hclear hle hlt hnb hmid.1 hmid.2
+    rw [← hy₁]
+    exact hn.tiling.tile_y₁_le j
+  · obtain ⟨j, -, hjx₀, hjx₁, hy₀, hy₁⟩ := exists_level_tile hn hk hclear hle hlt hnb hx₀ hx₁
+    rw [hn.tiling.eq_of_mem_cell (sx := true) (sy := true) hmem
+      ⟨⟨hjx₀, hjx₁⟩, by rw [hy₀]; linarith, by rw [hy₁]⟩, hy₁]
+
+/-- **The strip runs straight up until it stops.** Below the first stop the strip is clear at
+every unit height above the H-tile it is grown from, and stays inside `R`. -/
+lemma level (hn : Normalized R T H) {k : ι} (hk : H k) :
+    ∀ n : ℕ, (∀ m : ℕ, m < n → ¬ StopsAbove R T H k m) →
+      (T k).y₁ + n ≤ R.y₁ ∧ Clear T k ((T k).y₁ + n) := by
+  have hR₀ : R.y₀ ≤ (T k).y₁ :=
+    (hn.tiling.le_tile_y₀ k).trans (hn.proper k).2.le
+  intro n
+  induction n with
+  | zero => exact fun _ ↦ ⟨by simpa using hn.tiling.tile_y₁_le k, by simpa using clear_top hn hk⟩
+  | succ n ih =>
+    intro hstop
+    obtain ⟨hle, hclear⟩ := ih fun m hm ↦ hstop m (by lia)
+    have hnb : ¬ BlockedAt T H k ((T k).y₁ + n) := fun h ↦ hstop n (by lia) (Or.inr h)
+    have hlt : (T k).y₁ + n < R.y₁ :=
+      lt_of_le_of_ne hle fun h ↦ hstop n (by lia) (Or.inl h)
+    have hn0 : (0 : ℝ) ≤ n := Nat.cast_nonneg n
+    obtain ⟨h₁, h₂⟩ := clear_succ hn hk hclear (by linarith) hlt hnb
+    constructor
+    · push_cast
+      linarith
+    · have : (T k).y₁ + ((n : ℝ) + 1) = (T k).y₁ + n + 1 := by ring
+      push_cast
+      rw [this]
+      exact h₂
+
+/-- **The strip always stops.** It rises by one unit at each level, so it must reach the top of
+`R` or be blocked. -/
+lemma exists_stopsAbove (hn : Normalized R T H) {k : ι} (hk : H k) :
+    ∃ n : ℕ, StopsAbove R T H k n ∧ ∀ m : ℕ, m < n → ¬ StopsAbove R T H k m := by
+  classical
+  have hex : ∃ n : ℕ, StopsAbove R T H k n := by
+    by_contra hcon
+    push Not at hcon
+    obtain ⟨n, hgt⟩ := exists_nat_gt (R.y₁ - (T k).y₁)
+    exact absurd (level hn hk n fun m _ ↦ hcon m).1 (by linarith)
+  exact ⟨Nat.find hex, Nat.find_spec hex, fun m hm ↦ Nat.find_min hex hm⟩
+
+/-- **The column of the staircase above an H-tile.** The strip runs from the bottom of the H-tile
+up to the height `hi` where it stops. Every tile meeting the strip along the way lies inside the
+column, and is a V-tile unless it is the H-tile itself; and at `hi` either the strip has reached
+the top of `R` or an H-tile carries it on. -/
+theorem exists_column (hn : Normalized R T H) {k : ι} (hk : H k) :
+    ∃ hi : ℝ, (T k).y₁ ≤ hi ∧ hi ≤ R.y₁ ∧
+      (∀ (j : ι) (y : ℝ), (T j).y₀ < y → y ≤ (T j).y₁ → (T k).y₀ < y → y ≤ hi →
+        (T j).x₁ ≤ (T k).x₀ ∨ (T k).x₀ + 1 ≤ (T j).x₀ ∨ ((T k).y₀ ≤ (T j).y₀ ∧ (T j).y₁ ≤ hi ∧
+          (H j → (T j).x₀ = (T k).x₀ ∧ (T j).x₁ = (T k).x₀ + 1))) ∧
+      (hi = R.y₁ ∨ ∃ k', H k' ∧ (T k').y₀ = hi ∧ (T k').x₀ < (T k).x₀ + 1 ∧ (T k).x₀ < (T k').x₁) :=
+  by
+  obtain ⟨N, hN, hNmin⟩ := exists_stopsAbove hn hk
+  obtain ⟨hle, -⟩ := level hn hk N hNmin
+  have hkw : (T k).x₁ = (T k).x₀ + 1 := x₁_eq_of_H hn hk
+  have hN0 : (0 : ℝ) ≤ N := Nat.cast_nonneg N
+  refine ⟨(T k).y₁ + N, by linarith, hle, fun j y hjy₀ hjy₁ hky₀ hyhi ↦ ?_, ?_⟩
+  · by_cases hleft : (T j).x₁ ≤ (T k).x₀
+    · exact Or.inl hleft
+    by_cases hright : (T k).x₀ + 1 ≤ (T j).x₀
+    · exact Or.inr (Or.inl hright)
+    push Not at hleft hright
+    -- the tile meets the strip, so it lies in the column: take a point of the overlap
+    refine Or.inr (Or.inr ?_)
+    set x := (max (T j).x₀ (T k).x₀ + min (T j).x₁ ((T k).x₀ + 1)) / 2 with hxdef
+    have hx : (T j).x₀ < x ∧ x ≤ (T j).x₁ ∧ (T k).x₀ < x ∧ x < (T k).x₀ + 1 := by
+      have h₁ : (T j).x₀ ≤ max (T j).x₀ (T k).x₀ := le_max_left _ _
+      have h₂ : (T k).x₀ ≤ max (T j).x₀ (T k).x₀ := le_max_right _ _
+      have h₃ : min (T j).x₁ ((T k).x₀ + 1) ≤ (T j).x₁ := min_le_left _ _
+      have h₄ : min (T j).x₁ ((T k).x₀ + 1) ≤ (T k).x₀ + 1 := min_le_right _ _
+      have h₅ : max (T j).x₀ (T k).x₀ < min (T j).x₁ ((T k).x₀ + 1) :=
+        max_lt (lt_min ((hn.proper j).1) hright) (lt_min hleft (by linarith))
+      refine ⟨by rw [hxdef]; linarith, by rw [hxdef]; linarith, by rw [hxdef]; linarith, ?_⟩
+      rw [hxdef]
+      linarith
+    have hmem : ((x, y) : ℝ × ℝ) ∈ (T j).toSetIoc := ⟨⟨hx.1, hx.2.1⟩, hjy₀, hjy₁⟩
+    rcases le_or_gt y (T k).y₁ with hy | hy
+    · -- inside the H-tile itself
+      have hjk : j = k := hn.tiling.eq_of_mem_cell (sx := true) (sy := true) hmem
+        ⟨⟨hx.2.2.1, by rw [hkw]; linarith [hx.2.2.2]⟩, hky₀, hy⟩
+      subst hjk
+      exact ⟨le_rfl, by linarith, fun _ ↦ ⟨rfl, hkw⟩⟩
+    · -- above it, in one of the unit levels of the run
+      obtain ⟨m, hmN, hm₀, hm₁⟩ := exists_index hy hyhi (a := (T k).y₁) (n := N) rfl
+      obtain ⟨hlem, hclearm⟩ := level hn hk m fun m' hm' ↦ hNmin m' (by lia)
+      have hlt : (T k).y₁ + m < R.y₁ := by
+        have : (T k).y₁ + (m : ℝ) < y := hm₀
+        linarith [hjy₁.trans (hn.tiling.tile_y₁_le j), hyhi.trans hle]
+      have hR₀ : R.y₀ ≤ (T k).y₁ + m :=
+        le_trans ((hn.tiling.le_tile_y₀ k).trans (hn.proper k).2.le) (by
+          linarith [Nat.cast_nonneg (α := ℝ) m])
+      obtain ⟨j₀, hH₀, hj₀x₀, hj₀x₁, hy₀, hy₁⟩ := exists_level_tile hn hk hclearm hR₀ hlt
+        (fun h ↦ hNmin m hmN (Or.inr h)) hx.2.2.1 hx.2.2.2
+      have hjj : j = j₀ := hn.tiling.eq_of_mem_cell (sx := true) (sy := true) hmem
+        ⟨⟨hj₀x₀, hj₀x₁⟩, by rw [hy₀]; exact hm₀, by rw [hy₁]; exact hm₁⟩
+      subst hjj
+      have hmN' : (m : ℝ) + 1 ≤ N := by exact_mod_cast hmN
+      exact ⟨by rw [hy₀]; linarith [(hn.proper k).2, Nat.cast_nonneg (α := ℝ) m],
+        by rw [hy₁]; linarith, fun h ↦ absurd h hH₀⟩
+  · rcases hN with h | ⟨k', hk', hy₀, hx₀, hx₁⟩
+    · exact Or.inl h
+    · exact Or.inr ⟨k', hk', hy₀, hx₀, hx₁⟩
+
+/-! ### The staircase above an H-tile -/
+
+/-- **The staircase strip above an H-tile.** Starting from the H-tile `k`, the strip runs up its
+column and then steps sideways onto the H-tile blocking it, and so on until it reaches the top of
+`R`. The walk terminates because each step raises the top edge to a strictly higher one of the
+finitely many edge heights of the tiling. -/
+private theorem strip_above_aux (hn : Normalized R T H) :
+    ∀ n : ℕ, ∀ k : ι, H k →
+      ((edgeHeights R T).filter fun a ↦ (T k).y₁ < a ∧ a ≤ R.y₁).card ≤ n →
+      ∃ c : ℝ → ℝ, Strip R T H (T k).y₀ R.y₁ c ∧
+        ∀ y, (T k).y₀ < y → y ≤ (T k).y₁ → c y = (T k).x₀ := by
+  classical
+  intro n
+  induction n using Nat.strong_induction_on with
+  | _ n ih =>
+    intro k hk hcard
+    obtain ⟨hi, hhi₀, hhi₁, hcol, hend⟩ := exists_column hn hk
+    have hkw : (T k).x₁ = (T k).x₀ + 1 := x₁_eq_of_H hn hk
+    have hkx₀ : R.x₀ ≤ (T k).x₀ := hn.tiling.le_tile_x₀ k
+    have hkx₁ : (T k).x₀ + 1 ≤ R.x₁ := hkw ▸ hn.tiling.tile_x₁_le k
+    rcases hend with htop | ⟨k', hk', hk'y, hk'x₀, hk'x₁⟩
+    · -- the column reaches the top of `R`, and the strip is that single column
+      refine ⟨fun _ ↦ (T k).x₀, ⟨fun y _ _ ↦ ⟨hkx₀, hkx₁⟩, fun j y hy₀ hy₁ hjy₀ hjy₁ ↦ ?_,
+        fun j y y' _ _ _ _ _ _ _ _ hleft hright ↦ by linarith [(T j).hx]⟩, fun y _ _ ↦ rfl⟩
+      rcases hcol j y hjy₀ hjy₁ hy₀ (htop ▸ hy₁) with h | h | ⟨h₀, h₁, h₂⟩
+      · exact Or.inl h
+      · exact Or.inr (Or.inl h)
+      · exact Or.inr (Or.inr ⟨h₀, htop ▸ h₁, fun _ _ _ ↦ rfl, h₂⟩)
+    -- the column is blocked, and the staircase steps sideways onto the H-tile `k'`
+    have hk'w : (T k').x₁ = (T k').x₀ + 1 := x₁_eq_of_H hn hk'
+    have hk'y₁ : hi < (T k').y₁ := hk'y ▸ (hn.proper k').2
+    have hlt : (T k).y₁ < (T k').y₁ := lt_of_le_of_lt hhi₀ hk'y₁
+    have hdrop : ((edgeHeights R T).filter fun a ↦ (T k').y₁ < a ∧ a ≤ R.y₁).card <
+        ((edgeHeights R T).filter fun a ↦ (T k).y₁ < a ∧ a ≤ R.y₁).card :=
+      Finset.card_lt_card ⟨fun a ha ↦ by
+        obtain ⟨h₁, h₂, h₃⟩ := Finset.mem_filter.mp ha
+        exact Finset.mem_filter.mpr ⟨h₁, hlt.trans h₂, h₃⟩, fun hcon ↦
+        absurd (Finset.mem_filter.mp (hcon (Finset.mem_filter.mpr
+          ⟨y₁_mem_edgeHeights k', hlt, hn.tiling.tile_y₁_le k'⟩))).2.1 (lt_irrefl _)⟩
+    obtain ⟨c', hc', hc'k⟩ := ih _ (hdrop.trans_le hcard) k' hk' le_rfl
+    -- the glued staircase: the column of `k` up to `hi`, and the staircase of `k'` above it
+    refine ⟨fun y ↦ if y ≤ hi then (T k).x₀ else c' y, ⟨fun y hy₀ hy₁ ↦ ?_,
+      fun j y hy₀ hy₁ hjy₀ hjy₁ ↦ ?_, fun j y y' hy₀ hy₁ hy'₀ hy'₁ hjy₀ hjy₁ hjy'₀ hjy'₁ hleft
+        hright ↦ ?_⟩, fun y _ hy ↦ if_pos (hy.trans hhi₀)⟩
+  -- the strip stays inside `R`
+    · by_cases hy : y ≤ hi
+      · rw [if_pos hy]
+        exact ⟨hkx₀, hkx₁⟩
+      · rw [if_neg hy]
+        exact hc'.mem y (by rw [hk'y]; exact not_le.mp hy) hy₁
+  -- each tile is left of, right of, or inside the strip
+    · by_cases hy : y ≤ hi
+      · rw [if_pos hy]
+        rcases hcol j y hjy₀ hjy₁ hy₀ hy with h | h | ⟨h₀, h₁, h₂⟩
+        · exact Or.inl h
+        · exact Or.inr (Or.inl h)
+        · exact Or.inr (Or.inr ⟨h₀, hn.tiling.tile_y₁_le j,
+            fun t _ ht₁ ↦ if_pos (ht₁.trans h₁), h₂⟩)
+      · rw [if_neg hy]
+        rcases hc'.side j y (by rw [hk'y]; exact not_le.mp hy) hy₁ hjy₀ hjy₁ with
+          h | h | ⟨h₀, h₁, h₂, h₃⟩
+        · exact Or.inl h
+        · exact Or.inr (Or.inl h)
+        · rw [hk'y] at h₀
+          exact Or.inr (Or.inr ⟨by linarith [(hn.proper k).2], h₁,
+            fun t ht₀ ht₁ ↦ by rw [if_neg (by linarith : ¬ t ≤ hi)]; exact h₂ t ht₀ ht₁, h₃⟩)
+  -- consistency: consecutive columns of the staircase overlap, so it is a wall
+    · by_cases hy : y ≤ hi <;> by_cases hy' : y' ≤ hi
+      · rw [if_pos hy] at hleft
+        rw [if_pos hy'] at hright
+        linarith [(T j).hx]
+      · rw [if_pos hy] at hleft
+        rw [if_neg hy'] at hright
+        push Not at hy'
+        have ht₀ : hi < min y' (T k').y₁ := lt_min hy' hk'y₁
+        have ht₁ : min y' (T k').y₁ ≤ (T j).y₁ := (min_le_left _ _).trans hjy'₁
+        have ht₂ : (T j).y₀ < min y' (T k').y₁ := by linarith
+        have htR : min y' (T k').y₁ ≤ R.y₁ := (min_le_left _ _).trans hy'₁
+        have htc : c' (min y' (T k').y₁) = (T k').x₀ :=
+          hc'k _ (by rw [hk'y]; exact ht₀) (min_le_right _ _)
+        rcases hc'.side j _ (by rw [hk'y]; exact ht₀) htR ht₂ ht₁ with h | h | ⟨h₀, -, -, -⟩
+        · exact hc'.consistent j _ y' (by rw [hk'y]; exact ht₀) htR
+            (by rw [hk'y]; exact hy') hy'₁ ht₂ ht₁ hjy'₀ hjy'₁ h hright
+        · rw [htc] at h
+          linarith [(T j).hx]
+        · rw [hk'y] at h₀
+          linarith
+      · rw [if_neg hy] at hleft
+        rw [if_pos hy'] at hright
+        push Not at hy
+        have ht₀ : hi < min y (T k').y₁ := lt_min hy hk'y₁
+        have ht₁ : min y (T k').y₁ ≤ (T j).y₁ := (min_le_left _ _).trans hjy₁
+        have ht₂ : (T j).y₀ < min y (T k').y₁ := by linarith
+        have htR : min y (T k').y₁ ≤ R.y₁ := (min_le_left _ _).trans hy₁
+        have htc : c' (min y (T k').y₁) = (T k').x₀ :=
+          hc'k _ (by rw [hk'y]; exact ht₀) (min_le_right _ _)
+        rcases hc'.side j _ (by rw [hk'y]; exact ht₀) htR ht₂ ht₁ with h | h | ⟨h₀, -, -, -⟩
+        · rw [htc] at h
+          linarith [(T j).hx]
+        · exact hc'.consistent j y _ (by rw [hk'y]; exact hy) hy₁ (by rw [hk'y]; exact ht₀) htR
+            hjy₀ hjy₁ ht₂ ht₁ hleft h
+        · rw [hk'y] at h₀
+          linarith
+      · rw [if_neg hy] at hleft
+        rw [if_neg hy'] at hright
+        push Not at hy hy'
+        exact hc'.consistent j y y' (by rw [hk'y]; exact hy) hy₁ (by rw [hk'y]; exact hy') hy'₁
+          hjy₀ hjy₁ hjy'₀ hjy'₁ hleft hright
+
+/-- **The staircase strip above an H-tile.** -/
+theorem exists_strip_above (hn : Normalized R T H) {k : ι} (hk : H k) :
+    ∃ c : ℝ → ℝ, Strip R T H (T k).y₀ R.y₁ c ∧
+      ∀ y, (T k).y₀ < y → y ≤ (T k).y₁ → c y = (T k).x₀ :=
+  strip_above_aux hn _ k hk le_rfl
+
+/-! ### The staircase all the way down to the bottom of `R` -/
+
+/-- Reflecting the plane in the horizontal axis carries a normalized tiling to a normalized one,
+with the same tiles designated: widths are unchanged and so are heights. -/
+lemma Normalized.reflectY (hn : Normalized R T H) :
+    Normalized R.reflectY (fun i ↦ (T i).reflectY) H where
+  tiling := hn.tiling.reflectY
+  proper := properReflectY hn.proper
+  width_one i hi := by simpa using hn.width_one i hi
+  height_one i hi := by simpa using hn.height_one i hi
+
+/-- **The column of the staircase below an H-tile**, the mirror image of `exists_column`. It is
+read off the reflected tiling; only the half-open convention needs care, and a column is settled
+by an argument at any interior height, since its abscissa is the same throughout. -/
+theorem exists_column_below (hn : Normalized R T H) {k : ι} (hk : H k) :
+    ∃ lo : ℝ, lo ≤ (T k).y₀ ∧ R.y₀ ≤ lo ∧
+      (∀ (j : ι) (y : ℝ), (T j).y₀ < y → y ≤ (T j).y₁ → lo < y → y ≤ (T k).y₁ →
+        (T j).x₁ ≤ (T k).x₀ ∨ (T k).x₀ + 1 ≤ (T j).x₀ ∨ (lo ≤ (T j).y₀ ∧ (T j).y₁ ≤ (T k).y₁ ∧
+          (H j → (T j).x₀ = (T k).x₀ ∧ (T j).x₁ = (T k).x₀ + 1))) ∧
+      (lo = R.y₀ ∨
+        ∃ k', H k' ∧ (T k').y₁ = lo ∧ (T k').x₀ < (T k).x₀ + 1 ∧ (T k).x₀ < (T k').x₁) := by
+  obtain ⟨hi, h₁, h₂, hcol, hend⟩ := exists_column hn.reflectY hk
+  simp only [Rectangle.reflectY] at h₁ h₂ hcol hend
+  refine ⟨-hi, by linarith, by linarith, fun j y hjy₀ hjy₁ hlo hhi ↦ ?_, ?_⟩
+  · -- the reflected column applies just below `y`, and its conclusion does not depend on the
+    -- height at which it is read
+    obtain ⟨e, he₀, he₁, he₂⟩ : ∃ e : ℝ, 0 < e ∧ e ≤ y - (T j).y₀ ∧ e ≤ y + hi :=
+      ⟨min (y - (T j).y₀) (y + hi), lt_min (by linarith) (by linarith), min_le_left _ _,
+        min_le_right _ _⟩
+    rcases hcol j (-(y - e)) (by linarith) (by linarith) (by linarith) (by linarith) with
+      h | h | ⟨h₃, h₄, h₅⟩
+    · exact Or.inl h
+    · exact Or.inr (Or.inl h)
+    · exact Or.inr (Or.inr ⟨by linarith, by linarith, h₅⟩)
+  · rcases hend with h | ⟨k', hk', hy, hx₀, hx₁⟩
+    · exact Or.inl (by linarith)
+    · exact Or.inr ⟨k', hk', by linarith, hx₀, hx₁⟩
+
+/-- **The staircase can be started at the bottom of `R`.** Walking down along the staircase from
+any H-tile reaches an H-tile whose column runs down to the bottom edge of `R`; each step lands on
+a strictly lower tile, so the walk stops. -/
+theorem exists_column_bottom (hn : Normalized R T H) {k : ι} (hk : H k) :
+    ∃ k₀, H k₀ ∧ ∀ (j : ι) (y : ℝ), (T j).y₀ < y → y ≤ (T j).y₁ → R.y₀ < y → y ≤ (T k₀).y₁ →
+      (T j).x₁ ≤ (T k₀).x₀ ∨ (T k₀).x₀ + 1 ≤ (T j).x₀ ∨ (R.y₀ ≤ (T j).y₀ ∧ (T j).y₁ ≤ (T k₀).y₁ ∧
+        (H j → (T j).x₀ = (T k₀).x₀ ∧ (T j).x₁ = (T k₀).x₀ + 1)) := by
+  classical
+  refine walk_down_until (R := R) (T := T) (P := H) (fun s hs hgoal ↦ ?_) _ k hk le_rfl
+  obtain ⟨lo, hlo₀, hlo₁, hcol, hend⟩ := exists_column_below hn hs
+  rcases hend with rfl | ⟨k', hk', hy, -, -⟩
+  · exact absurd hcol hgoal
+  · exact ⟨k', hk', lt_of_lt_of_le (hy ▸ (hn.proper k').2) hlo₀⟩
+
+/-- **The staircase strip of a normalized tiling.** Grown upwards from an H-tile whose column
+reaches the bottom of `R`, the staircase runs from the bottom edge of `R` to its top edge, and the
+H-tile it starts from lies inside it. -/
+theorem exists_strip (hn : Normalized R T H) {k : ι} (hk : H k) :
+    ∃ (c : ℝ → ℝ) (k₀ : ι), Strip R T H R.y₀ R.y₁ c ∧ H k₀ ∧ (T k₀).x₀ = c (T k₀).y₁ := by
+  classical
+  obtain ⟨k₀, hk₀, hbot⟩ := exists_column_bottom hn hk
+  obtain ⟨c₀, hc₀, hc₀k⟩ := exists_strip_above hn hk₀
+  have hk₀y : (T k₀).y₀ < (T k₀).y₁ := (hn.proper k₀).2
+  have hk₀w : (T k₀).x₁ = (T k₀).x₀ + 1 := x₁_eq_of_H hn hk₀
+  have hk₀x₀ : R.x₀ ≤ (T k₀).x₀ := hn.tiling.le_tile_x₀ k₀
+  have hk₀x₁ : (T k₀).x₀ + 1 ≤ R.x₁ := hk₀w ▸ hn.tiling.tile_x₁_le k₀
+  refine ⟨fun y ↦ if y ≤ (T k₀).y₀ then (T k₀).x₀ else c₀ y, k₀, ⟨fun y hy₀ hy₁ ↦ ?_,
+    fun j y hy₀ hy₁ hjy₀ hjy₁ ↦ ?_, fun j y y' hy₀ hy₁ hy'₀ hy'₁ hjy₀ hjy₁ hjy'₀ hjy'₁ hleft
+      hright ↦ ?_⟩, hk₀, ?_⟩
+  -- the strip stays inside `R`
+  · by_cases hy : y ≤ (T k₀).y₀
+    · rw [if_pos hy]
+      exact ⟨hk₀x₀, hk₀x₁⟩
+    · rw [if_neg hy]
+      exact hc₀.mem y (not_le.mp hy) hy₁
+  -- each tile is left of, right of, or inside the strip
+  · by_cases hy : y ≤ (T k₀).y₀
+    · rw [if_pos hy]
+      rcases hbot j y hjy₀ hjy₁ hy₀ (hy.trans hk₀y.le) with h | h | ⟨h₀, h₁, h₂⟩
+      · exact Or.inl h
+      · exact Or.inr (Or.inl h)
+      · refine Or.inr (Or.inr ⟨h₀, hn.tiling.tile_y₁_le j, fun t ht₀ ht₁ ↦ ?_, h₂⟩)
+        by_cases ht : t ≤ (T k₀).y₀
+        · rw [if_pos ht]
+        · rw [if_neg ht]
+          exact hc₀k t (not_le.mp ht) (ht₁.trans h₁)
+    · rw [if_neg hy]
+      rcases hc₀.side j y (not_le.mp hy) hy₁ hjy₀ hjy₁ with h | h | ⟨h₀, h₁, h₂, h₃⟩
+      · exact Or.inl h
+      · exact Or.inr (Or.inl h)
+      · exact Or.inr (Or.inr ⟨hn.tiling.le_tile_y₀ j, h₁,
+          fun t ht₀ ht₁ ↦ by rw [if_neg (by linarith : ¬ t ≤ (T k₀).y₀)]; exact h₂ t ht₀ ht₁, h₃⟩)
+  -- consistency: the bottom column and the staircase above it share their abscissa
+  · by_cases hy : y ≤ (T k₀).y₀ <;> by_cases hy' : y' ≤ (T k₀).y₀
+    · rw [if_pos hy] at hleft
+      rw [if_pos hy'] at hright
+      linarith [(T j).hx]
+    · rw [if_pos hy] at hleft
+      rw [if_neg hy'] at hright
+      push Not at hy'
+      have ht₀ : (T k₀).y₀ < min y' (T k₀).y₁ := lt_min hy' hk₀y
+      have ht₁ : min y' (T k₀).y₁ ≤ (T j).y₁ := (min_le_left _ _).trans hjy'₁
+      have ht₂ : (T j).y₀ < min y' (T k₀).y₁ := by linarith
+      have htR : min y' (T k₀).y₁ ≤ R.y₁ := (min_le_left _ _).trans hy'₁
+      have htc : c₀ (min y' (T k₀).y₁) = (T k₀).x₀ := hc₀k _ ht₀ (min_le_right _ _)
+      rcases hc₀.side j _ ht₀ htR ht₂ ht₁ with h | h | ⟨h₀, -, -, -⟩
+      · exact hc₀.consistent j _ y' ht₀ htR hy' hy'₁ ht₂ ht₁ hjy'₀ hjy'₁ h hright
+      · rw [htc] at h
+        linarith [(T j).hx]
+      · linarith
+    · rw [if_neg hy] at hleft
+      rw [if_pos hy'] at hright
+      push Not at hy
+      have ht₀ : (T k₀).y₀ < min y (T k₀).y₁ := lt_min hy hk₀y
+      have ht₁ : min y (T k₀).y₁ ≤ (T j).y₁ := (min_le_left _ _).trans hjy₁
+      have ht₂ : (T j).y₀ < min y (T k₀).y₁ := by linarith
+      have htR : min y (T k₀).y₁ ≤ R.y₁ := (min_le_left _ _).trans hy₁
+      have htc : c₀ (min y (T k₀).y₁) = (T k₀).x₀ := hc₀k _ ht₀ (min_le_right _ _)
+      rcases hc₀.side j _ ht₀ htR ht₂ ht₁ with h | h | ⟨h₀, -, -, -⟩
+      · rw [htc] at h
+        linarith [(T j).hx]
+      · exact hc₀.consistent j y _ hy hy₁ ht₀ htR hjy₀ hjy₁ ht₂ ht₁ hleft h
+      · linarith
+    · rw [if_neg hy] at hleft
+      rw [if_neg hy'] at hright
+      push Not at hy hy'
+      exact hc₀.consistent j y y' hy hy₁ hy' hy'₁ hjy₀ hjy₁ hjy'₀ hjy'₁ hleft hright
+  -- the H-tile the staircase starts from lies inside it
+  · change (T k₀).x₀ = if (T k₀).y₁ ≤ (T k₀).y₀ then (T k₀).x₀ else c₀ (T k₀).y₁
+    rw [if_neg (by linarith), hc₀k _ hk₀y le_rfl]
+
+/-! ### The induction -/
+
+/-- The induction motive: the integer-rectangle theorem for normalized tilings with at most `n`
+H-tiles, the index type quantified away so that cutting the staircase out can shrink it. -/
+private def IH (n : ℕ) : Prop :=
+  ∀ (ι : Type) [Fintype ι] (R : Rectangle) (T : ι → Rectangle) (H : ι → Prop),
+    Nat.card {i // H i} ≤ n → Normalized R T H → R.HasIntegerSide
+
+/-- **A normalized tiling tiles a rectangle with an integer side**, by induction on the number of
+H-tiles. With no H-tile every tile has integer height and so does `R`. Otherwise grow the
+staircase strip from an H-tile: either `R` is too narrow to hold anything but the strip, and is
+one unit wide, or cutting the strip out leaves a normalized tiling of a rectangle one unit
+narrower with fewer H-tiles, whose integer side is one of `R`'s. -/
+private theorem hasIntegerSide_of_normalized : ∀ n : ℕ, IH n := by
+  intro n
+  induction n using Nat.strong_induction_on with
+  | _ n ih =>
+    intro ι _ R T H hcard hn
+    classical
+    by_cases hH : ∀ i, ¬ H i
+    · exact Or.inr (intHeight_of_forall hn.tiling hn.pos_width fun i ↦
+        ⟨1, by simpa using hn.height_one i (hH i)⟩)
+    push Not at hH
+    obtain ⟨k, hk⟩ := hH
+    rcases lt_or_ge (R.x₀ + 1) R.x₁ with hRx | hRx
+    · obtain ⟨c, k₀, hs, hk₀, hk₀c⟩ := exists_strip hn hk
+      obtain ⟨ι', _, T', H', hn', hlt⟩ := exists_normalized_cut hn hs hRx hk₀ hk₀c
+      rcases ih _ (hlt.trans_le hcard) ι' _ T' H' le_rfl hn' with ⟨m, hm⟩ | ⟨m, hm⟩
+      · exact Or.inl ⟨m + 1, by
+          simp only [Rectangle.width, cutRect] at hm ⊢
+          push_cast
+          linarith⟩
+      · exact Or.inr ⟨m, by simpa only [Rectangle.height, cutRect] using hm⟩
+    · -- `R` is only wide enough for the H-tile itself, so it is one unit wide
+      refine Or.inl ⟨1, ?_⟩
+      have h₀ := hn.tiling.le_tile_x₀ k
+      have h₁ := hn.tiling.tile_x₁_le k
+      rw [x₁_eq_of_H hn hk] at h₁
+      simp only [Rectangle.width, Int.cast_one]
+      linarith
+
+/-- **Robinson's proof** of the integer-rectangle tiling theorem, by induction on the number of
+H-tiles. Cutting every tile into unit pieces along its integer side normalizes the tiling, and
+the induction then runs on normalized tilings. -/
+theorem IntegerRectangleTheorem_Staircase : IntegerRectangleTheorem := by
+  intro ι _ R T hT hsides
+  rcases eq_or_lt_of_le R.hx with hRx | hRx
+  · exact Or.inl ⟨0, by simp [Rectangle.width, ← hRx]⟩
+  rcases eq_or_lt_of_le R.hy with hRy | hRy
+  · exact Or.inr ⟨0, by simp [Rectangle.height, ← hRy]⟩
+  obtain ⟨ι', _, T', H', hn'⟩ := exists_normalized hT hRx hRy hsides
+  exact hasIntegerSide_of_normalized _ ι' R T' H' le_rfl hn'
 
 end IntegerRectangle.Staircase

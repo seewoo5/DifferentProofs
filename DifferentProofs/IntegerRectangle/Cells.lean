@@ -134,6 +134,12 @@ lemma mem_reflectY_cell (S : Rectangle) (sx : Bool) (x y : ℝ) :
 
 @[simp] lemma reflectX_height (S : Rectangle) : S.reflectX.height = S.height := rfl
 
+@[simp] lemma reflectY_width (S : Rectangle) : S.reflectY.width = S.width := rfl
+
+@[simp] lemma reflectY_height (S : Rectangle) : S.reflectY.height = S.height := by
+  simp only [Rectangle.height, Rectangle.reflectY]
+  ring
+
 @[simp] lemma transpose_width (S : Rectangle) : S.transpose.width = S.height := rfl
 
 @[simp] lemma transpose_height (S : Rectangle) : S.transpose.height = S.width := rfl

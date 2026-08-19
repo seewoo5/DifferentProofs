@@ -134,4 +134,27 @@ theorem walk_left (hT : IsTiling R T) {P : ι → Prop}
           ⟨x₀_mem_edgeAbscissae j, hT.le_tile_x₀ j, hlt'⟩))).2.2 (lt_irrefl _)
     · exact ⟨i, hi, heq.symm⟩
 
+/-- **Walking down until a goal is reached.** If from every tile of the family `P` that has not
+reached the goal one can step to a tile of `P` sitting strictly lower, then some tile of `P` has
+reached it. The walk terminates because each step lowers the bottom edge to a strictly lower one
+of the finitely many edge heights. -/
+theorem walk_down_until {P Goal : ι → Prop}
+    (hstep : ∀ s, P s → ¬ Goal s → ∃ s', P s' ∧ (T s').y₀ < (T s).y₀) :
+    ∀ n : ℕ, ∀ s, P s → ((edgeHeights R T).filter fun a ↦ a < (T s).y₀).card ≤ n →
+      ∃ u, P u ∧ Goal u := by
+  classical
+  intro n
+  induction n using Nat.strong_induction_on with
+  | _ n ih =>
+    intro s hs hcard
+    by_cases hgoal : Goal s
+    · exact ⟨s, hs, hgoal⟩
+    obtain ⟨s', hs', hlt⟩ := hstep s hs hgoal
+    refine ih _ (lt_of_lt_of_le (Finset.card_lt_card ⟨fun a ha ↦ ?_, fun hcon ↦ ?_⟩) hcard) s' hs'
+      le_rfl
+    · obtain ⟨h₁, h₂⟩ := Finset.mem_filter.mp ha
+      exact Finset.mem_filter.mpr ⟨h₁, h₂.trans hlt⟩
+    · exact absurd (Finset.mem_filter.mp (hcon (Finset.mem_filter.mpr
+        ⟨y₀_mem_edgeHeights s', hlt⟩))).2 (lt_irrefl _)
+
 end IntegerRectangle
