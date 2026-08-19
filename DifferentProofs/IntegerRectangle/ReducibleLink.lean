@@ -971,8 +971,10 @@ theorem step_of_reducible {n : ℕ}
     rw [hi₀R.1] at this
     rintro ⟨h, -⟩
     linarith
-  refine ih _ (lt_of_lt_of_le (Fintype.card_subtype_lt (p := fun i ↦
-    (T' i).x₀ < (T' i).x₁ ∧ (T' i).y₀ < (T' i).y₁) hdeg) hcard) _ R _ le_rfl
+  -- proper tiling form `T'` has smaller number of tiles, so one can use induction hypothesis
+  have hlt := Fintype.card_subtype_lt
+    (p := fun i ↦ (T' i).x₀ < (T' i).x₁ ∧ (T' i).y₀ < (T' i).y₁) hdeg
+  refine ih _ (lt_of_lt_of_le hlt hcard) _ R _ le_rfl
     (isTiling_proper hT' hRx hRy) fun i ↦ hasIntegerSide_push hp hsides hred hwm i.1
 
 /-- **Reducible-link proof** (Bishop–Wagon) of the integer-rectangle tiling theorem, by induction
