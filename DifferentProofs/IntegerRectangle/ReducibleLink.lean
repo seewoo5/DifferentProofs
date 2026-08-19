@@ -803,16 +803,16 @@ private theorem step_of_reducible_right {n : ℕ} (ih : ∀ m, m < n → IH m)
   obtain ⟨wm, hwm⟩ := hred i₀ hi₀R
   set T' := push l (T i₀).width hw0.le hR with hT'def
   have hT' : IsTiling R T' := isTiling_push hT hp hRx hRy hw0 hR
-  have hdeg : ¬((T' i₀).x₀ < (T' i₀).x₁ ∧ (T' i₀).y₀ < (T' i₀).y₁) := by
-    rw [hT'def, push_x₀_of_isRight hp hi₀R, push_x₁_of_isRight hp hi₀R]
+  have hdeg : ¬ (T' i₀).Nondegenerate := by
+    rw [Rectangle.Nondegenerate, hT'def, push_x₀_of_isRight hp hi₀R,
+      push_x₁_of_isRight hp hi₀R]
     have : (T i₀).x₁ - (T i₀).x₀ = (T i₀).width := rfl
     rw [hi₀R.1] at this
     rintro ⟨h, -⟩
     linarith
-  have hlt := Fintype.card_subtype_lt
-    (p := fun i ↦ (T' i).x₀ < (T' i).x₁ ∧ (T' i).y₀ < (T' i).y₁) hdeg
-  refine ih _ (hlt.trans_le hcard) _ R _ le_rfl
-    (isTiling_proper hT' hRx hRy) fun i ↦ hasIntegerSide_push hp hsides hred hwm i.1
+  have hlt := Fintype.card_subtype_lt (p := fun i ↦ (T' i).Nondegenerate) hdeg
+  refine ih _ (hlt.trans_le hcard) _ R _ le_rfl (hT'.proper hRx hRy)
+    fun i ↦ hasIntegerSide_push (hw := hw0.le) hp hsides hred hwm i.1
 
 /-- **A reducible V-link loses a tile.** The right-handed case is `step_of_reducible_right`, and
 the left-handed case is its image under the reflection in the vertical axis. -/
@@ -859,10 +859,8 @@ theorem IntegerRectangleTheorem_ReducibleLink : IntegerRectangleTheorem := by
       by_cases hp : Proper T
       case neg =>
         obtain ⟨i₀, hi₀⟩ := not_forall.mp hp
-        have hlt := Fintype.card_subtype_lt
-          (p := fun i ↦ (T i).x₀ < (T i).x₁ ∧ (T i).y₀ < (T i).y₁) hi₀
-        exact ih _ (hlt.trans_le hcard) _ R _ le_rfl (isTiling_proper hT hRx hRy)
-          fun i ↦ hsides i.1
+        have hlt := Fintype.card_subtype_lt (p := fun i ↦ (T i).Nondegenerate) hi₀
+        exact ih _ (hlt.trans_le hcard) _ R _ le_rfl (hT.proper hRx hRy) fun i ↦ hsides i.1
       by_cases hH : ∀ i, ∃ m : ℤ, (T i).width = m
       · exact Or.inl (intWidth_of_forall hT hRy hH)
       by_cases hV : ∀ i, ¬ ∃ m : ℤ, (T i).width = m

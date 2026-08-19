@@ -256,10 +256,10 @@ theorem IsTiling.eq_of_mem_cell (hT : IsTiling R T) {sx sy : Bool} {x y : ℝ} {
 
 /-! ### Proper tilings -/
 
-/-- A family of rectangles is *proper* when each of its members has positive width and positive
-height. Degenerate tiles are harmless but carry no information, and every tiling can be pruned
-down to a proper one (`isTiling_proper`). -/
-def Proper (T : ι → Rectangle) : Prop := ∀ i, (T i).x₀ < (T i).x₁ ∧ (T i).y₀ < (T i).y₁
+/-- A family of rectangles is *proper* when each of its members is nondegenerate. Degenerate tiles
+are harmless but carry no information, and every tiling can be pruned down to a proper one
+(`IsTiling.proper`). -/
+def Proper (T : ι → Rectangle) : Prop := ∀ i, (T i).Nondegenerate
 
 omit [Fintype ι] in
 /-- Transposing the plane preserves properness. -/
@@ -276,14 +276,22 @@ omit [Fintype ι] in
 lemma properReflectY (hp : Proper T) : Proper fun i ↦ (T i).reflectY := fun i ↦
   ⟨(hp i).1, by simpa [Rectangle.reflectY] using (hp i).2⟩
 
+/-- The nondegenerate tiles of a family, reindexed by the indices that carry one. -/
+def properTiles (T : ι → Rectangle) (i : {i : ι // (T i).Nondegenerate}) : Rectangle := T i.1
+
+omit [Fintype ι] in
+/-- Pruning a family of rectangles leaves a proper one. -/
+lemma proper_properTiles (T : ι → Rectangle) : Proper (properTiles T) := fun i ↦ i.2
+
 /-- **Degenerate tiles may be discarded.** The half-open cell of a degenerate rectangle is empty,
-so it contributes nothing to the partition and deleting it leaves a tiling. -/
-theorem isTiling_proper (hT : IsTiling R T) (hx : R.x₀ < R.x₁) (hy : R.y₀ < R.y₁) :
-    IsTiling R fun i : {i : ι // (T i).x₀ < (T i).x₁ ∧ (T i).y₀ < (T i).y₁} ↦ T i.1 := by
+so it contributes nothing to the partition and the nondegenerate tiles alone still tile `R`. -/
+theorem IsTiling.proper (hT : IsTiling R T) (hx : R.x₀ < R.x₁) (hy : R.y₀ < R.y₁) :
+    IsTiling R (properTiles T) := by
   refine isTiling_of_toSetIoc hx hy (fun i ↦ hT.tile_subset i.1)
     (fun i j hij ↦ hT.pairwiseDisjoint_toSetIoc (Subtype.coe_ne_coe.mpr hij)) fun z hz ↦ ?_
   obtain ⟨i, hi, -⟩ := hT.existsUnique_toSetIoc hz
   exact Set.mem_iUnion.mpr ⟨⟨i, hi.1.1.trans_le hi.1.2, hi.2.1.trans_le hi.2.2⟩, hi⟩
+
 /-- **Two distinct tiles that overlap in height lie one strictly to the left of the other.** The
 point just inside the upper right corner of the leftmost of the two right edges would otherwise
 be in the lower-left cell of both. -/

@@ -357,7 +357,7 @@ and likewise downwards. The resulting staircase runs from the bottom edge of $`R
 and deleting it and sliding everything on its right one unit leftwards tiles a rectangle one unit
 narrower with fewer H-tiles.
 
-:::lemma_ "lem:int-rect-normalize" (parent := "grp:int-rect") (lean := "IntegerRectangle.Staircase.exists_normalized")
+:::lemma_ "lem:int-rect-normalize" (parent := "grp:int-rect") (lean := "IntegerRectangle.IsTiling.normalized")
 Every tiling by tiles with an integer side refines to a normalized one, in which every tile is one
 unit wide or one unit tall.
 :::

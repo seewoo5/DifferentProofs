@@ -10,7 +10,7 @@ public import DifferentProofs.IntegerRectangle.GridRefinement
 Robinson's ninth proof. Call a tile an *H-tile* if it is designated by its integer width and a
 *V-tile* if it is designated by its integer height. Splitting each tile along its designated side
 normalizes the tiling: every H-tile then has width exactly `1` and every V-tile height exactly `1`
-(`Normalized`, `exists_normalized`). Robinson's induction runs on the number of H-tiles of a
+(`Normalized`, `IsTiling.normalized`). Robinson's induction runs on the number of H-tiles of a
 normalized tiling. If there are none, every tile has integer height and so does `R`. Otherwise
 pick an H-tile and grow a vertical strip of width `1` from it, upwards and downwards: the strip
 runs straight up through V-tiles until an H-tile blocks it, at which point it steps sideways onto
@@ -107,15 +107,15 @@ private lemma piece_height_of_not_cutsWidth (h : ¬ CutsWidth S) (j : ℕ) :
 
 /-- Each piece is proper: it is one unit long along the side it is cut from, and keeps the other
 side of the tile it comes from. -/
-private lemma piece_proper (hx : S.x₀ < S.x₁) (hy : S.y₀ < S.y₁) (j : ℕ) :
-    (piece S j).x₀ < (piece S j).x₁ ∧ (piece S j).y₀ < (piece S j).y₁ := by
+private lemma piece_nondegenerate (hnd : S.Nondegenerate) (j : ℕ) :
+    (piece S j).Nondegenerate := by
   classical
-  rw [piece]
+  rw [Rectangle.Nondegenerate, piece]
   split_ifs
-  exacts [⟨by simp, hy⟩, ⟨hx, by simp⟩]
+  exacts [⟨by simp, hnd.2⟩, ⟨hnd.1, by simp⟩]
 
 /-- A piece with a legitimate index sits inside the tile it comes from. -/
-private lemma piece_le (hS : S.HasIntegerSide) (hx : S.x₀ < S.x₁) (hy : S.y₀ < S.y₁) {j : ℕ}
+private lemma piece_le (hS : S.HasIntegerSide) (hnd : S.Nondegenerate) {j : ℕ}
     (hj : j < pieceCount S) :
     S.x₀ ≤ (piece S j).x₀ ∧ (piece S j).x₁ ≤ S.x₁ ∧ S.y₀ ≤ (piece S j).y₀ ∧
       (piece S j).y₁ ≤ S.y₁ := by
@@ -124,20 +124,20 @@ private lemma piece_le (hS : S.HasIntegerSide) (hx : S.x₀ < S.x₁) (hy : S.y�
   have hj0 : (0 : ℝ) ≤ j := Nat.cast_nonneg j
   rw [piece]
   split_ifs with h
-  · have := add_pieceCount_width h hx
+  · have := add_pieceCount_width h hnd.1
     exact ⟨by linarith, by linarith, le_rfl, le_rfl⟩
-  · have := add_pieceCount_height hS h hy
+  · have := add_pieceCount_height hS h hnd.2
     exact ⟨le_rfl, le_rfl, by linarith, by linarith⟩
 
-private lemma piece_subset (hS : S.HasIntegerSide) (hx : S.x₀ < S.x₁) (hy : S.y₀ < S.y₁) {j : ℕ}
+private lemma piece_subset (hS : S.HasIntegerSide) (hnd : S.Nondegenerate) {j : ℕ}
     (hj : j < pieceCount S) : (piece S j).toSet ⊆ S.toSet := by
-  obtain ⟨h₁, h₂, h₃, h₄⟩ := piece_le hS hx hy hj
+  obtain ⟨h₁, h₂, h₃, h₄⟩ := piece_le hS hnd hj
   rintro ⟨a, b⟩ ⟨⟨k₁, k₂⟩, k₃, k₄⟩
   exact ⟨⟨by linarith, by linarith⟩, by linarith, by linarith⟩
 
-private lemma piece_subset_toSetIoc (hS : S.HasIntegerSide) (hx : S.x₀ < S.x₁)
-    (hy : S.y₀ < S.y₁) {j : ℕ} (hj : j < pieceCount S) : (piece S j).toSetIoc ⊆ S.toSetIoc := by
-  obtain ⟨h₁, h₂, h₃, h₄⟩ := piece_le hS hx hy hj
+private lemma piece_subset_toSetIoc (hS : S.HasIntegerSide) (hnd : S.Nondegenerate) {j : ℕ}
+    (hj : j < pieceCount S) : (piece S j).toSetIoc ⊆ S.toSetIoc := by
+  obtain ⟨h₁, h₂, h₃, h₄⟩ := piece_le hS hnd hj
   rintro ⟨a, b⟩ ⟨⟨k₁, k₂⟩, k₃, k₄⟩
   exact ⟨⟨by linarith, by linarith⟩, by linarith, by linarith⟩
 
@@ -156,15 +156,15 @@ private lemma exists_index {a b t : ℝ} (hat : a < t) (htb : t ≤ b) {n : ℕ}
     linarith [Nat.le_ceil (t - a)]
 
 /-- Every point of a tile lies in the half-open cell of one of its pieces. -/
-private lemma exists_mem_piece (hS : S.HasIntegerSide) (hx : S.x₀ < S.x₁) (hy : S.y₀ < S.y₁)
-    {x y : ℝ} (hz : ((x, y) : ℝ × ℝ) ∈ S.toSetIoc) :
-    ∃ j : ℕ, j < pieceCount S ∧ ((x, y) : ℝ × ℝ) ∈ (piece S j).toSetIoc := by
+private lemma exists_mem_piece (hS : S.HasIntegerSide) (hnd : S.Nondegenerate) {x y : ℝ}
+    (hz : (x, y) ∈ S.toSetIoc) :
+    ∃ j : ℕ, j < pieceCount S ∧ (x, y) ∈ (piece S j).toSetIoc := by
   classical
   obtain ⟨⟨h₁, h₂⟩, h₃, h₄⟩ := hz
   by_cases h : CutsWidth S
-  · obtain ⟨j, hj, hj₁, hj₂⟩ := exists_index h₁ h₂ (add_pieceCount_width h hx)
+  · obtain ⟨j, hj, hj₁, hj₂⟩ := exists_index h₁ h₂ (add_pieceCount_width h hnd.1)
     exact ⟨j, hj, by rw [Rectangle.mem_toSetIoc', piece, if_pos h]; exact ⟨⟨hj₁, hj₂⟩, h₃, h₄⟩⟩
-  · obtain ⟨j, hj, hj₁, hj₂⟩ := exists_index h₃ h₄ (add_pieceCount_height hS h hy)
+  · obtain ⟨j, hj, hj₁, hj₂⟩ := exists_index h₃ h₄ (add_pieceCount_height hS h hnd.2)
     exact ⟨j, hj, by rw [Rectangle.mem_toSetIoc', piece, if_neg h]; exact ⟨⟨h₁, h₂⟩, hj₁, hj₂⟩⟩
 
 /-- Distinct pieces of a tile have disjoint half-open cells. -/
@@ -182,36 +182,48 @@ private lemma piece_disjoint {j j' : ℕ} (hjj : j ≠ j') :
   · linarith [hj.2.2, hj'.2.1, hne hlt]
   · linarith [hj'.2.2, hj.2.1, hne hlt]
 
-/-- **Every tiling by tiles with an integer side refines to a normalized one**, by cutting each
-tile into unit pieces along its integer side. -/
-theorem exists_normalized (hT : IsTiling R T) (hx : R.x₀ < R.x₁) (hy : R.y₀ < R.y₁)
+/-- The index type of the normalized tiling attached to `T`: one index per unit piece of each
+nondegenerate tile. -/
+abbrev PieceIndex (T : ι → Rectangle) : Type :=
+  Σ i : {i : ι // (T i).Nondegenerate}, Fin (pieceCount (properTiles T i))
+
+/-- **The normalized tiling attached to a tiling by tiles with an integer side**: drop the
+degenerate tiles and cut each of the others into unit pieces along a side of integer length. -/
+noncomputable def pieceTiles (T : ι → Rectangle) (p : PieceIndex T) : Rectangle :=
+  piece (properTiles T p.1) p.2
+
+/-- The H-tiles of the normalized tiling: the pieces of the tiles cut along their width. -/
+def PieceCutsWidth (T : ι → Rectangle) (p : PieceIndex T) : Prop :=
+  CutsWidth (properTiles T p.1)
+
+/-- **Cutting each tile into unit pieces normalizes a tiling.** Every tile has a side of integer
+length, at least one unit long since the tile is nondegenerate, and the half-open cells of the
+pieces of a tile partition its own. -/
+theorem _root_.IntegerRectangle.IsTiling.normalized (hT : IsTiling R T) (hx : R.x₀ < R.x₁)
+    (hy : R.y₀ < R.y₁)
     (hsides : ∀ i, (T i).HasIntegerSide) :
-    ∃ (ι' : Type) (_ : Fintype ι') (T' : ι' → Rectangle) (H' : ι' → Prop), Normalized R T' H' := by
+    Normalized R (pieceTiles T) (PieceCutsWidth T) := by
   classical
-  set ι₁ := {i : ι // (T i).x₀ < (T i).x₁ ∧ (T i).y₀ < (T i).y₁} with hι₁
-  have hT₁ : IsTiling R fun i : ι₁ ↦ T i.1 := isTiling_proper hT hx hy
-  have hs : ∀ i : ι₁, (T i.1).HasIntegerSide := fun i ↦ hsides i.1
-  refine ⟨Σ i : ι₁, Fin (pieceCount (T i.1)), inferInstance, fun p ↦ piece (T p.1.1) p.2,
-    fun p ↦ CutsWidth (T p.1.1), ?_, ?_, ?_, ?_⟩
-  · refine isTiling_of_toSetIoc hx hy
-      (fun p ↦ (piece_subset (hs p.1) p.1.2.1 p.1.2.2 p.2.2).trans (hT₁.tile_subset p.1))
-      (fun p q hpq ↦ ?_) fun z hz ↦ ?_
-    · obtain ⟨p₁, p₂⟩ := p
-      obtain ⟨q₁, q₂⟩ := q
-      rw [Function.onFun]
-      rcases eq_or_ne p₁ q₁ with heq | hne
-      · subst heq
-        exact piece_disjoint fun hcon ↦ hpq (congrArg _ (Fin.val_injective hcon))
-      · exact (hT₁.pairwiseDisjoint_toSetIoc hne).mono
-          (piece_subset_toSetIoc (hs p₁) p₁.2.1 p₁.2.2 p₂.2)
-          (piece_subset_toSetIoc (hs q₁) q₁.2.1 q₁.2.2 q₂.2)
-    · obtain ⟨x, y⟩ := z
-      obtain ⟨i, hi, -⟩ := hT₁.existsUnique_toSetIoc hz
-      obtain ⟨j, hj, hmem⟩ := exists_mem_piece (hs i) i.2.1 i.2.2 hi
-      exact Set.mem_iUnion.mpr ⟨⟨i, ⟨j, hj⟩⟩, hmem⟩
-  · exact fun p ↦ piece_proper p.1.2.1 p.1.2.2 p.2
-  · exact fun p hp ↦ piece_width_of_cutsWidth hp p.2
-  · exact fun p hp ↦ piece_height_of_not_cutsWidth hp p.2
+  have hT₁ : IsTiling R (properTiles T) := hT.proper hx hy
+  have hs : ∀ i : {i : ι // (T i).Nondegenerate}, (properTiles T i).HasIntegerSide :=
+    fun i ↦ hsides i.1
+  refine ⟨?_, fun p ↦ piece_nondegenerate p.1.2 p.2, fun p hp ↦ piece_width_of_cutsWidth hp p.2,
+    fun p hp ↦ piece_height_of_not_cutsWidth hp p.2⟩
+  refine isTiling_of_toSetIoc hx hy
+    (fun p ↦ (piece_subset (hs p.1) p.1.2 p.2.2).trans (hT₁.tile_subset p.1))
+    (fun p q hpq ↦ ?_) fun z hz ↦ ?_
+  · obtain ⟨p₁, p₂⟩ := p
+    obtain ⟨q₁, q₂⟩ := q
+    rw [Function.onFun]
+    rcases eq_or_ne p₁ q₁ with heq | hne
+    · subst heq
+      exact piece_disjoint fun hcon ↦ hpq (congrArg _ (Fin.val_injective hcon))
+    · exact (hT₁.pairwiseDisjoint_toSetIoc hne).mono
+        (piece_subset_toSetIoc (hs p₁) p₁.2 p₂.2) (piece_subset_toSetIoc (hs q₁) q₁.2 q₂.2)
+  · obtain ⟨x, y⟩ := z
+    obtain ⟨i, hi, -⟩ := hT₁.existsUnique_toSetIoc hz
+    obtain ⟨j, hj, hmem⟩ := exists_mem_piece (hs i) i.2 hi
+    exact Set.mem_iUnion.mpr ⟨⟨i, ⟨j, hj⟩⟩, hmem⟩
 
 /-! ### Cutting a tiling along a staircase strip -/
 
@@ -257,33 +269,41 @@ def cutRect (R : Rectangle) (h : R.x₀ + 1 ≤ R.x₁) : Rectangle where
   hy := R.hy
 
 private lemma mem_cutLeft {S : Rectangle} {c x y : ℝ}
-    (h : ((x, y) : ℝ × ℝ) ∈ (cutLeft S c).toSetIoc) :
-    ((x, y) : ℝ × ℝ) ∈ S.toSetIoc ∧ x ≤ c := by
+    (h : (x, y) ∈ (cutLeft S c).toSetIoc) :
+    (x, y) ∈ S.toSetIoc ∧ x ≤ c := by
   simp only [Rectangle.mem_toSetIoc', cutLeft] at h ⊢
   grind
 
 private lemma mem_cutRight {S : Rectangle} {c x y : ℝ}
-    (h : ((x, y) : ℝ × ℝ) ∈ (cutRight S c).toSetIoc) :
-    ((x + 1, y) : ℝ × ℝ) ∈ S.toSetIoc ∧ c < x := by
+    (h : (x, y) ∈ (cutRight S c).toSetIoc) :
+    (x + 1, y) ∈ S.toSetIoc ∧ c < x := by
   simp only [Rectangle.mem_toSetIoc', cutRight] at h ⊢
   grind
 
-private lemma mem_cutLeft_of_le {S : Rectangle} {c x y : ℝ} (h : ((x, y) : ℝ × ℝ) ∈ S.toSetIoc)
+private lemma mem_cutLeft_of_le {S : Rectangle} {c x y : ℝ} (h : (x, y) ∈ S.toSetIoc)
     (hc : x ≤ c) :
-    ((x, y) : ℝ × ℝ) ∈ (cutLeft S c).toSetIoc := by
+    (x, y) ∈ (cutLeft S c).toSetIoc := by
   simp only [Rectangle.mem_toSetIoc', cutLeft] at h ⊢
   grind
 
-private lemma mem_cutRight_of_lt {S : Rectangle} {c x y : ℝ} (h : ((x + 1, y) : ℝ × ℝ) ∈ S.toSetIoc)
-    (hc : c < x) : ((x, y) : ℝ × ℝ) ∈ (cutRight S c).toSetIoc := by
+private lemma mem_cutRight_of_lt {S : Rectangle} {c x y : ℝ} (h : (x + 1, y) ∈ S.toSetIoc)
+    (hc : c < x) : (x, y) ∈ (cutRight S c).toSetIoc := by
   simp only [Rectangle.mem_toSetIoc', cutRight] at h ⊢
   grind
 
-/-- A *staircase strip* for a tiling: `c y` is the left edge of a strip of width `1` at height
-`y`, defined for the heights in `(a, b]`. Each tile of the tiling lies to the left of the strip at
-each of its heights, or to its right, or inside it; a tile inside the strip meets no other column
-of the staircase, and if it is an H-tile it fills the strip exactly. No tile lies to the left of
-the strip at one of its heights and to the right of it at another: the staircase is a wall. -/
+/-- A *staircase strip* for a tiling, running across the heights `(a, b]`.
+
+The strip is one unit wide but it does not stand straight: it is a staircase, so which vertical
+line carries its left edge depends on how high one looks. That is what `c : ℝ → ℝ` records — at
+height `y` the strip is `[c y, c y + 1] × {y}`. It is a step function, constant along each
+*column* of the staircase and jumping at the finitely many heights where the staircase steps
+sideways, but only the following three properties of it are ever used, so it is taken as an
+arbitrary function of the height.
+
+Each tile lies to the left of the strip at each of its heights, or to its right, or inside it; a
+tile inside the strip meets no other column of the staircase, and if it is an H-tile it fills the
+strip exactly. And no tile lies to the left of the strip at one of its heights and to the right of
+it at another: the staircase is a wall. -/
 structure Strip (R : Rectangle) (T : ι → Rectangle) (H : ι → Prop) (a b : ℝ) (c : ℝ → ℝ) :
     Prop where
   /-- The strip stays inside `R`. -/
@@ -361,8 +381,8 @@ private lemma cutAt_mem (hn : Normalized R T H) (hs : Strip R T H R.y₀ R.y₁ 
 
 /-- The left piece of a tile lies in the tile, to the left of the strip. -/
 private lemma mem_cutPiece_left (hn : Normalized R T H) (hs : Strip R T H R.y₀ R.y₁ c) {j : ι}
-    {u v : ℝ} (h : ((u, v) : ℝ × ℝ) ∈ (cutPiece (T j) (cutAt T c j) false).toSetIoc) :
-    ((u, v) : ℝ × ℝ) ∈ (T j).toSetIoc ∧ u ≤ c v := by
+    {u v : ℝ} (h : (u, v) ∈ (cutPiece (T j) (cutAt T c j) false).toSetIoc) :
+    (u, v) ∈ (T j).toSetIoc ∧ u ≤ c v := by
   obtain ⟨hmem, hle⟩ := mem_cutLeft h
   refine ⟨hmem, ?_⟩
   rcases cutAt_spec hn hs j hmem.2.1 hmem.2.2 with ⟨he, hx⟩ | ⟨he, hx⟩ | ⟨he, -⟩ <;> rw [he] at hle
@@ -372,8 +392,8 @@ private lemma mem_cutPiece_left (hn : Normalized R T H) (hs : Strip R T H R.y₀
 
 /-- The right piece of a tile lies, once slid back, in the tile, to the right of the strip. -/
 private lemma mem_cutPiece_right (hn : Normalized R T H) (hs : Strip R T H R.y₀ R.y₁ c) {j : ι}
-    {u v : ℝ} (h : ((u, v) : ℝ × ℝ) ∈ (cutPiece (T j) (cutAt T c j) true).toSetIoc) :
-    ((u + 1, v) : ℝ × ℝ) ∈ (T j).toSetIoc ∧ c v < u := by
+    {u v : ℝ} (h : (u, v) ∈ (cutPiece (T j) (cutAt T c j) true).toSetIoc) :
+    (u + 1, v) ∈ (T j).toSetIoc ∧ c v < u := by
   obtain ⟨hmem, hlt⟩ := mem_cutRight h
   refine ⟨hmem, ?_⟩
   rcases cutAt_spec hn hs j hmem.2.1 hmem.2.2 with ⟨he, hx⟩ | ⟨he, hx⟩ | ⟨he, -⟩ <;> rw [he] at hlt
@@ -383,8 +403,8 @@ private lemma mem_cutPiece_right (hn : Normalized R T H) (hs : Strip R T H R.y�
 
 /-- A point of a tile to the left of the strip lies in the left piece of the tile. -/
 private lemma mem_cutPiece_left_of_le (hn : Normalized R T H) (hs : Strip R T H R.y₀ R.y₁ c) {j : ι}
-    {u v : ℝ} (h : ((u, v) : ℝ × ℝ) ∈ (T j).toSetIoc) (hc : u ≤ c v) :
-    ((u, v) : ℝ × ℝ) ∈ (cutPiece (T j) (cutAt T c j) false).toSetIoc := by
+    {u v : ℝ} (h : (u, v) ∈ (T j).toSetIoc) (hc : u ≤ c v) :
+    (u, v) ∈ (cutPiece (T j) (cutAt T c j) false).toSetIoc := by
   refine mem_cutLeft_of_le h ?_
   rcases cutAt_spec hn hs j h.2.1 h.2.2 with ⟨he, hx⟩ | ⟨he, hx⟩ | ⟨he, -⟩ <;> rw [he]
   · linarith [h.1.2]
@@ -394,8 +414,8 @@ private lemma mem_cutPiece_left_of_le (hn : Normalized R T H) (hs : Strip R T H 
 /-- A point whose translate lies in a tile to the right of the strip lies in the right piece of
 that tile. -/
 private lemma mem_cutPiece_right_of_lt (hn : Normalized R T H) (hs : Strip R T H R.y₀ R.y₁ c)
-    {j : ι} {u v : ℝ} (h : ((u + 1, v) : ℝ × ℝ) ∈ (T j).toSetIoc) (hc : c v < u) :
-    ((u, v) : ℝ × ℝ) ∈ (cutPiece (T j) (cutAt T c j) true).toSetIoc := by
+    {j : ι} {u v : ℝ} (h : (u + 1, v) ∈ (T j).toSetIoc) (hc : c v < u) :
+    (u, v) ∈ (cutPiece (T j) (cutAt T c j) true).toSetIoc := by
   refine mem_cutRight_of_lt h ?_
   rcases cutAt_spec hn hs j h.2.1 h.2.2 with ⟨he, hx⟩ | ⟨he, hx⟩ | ⟨he, -⟩ <;> rw [he]
   · linarith
@@ -446,11 +466,11 @@ theorem isTiling_cut (hn : Normalized R T H) (hs : Strip R T H R.y₀ R.y₁ c)
     simp only [cutRect] at hu₀ hu₁ hv₀ hv₁
     by_cases hc : u ≤ c v
     · obtain ⟨j, hj, -⟩ := hn.tiling.existsUnique_toSetIoc
-        (show ((u, v) : ℝ × ℝ) ∈ R.toSetIoc from ⟨⟨hu₀, by linarith⟩, hv₀, hv₁⟩)
+        (show (u, v) ∈ R.toSetIoc from ⟨⟨hu₀, by linarith⟩, hv₀, hv₁⟩)
       exact Set.mem_iUnion.mpr ⟨(j, false), mem_cutPiece_left_of_le hn hs hj hc⟩
     · push Not at hc
       obtain ⟨j, hj, -⟩ := hn.tiling.existsUnique_toSetIoc
-        (show ((u + 1, v) : ℝ × ℝ) ∈ R.toSetIoc from ⟨⟨by linarith, by linarith⟩, hv₀, hv₁⟩)
+        (show (u + 1, v) ∈ R.toSetIoc from ⟨⟨by linarith, by linarith⟩, hv₀, hv₁⟩)
       exact Set.mem_iUnion.mpr ⟨(j, true), mem_cutPiece_right_of_lt hn hs hj hc⟩
 
 /-! ### One step of the induction -/
@@ -506,11 +526,9 @@ theorem exists_normalized_cut (hn : Normalized R T H) (hs : Strip R T H R.y₀ R
   classical
   have hcut : IsTiling (cutRect R hRx.le) fun p : ι × Bool ↦ cutPiece (T p.1) (cutAt T c p.1) p.2 :=
     isTiling_cut hn hs hRx
-  refine ⟨{p : ι × Bool // (cutPiece (T p.1) (cutAt T c p.1) p.2).x₀ <
-      (cutPiece (T p.1) (cutAt T c p.1) p.2).x₁ ∧ (cutPiece (T p.1) (cutAt T c p.1) p.2).y₀ <
-      (cutPiece (T p.1) (cutAt T c p.1) p.2).y₁}, inferInstance,
-    fun p ↦ cutPiece (T p.1.1) (cutAt T c p.1.1) p.1.2, fun p ↦ H p.1.1,
-    ⟨isTiling_proper hcut (by simp only [cutRect]; linarith) hn.pos_height, fun p ↦ p.2, ?_, ?_⟩,
+  refine ⟨{p : ι × Bool // (cutPiece (T p.1) (cutAt T c p.1) p.2).Nondegenerate}, inferInstance,
+    properTiles fun p : ι × Bool ↦ cutPiece (T p.1) (cutAt T c p.1) p.2, fun p ↦ H p.1.1,
+    ⟨hcut.proper (by simp only [cutRect]; linarith) hn.pos_height, proper_properTiles _, ?_, ?_⟩,
     ?_⟩
   · rintro ⟨⟨j, b⟩, hprop⟩ hj
     have hne := width_ne_zero_iff.mp hprop.1
@@ -521,7 +539,8 @@ theorem exists_normalized_cut (hn : Normalized R T H) (hs : Strip R T H R.y₀ R
         | exact absurd h₀ hne
         | exact absurd h₁ hne
   · rintro ⟨⟨j, b⟩, hprop⟩ hj
-    simpa only [Rectangle.height, cutPiece_y₀, cutPiece_y₁] using hn.height_one j hj
+    simpa only [Rectangle.height, properTiles, cutPiece_y₀, cutPiece_y₁] using
+      hn.height_one j hj
   · rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
     refine Fintype.card_lt_of_injective_of_notMem
       (fun p ↦ (⟨p.1.1.1, p.2⟩ : {i // H i})) (fun p q hpq ↦ ?_) (b := ⟨k, hk⟩) ?_
@@ -559,11 +578,19 @@ there or is blocked there. -/
 def StopsAbove (R : Rectangle) (T : ι → Rectangle) (H : ι → Prop) (k : ι) (n : ℕ) : Prop :=
   (T k).y₁ + n = R.y₁ ∨ BlockedAt T H k ((T k).y₁ + n)
 
-/-- The strip grown upwards from `k` is *clear* at height `t` when no tile crosses that height
-inside it. -/
+/-- The strip grown upwards from the H-tile `k` is *clear* at height `t` when no tile of the
+tiling crosses that height inside it — every tile below `t` there ends exactly at `t`, so `t` is a
+clean horizontal cut across the strip.
+
+Spelled out: for every abscissa `x` strictly inside the column `((T k).x₀, (T k).x₀ + 1)` of the
+strip, the tile whose half-open cell contains `(x, t)` — the tile immediately below and to the
+left of that point, of which there is exactly one — has its top edge at `t` rather than reaching
+past it. This is the invariant that the strip carries up one unit level at a time: it holds at the
+top edge of `k` (`clear_top`), and survives a level as long as no H-tile blocks the strip there
+(`clear_succ`). -/
 def Clear (T : ι → Rectangle) (k : ι) (t : ℝ) : Prop :=
   ∀ x, (T k).x₀ < x → x < (T k).x₀ + 1 → ∀ j : ι,
-    ((x, t) : ℝ × ℝ) ∈ (T j).toSetIoc → (T j).y₁ = t
+    (x, t) ∈ (T j).toSetIoc → (T j).y₁ = t
 
 /-- The strip is clear at the top edge of the H-tile it is grown from: the only tile below that
 edge inside the strip is the H-tile itself. -/
@@ -582,7 +609,7 @@ private lemma exists_level_tile (hn : Normalized R T H) {k : ι} (hk : H k) {t :
   have hkx₁ : (T k).x₁ ≤ R.x₁ := hn.tiling.tile_x₁_le k
   have hkw : (T k).x₁ = (T k).x₀ + 1 := x₁_eq_of_H hn hk
   obtain ⟨j, hj, -⟩ := hn.tiling.existsUnique_cell true false
-    (show ((x, t) : ℝ × ℝ) ∈ R.cell true false from ⟨⟨by linarith, by linarith⟩, hle, hlt⟩)
+    (show (x, t) ∈ R.cell true false from ⟨⟨by linarith, by linarith⟩, hle, hlt⟩)
   obtain ⟨⟨hjx₀, hjx₁⟩, hjy₀, hjy₁⟩ := hj
   have hy₀ : (T j).y₀ = t := by
     refine le_antisymm hjy₀ (not_lt.mp fun hcon ↦ ?_)
@@ -666,7 +693,7 @@ theorem exists_column (hn : Normalized R T H) {k : ι} (hk : H k) :
           min_le_left (T j).x₁ ((T k).x₀ + 1), min_le_right (T j).x₁ ((T k).x₀ + 1),
           max_lt (lt_min (hn.proper j).1 hright) (lt_min hleft (by linarith :
             (T k).x₀ < (T k).x₀ + 1))]
-    have hmem : ((x, y) : ℝ × ℝ) ∈ (T j).toSetIoc := ⟨⟨hxj₀, hxj₁⟩, hjy₀, hjy₁⟩
+    have hmem : (x, y) ∈ (T j).toSetIoc := ⟨⟨hxj₀, hxj₁⟩, hjy₀, hjy₁⟩
     rcases le_or_gt y (T k).y₁ with hy | hy
     · -- inside the H-tile itself
       have hjk : j = k := hn.tiling.eq_of_mem_cell (sx := true) (sy := true) hmem
@@ -926,7 +953,7 @@ theorem IntegerRectangleTheorem_Staircase : IntegerRectangleTheorem := by
   · exact Or.inl ⟨0, by simp [Rectangle.width, ← hRx]⟩
   rcases eq_or_lt_of_le R.hy with hRy | hRy
   · exact Or.inr ⟨0, by simp [Rectangle.height, ← hRy]⟩
-  obtain ⟨ι', _, T', H', hn'⟩ := exists_normalized hT hRx hRy hsides
-  exact hasIntegerSide_of_normalized _ ι' R T' H' le_rfl hn'
+  exact hasIntegerSide_of_normalized _ _ R (pieceTiles T) (PieceCutsWidth T) le_rfl
+    (hT.normalized hRx hRy hsides)
 
 end IntegerRectangle.Staircase
