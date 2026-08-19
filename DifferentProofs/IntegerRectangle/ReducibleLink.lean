@@ -845,19 +845,24 @@ private theorem rightOfAll_step (hT : IsTiling R T) (hp : Proper T)
     (hD : ∀ l' : Link R.transpose fun i ↦ (T i).transpose, ∃ i, IsLeft l' i ∧ H i) {i : ι}
     (hi : RightOfAll T H i) (hlt : (T i).x₁ < R.x₁) :
     ∃ j, RightOfAll T H j ∧ (T i).x₁ < (T j).x₁ := by
+  -- The V-link `l` on the right edge of `i`, and the non-`H`-tile `j` on its far side.
   obtain ⟨l, hc, hlo, hhi⟩ := exists_link_right hT hp hlt
   obtain ⟨j, hRj, hHj⟩ := hA l
   have hjx : (T j).x₀ = (T i).x₁ := hRj.1.trans hc
   refine ⟨j, ⟨hHj, fun s hs hov ↦ ?_⟩, by have := (hp j).1; linarith⟩
+  -- An `H`-tile `s` overlapping `j` in height is left or right of it; suppose left of the link.
   rcases dichotomy hT hp (fun h ↦ hHj (by rw [h]; exact hs)) hov with h | h
   · exact h
   exfalso
   rw [hRj.1] at h
   have hiy := (hp i).2
+  -- Walk `s` along H-links to the mid-height of `i`. No H-link crosses the V-link `l`, so the
+  -- walk stays on the left of the link's line —
   obtain ⟨t, ht, htx, h₀, h₁⟩ := exists_isH_left hT hp hC hD l hs h
     (hRj.2.1.trans_lt (((le_max_left _ _).trans_lt hov).trans_le (min_le_right _ _)))
     ((((le_max_right _ _).trans_lt hov).trans_le (min_le_left _ _)).trans_le hRj.2.2)
     (y := ((T i).y₀ + (T i).y₁) / 2) (by linarith) (by linarith)
+  -- and ends at an `H`-tile overlapping `i` in height on its left, against the invariant.
   have h₂ := hi.2 t ht ((max_lt (by linarith) h₀).trans_le (le_min (by linarith) h₁))
   have h₃ := (hp t).1
   linarith
@@ -875,9 +880,14 @@ theorem exists_reducible (hT : IsTiling R T) (hp : Proper T) {a b : ι} (ha : H 
       ∃ l : Link R.transpose fun i ↦ (T i).transpose, ∀ i, IsLeft l i → ¬ H i := by
   by_contra hcon
   push Not at hcon
+  -- Were no link reducible: every V-link has a non-`H`-tile abutting each side (`hA`, `hB`), and
+  -- every H-link an `H`-tile abutting each side (`hC`, `hD`).
   obtain ⟨hA, hB, hC, hD⟩ := hcon
+  -- Walk from `b` leftwards along V-links to a non-`H`-tile `b₀` on the left wall of `R`.
   obtain ⟨b₀, hb₀, hb₀x⟩ :=
     walk_left hT (fun _ _ hlt ↦ exists_lt_x₀ hT hp hB hlt) _ b hb le_rfl
+  -- Carry the invariant rightwards along V-links to a tile `u` on the right wall of `R`. At `b₀`
+  -- the invariant holds because on the left wall there is no room on the left.
   obtain ⟨u, hQu, hux⟩ := walk_right hT (fun i hi hlt ↦ rightOfAll_step hT hp hA hC hD hi hlt) _ b₀
     ⟨hb₀, fun s hs hov ↦ by
       rcases dichotomy hT hp (fun h ↦ hb₀ (by rw [h]; exact hs)) hov with h | h
@@ -888,8 +898,10 @@ theorem exists_reducible (hT : IsTiling R T) (hp : Proper T) {a b : ι} (ha : H 
         rw [hb₀x] at h
         linarith⟩ le_rfl
   have huy := (hp u).2
+  -- Meanwhile the `H`-tiles, walking along H-links from `a`, reach the mid-height of `u` —
   obtain ⟨s, hs, hs₀, hs₁⟩ := exists_H_of_height hT hp hC hD ha (((T u).y₀ + (T u).y₁) / 2)
     (by have := hT.le_tile_y₀ u; linarith) (by have := hT.tile_y₁_le u; linarith)
+  -- and the invariant for `u` pushes that `H`-tile beyond the right wall.
   have h₁ := hQu.2 s hs ((max_lt (by linarith) hs₀).trans_le (le_min (by linarith) hs₁))
   have h₂ := hT.tile_x₁_le s
   have h₃ := (hp s).1
