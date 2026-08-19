@@ -285,9 +285,6 @@ omit [Fintype ι] in
 lemma push_of_not {i : ι} (h : ¬ IsLeft l i) (h' : ¬ IsRight l i) : push l w hw hR i = T i := by
   unfold push; rw [dif_neg h, dif_neg h']
 
-private lemma mem_toSetIoc' {S : Rectangle} {x y : ℝ} :
-    ((x, y) : ℝ × ℝ) ∈ S.toSetIoc ↔ (S.x₀ < x ∧ x ≤ S.x₁) ∧ S.y₀ < y ∧ y ≤ S.y₁ := Iff.rfl
-
 /-- Since some tile on the right of the link is at least `w` wide, the pushed edge stays inside
 `R`. -/
 private lemma add_le_x₁ (hT : IsTiling R T) (hp : Proper T)
@@ -310,14 +307,14 @@ private lemma mem_toSetIoc_or_mem_strip (hp : Proper T) (i : ι) {x y : ℝ}
     (hmem : ((x, y) : ℝ × ℝ) ∈ (push l w hw hR i).toSetIoc) :
     ((x, y) : ℝ × ℝ) ∈ (T i).toSetIoc ∨ ((l.c < x ∧ x ≤ l.c + w) ∧ l.lo < y ∧ y ≤ l.hi) := by
   by_cases hL : IsLeft l i
-  · simp only [mem_toSetIoc', push_x₀_of_isLeft hL, push_x₁_of_isLeft hL, push_y₀,
+  · simp only [Rectangle.mem_toSetIoc', push_x₀_of_isLeft hL, push_x₁_of_isLeft hL, push_y₀,
       push_y₁] at hmem
     rcases le_or_gt x l.c with h | h
     · exact Or.inl ⟨⟨hmem.1.1, by rw [hL.1]; exact h⟩, hmem.2⟩
     · exact Or.inr ⟨⟨h, hmem.1.2⟩, hL.2.1.trans_lt hmem.2.1, hmem.2.2.trans hL.2.2⟩
   by_cases hRi : IsRight l i
-  · simp only [mem_toSetIoc', push_x₀_of_isRight hp hRi, push_x₁_of_isRight hp hRi, push_y₀,
-      push_y₁] at hmem
+  · simp only [Rectangle.mem_toSetIoc', push_x₀_of_isRight hp hRi, push_x₁_of_isRight hp hRi,
+      push_y₀, push_y₁] at hmem
     exact Or.inl ⟨⟨by rw [hRi.1]; linarith [hmem.1.1], hmem.1.2⟩, hmem.2⟩
   · rw [push_of_not hL hRi] at hmem
     exact Or.inl hmem
@@ -329,7 +326,7 @@ private lemma isLeft_of_mem_strip (hT : IsTiling R T) (hp : Proper T) (i : ι) {
   by_cases hL : IsLeft l i
   · exact hL
   by_cases hRi : IsRight l i
-  · rw [mem_toSetIoc', push_x₀_of_isRight hp hRi] at hmem
+  · rw [Rectangle.mem_toSetIoc', push_x₀_of_isRight hp hRi] at hmem
     exact absurd hmem.1.1 (not_lt.mpr h₂)
   · rw [push_of_not hL hRi] at hmem
     obtain ⟨k, hk, hkmem⟩ := exists_isRight_of_mem_strip hT hp hR h₁ h₂ h₃ h₄
@@ -369,7 +366,7 @@ private lemma push_pairwiseDisjoint (hT : IsTiling R T) (hp : Proper T) :
   by_cases hs : (l.c < x ∧ x ≤ l.c + w) ∧ l.lo < y ∧ y ≤ l.hi
   · have hLi := isLeft_of_mem_strip hT hp i hi hs.1.1 hs.1.2 hs.2.1 hs.2.2
     have hLj := isLeft_of_mem_strip hT hp j hj hs.1.1 hs.1.2 hs.2.1 hs.2.2
-    simp only [mem_toSetIoc', push_y₀, push_y₁] at hi hj
+    simp only [Rectangle.mem_toSetIoc', push_y₀, push_y₁] at hi hj
     exact hij (isLeft_unique hT hp hLi hLj hi.2 hj.2)
   · rcases mem_toSetIoc_or_mem_strip hp i hi with hi' | hi'
     · rcases mem_toSetIoc_or_mem_strip hp j hj with hj' | hj'
@@ -383,28 +380,28 @@ private lemma subset_iUnion_push (hT : IsTiling R T) (hp : Proper T) :
     R.toSetIoc ⊆ ⋃ i, (push l w hw hR i).toSetIoc := by
   rintro ⟨x, y⟩ hz
   obtain ⟨i, hi, -⟩ := hT.existsUnique_toSetIoc hz
-  rw [mem_toSetIoc'] at hi
+  rw [Rectangle.mem_toSetIoc'] at hi
   by_cases hRi : IsRight l i
   · rcases le_or_gt x (l.c + w) with hx | hx
     · obtain ⟨j, hLj, hj₀, hj₁⟩ := exists_isLeft hT hp l (hRi.2.1.trans_lt hi.2.1)
         (hi.2.2.trans hRi.2.2)
       refine Set.mem_iUnion.mpr ⟨j, ?_⟩
-      simp only [mem_toSetIoc', push_x₀_of_isLeft hLj, push_x₁_of_isLeft hLj, push_y₀, push_y₁]
+      simp only [Rectangle.mem_toSetIoc', push_x₀_of_isLeft hLj, push_x₁_of_isLeft hLj, push_y₀, push_y₁]
       refine ⟨⟨?_, hx⟩, hj₀, hj₁⟩
       have h₁ := (hp j).1
       rw [hLj.1] at h₁
       rw [hRi.1] at hi
       linarith [hi.1.1]
     · refine Set.mem_iUnion.mpr ⟨i, ?_⟩
-      simp only [mem_toSetIoc', push_x₀_of_isRight hp hRi, push_x₁_of_isRight hp hRi, push_y₀,
+      simp only [Rectangle.mem_toSetIoc', push_x₀_of_isRight hp hRi, push_x₁_of_isRight hp hRi, push_y₀,
         push_y₁]
       exact ⟨⟨hx, hi.1.2⟩, hi.2⟩
   · by_cases hL : IsLeft l i
     · refine Set.mem_iUnion.mpr ⟨i, ?_⟩
-      simp only [mem_toSetIoc', push_x₀_of_isLeft hL, push_x₁_of_isLeft hL, push_y₀, push_y₁]
+      simp only [Rectangle.mem_toSetIoc', push_x₀_of_isLeft hL, push_x₁_of_isLeft hL, push_y₀, push_y₁]
       rw [hL.1] at hi
       exact ⟨⟨hi.1.1, by linarith [hi.1.2]⟩, hi.2⟩
-    · exact Set.mem_iUnion.mpr ⟨i, by rw [push_of_not hL hRi, mem_toSetIoc']; exact hi⟩
+    · exact Set.mem_iUnion.mpr ⟨i, by rw [push_of_not hL hRi, Rectangle.mem_toSetIoc']; exact hi⟩
 
 /-- **Pushing the tiles on the left of a link rightwards again tiles the same rectangle.** The
 strip `(c, c + w] × (lo, hi]` that the tiles on the left sweep out is exactly the strip that the

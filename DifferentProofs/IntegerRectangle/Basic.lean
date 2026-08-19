@@ -62,6 +62,9 @@ lemma mem_toSetIoc {R : Rectangle} {z : ℝ × ℝ} :
     z ∈ R.toSetIoc ↔ (R.x₀ < z.1 ∧ z.1 ≤ R.x₁) ∧ (R.y₀ < z.2 ∧ z.2 ≤ R.y₁) := Iff.rfl
 
 /-- A rectangle's half-open cell is a measurable subset of the plane. -/
+lemma mem_toSetIoc' {R : Rectangle} {x y : ℝ} :
+    ((x, y) : ℝ × ℝ) ∈ R.toSetIoc ↔ (R.x₀ < x ∧ x ≤ R.x₁) ∧ R.y₀ < y ∧ y ≤ R.y₁ := Iff.rfl
+
 lemma measurableSet_toSetIoc (R : Rectangle) : MeasurableSet R.toSetIoc :=
   measurableSet_Ioc.prod measurableSet_Ioc
 
