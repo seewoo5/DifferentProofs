@@ -19,6 +19,18 @@ Induction on the number of tiles then reduces everything to the claim that a red
 exists, and if none did there would be a chain of H-tiles running from the bottom of `R` to its
 top and a chain of V-tiles running from its left to its right, and those two chains would have to
 cross.
+
+Only one of each symmetric pair is developed here and the rest are read off it. H-links are the
+V-links of the transposed tiling (`IsTiling.transpose`), so nothing horizontal is defined
+separately; and the right-hand side of a vertical line is the left-hand side of the reflected
+tiling (`IsTiling.reflectX`, `Link.reflectX`, `Link.ofReflectX`), so `Link.exists_right` and
+`exists_link_left` are corollaries of `Link.exists_left` and `exists_link_right`. This is also why
+the four ways a link can be reducible cost a single proof: `step_of_reducible` is applied in turn
+to `T`, to `T.reflectX`, to `T.transpose` and to `T.transpose.reflectX`.
+
+Two unrelated senses of "left" meet in those names. `Link.exists_left` is about the tiles abutting
+a link *on its left*, whereas `exists_link_left` is about the link carried by the *left edge* of a
+given tile.
 -/
 
 @[expose] public section
@@ -31,7 +43,7 @@ variable {ι : Type} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
 
 /-- A family of rectangles is *proper* when each of its members has positive width and positive
 height. Degenerate tiles are harmless but carry no information, and every tiling can be pruned
-down to a proper one (`exists_proper`). -/
+down to a proper one (`isTiling_proper`). -/
 def Proper (T : ι → Rectangle) : Prop := ∀ i, (T i).x₀ < (T i).x₁ ∧ (T i).y₀ < (T i).y₁
 
 /-- The height `y` is *blocked* on the vertical line `x = c` when that line is not a free stretch
@@ -441,8 +453,10 @@ private lemma exists_upper_end (c : ℝ) {b : ℝ} (hb : b ≤ R.y₁) :
   exact (Finset.mem_insert.mp (S.min'_mem hne)).elim (hb.trans ·.ge)
     fun h ↦ (Finset.mem_filter.mp h).2.1
 
-/-- **Every vertical tile edge interior to `R` carries a V-link straddling that edge.** -/
-theorem exists_link (hT : IsTiling R T) (hp : Proper T) {k : ι} (hlt : (T k).x₁ < R.x₁) :
+/-- **The right edge of a tile, when interior to `R`, lies on a V-link straddling it**: the link
+starts at or below the tile's bottom and ends at or above its top. Here "right" is the edge of the
+tile the link runs along, not the side of the link a tile sits on, as in `Link.exists_right`. -/
+theorem exists_link_right (hT : IsTiling R T) (hp : Proper T) {k : ι} (hlt : (T k).x₁ < R.x₁) :
     ∃ l : Link R T, l.c = (T k).x₁ ∧ l.lo ≤ (T k).y₀ ∧ (T k).y₁ ≤ l.hi := by
   classical
   set c := (T k).x₁ with hc
@@ -542,11 +556,11 @@ omit [Fintype ι] in
 lemma properReflectX (hp : Proper T) : Proper fun i ↦ (T i).reflectX := fun i ↦
   ⟨by simpa [Rectangle.reflectX] using (hp i).1, (hp i).2⟩
 
-/-- **Every vertical tile edge interior to `R` carries a V-link straddling it**, the mirror image
-of `exists_link` for the left-hand edge of a tile. -/
+/-- **The left edge of a tile, when interior to `R`, lies on a V-link straddling it**, the mirror
+image of `exists_link_right` under reflection in the vertical axis. -/
 theorem exists_link_left (hT : IsTiling R T) (hp : Proper T) {k : ι} (hgt : R.x₀ < (T k).x₀) :
     ∃ l : Link R T, l.c = (T k).x₀ ∧ l.lo ≤ (T k).y₀ ∧ (T k).y₁ ≤ l.hi := by
-  obtain ⟨l, hc, hlo, hhi⟩ := exists_link hT.reflectX (properReflectX hp) (k := k)
+  obtain ⟨l, hc, hlo, hhi⟩ := exists_link_right hT.reflectX (properReflectX hp) (k := k)
     (by simpa [Rectangle.reflectX] using hgt)
   simp only [Rectangle.reflectX] at hc hlo hhi
   exact ⟨l.ofReflectX, by change -l.c = (T k).x₀; rw [hc, neg_neg], hlo, hhi⟩
@@ -700,7 +714,7 @@ private theorem step_up_left (hT : IsTiling R T) (hp : Proper T)
     (l : Link R T) {s : ι} (hleft : (T s).x₁ ≤ l.c) (hlo : l.lo < (T s).y₁)
     (hhi : (T s).y₁ < l.hi) :
     ∃ s', H s' ∧ (T s').x₁ ≤ l.c ∧ (T s').y₀ = (T s).y₁ ∧ (T s).y₁ < (T s').y₁ := by
-  obtain ⟨l', hc, hlo', hhi'⟩ := exists_link hT.transpose (properTranspose hp) (k := s)
+  obtain ⟨l', hc, hlo', hhi'⟩ := exists_link_right hT.transpose (properTranspose hp) (k := s)
     (show ((T s).transpose).x₁ < R.transpose.x₁ from hhi.trans_le l.le_y₁)
   obtain ⟨s', hR', hH'⟩ := hC l'
   have hy₀ : (T s').y₀ = (T s).y₁ := hR'.1.trans hc
@@ -748,7 +762,7 @@ private lemma dichotomy (hT : IsTiling R T) (hp : Proper T) {i j : ι} (hij : i 
 private theorem step_up_plain (hT : IsTiling R T) (hp : Proper T)
     (hC : ∀ l' : Link R.transpose fun i ↦ (T i).transpose, ∃ i, IsRight l' i ∧ H i) {s : ι}
     (hlt : (T s).y₁ < R.y₁) : ∃ s', H s' ∧ (T s').y₀ = (T s).y₁ ∧ (T s).y₁ < (T s').y₁ := by
-  obtain ⟨l', hc, -, -⟩ := exists_link hT.transpose (properTranspose hp) (k := s)
+  obtain ⟨l', hc, -, -⟩ := exists_link_right hT.transpose (properTranspose hp) (k := s)
     (show ((T s).transpose).x₁ < R.transpose.x₁ from hlt)
   obtain ⟨s', hR', hH'⟩ := hC l'
   have hy : (T s').y₀ = (T s).y₁ := hR'.1.trans hc
@@ -830,7 +844,7 @@ private theorem rightOfAll_step (hT : IsTiling R T) (hp : Proper T)
     (hD : ∀ l' : Link R.transpose fun i ↦ (T i).transpose, ∃ i, IsLeft l' i ∧ H i) {i : ι}
     (hi : RightOfAll T H i) (hlt : (T i).x₁ < R.x₁) :
     ∃ j, RightOfAll T H j ∧ (T i).x₁ < (T j).x₁ := by
-  obtain ⟨l, hc, hlo, hhi⟩ := exists_link hT hp hlt
+  obtain ⟨l, hc, hlo, hhi⟩ := exists_link_right hT hp hlt
   obtain ⟨j, hRj, hHj⟩ := hA l
   have hjx : (T j).x₀ = (T i).x₁ := hRj.1.trans hc
   refine ⟨j, ⟨hHj, fun s hs hov ↦ ?_⟩, by have := (hp j).1; linarith⟩
