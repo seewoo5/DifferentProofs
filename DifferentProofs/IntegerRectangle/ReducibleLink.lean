@@ -386,19 +386,21 @@ private lemma subset_iUnion_push (hT : IsTiling R T) (hp : Proper T) :
     · obtain ⟨j, hLj, hj₀, hj₁⟩ := exists_isLeft hT hp l (hRi.2.1.trans_lt hi.2.1)
         (hi.2.2.trans hRi.2.2)
       refine Set.mem_iUnion.mpr ⟨j, ?_⟩
-      simp only [Rectangle.mem_toSetIoc', push_x₀_of_isLeft hLj, push_x₁_of_isLeft hLj, push_y₀, push_y₁]
+      simp only [Rectangle.mem_toSetIoc', push_x₀_of_isLeft hLj, push_x₁_of_isLeft hLj, push_y₀,
+        push_y₁]
       refine ⟨⟨?_, hx⟩, hj₀, hj₁⟩
       have h₁ := (hp j).1
       rw [hLj.1] at h₁
       rw [hRi.1] at hi
       linarith [hi.1.1]
     · refine Set.mem_iUnion.mpr ⟨i, ?_⟩
-      simp only [Rectangle.mem_toSetIoc', push_x₀_of_isRight hp hRi, push_x₁_of_isRight hp hRi, push_y₀,
-        push_y₁]
+      simp only [Rectangle.mem_toSetIoc', push_x₀_of_isRight hp hRi, push_x₁_of_isRight hp hRi,
+        push_y₀, push_y₁]
       exact ⟨⟨hx, hi.1.2⟩, hi.2⟩
   · by_cases hL : IsLeft l i
     · refine Set.mem_iUnion.mpr ⟨i, ?_⟩
-      simp only [Rectangle.mem_toSetIoc', push_x₀_of_isLeft hL, push_x₁_of_isLeft hL, push_y₀, push_y₁]
+      simp only [Rectangle.mem_toSetIoc', push_x₀_of_isLeft hL, push_x₁_of_isLeft hL, push_y₀,
+        push_y₁]
       rw [hL.1] at hi
       exact ⟨⟨hi.1.1, by linarith [hi.1.2]⟩, hi.2⟩
     · exact Set.mem_iUnion.mpr ⟨i, by rw [push_of_not hL hRi, Rectangle.mem_toSetIoc']; exact hi⟩

@@ -23,7 +23,6 @@ public import DifferentProofs.InfinitudeOfPrimes.Wunderlich
 public import DifferentProofs.IntegerRectangle.Basic
 public import DifferentProofs.IntegerRectangle.BipartiteGraph
 public import DifferentProofs.IntegerRectangle.Cells
-public import DifferentProofs.IntegerRectangle.Walks
 public import DifferentProofs.IntegerRectangle.Checkerboard
 public import DifferentProofs.IntegerRectangle.ComplexIntegral
 public import DifferentProofs.IntegerRectangle.CornerCount
@@ -35,8 +34,10 @@ public import DifferentProofs.IntegerRectangle.Polynomials
 public import DifferentProofs.IntegerRectangle.Primes
 public import DifferentProofs.IntegerRectangle.RealIntegral
 public import DifferentProofs.IntegerRectangle.ReducibleLink
+public import DifferentProofs.IntegerRectangle.Staircase
 public import DifferentProofs.IntegerRectangle.StepFunction
 public import DifferentProofs.IntegerRectangle.SweepLine
+public import DifferentProofs.IntegerRectangle.Walks
 public import DifferentProofs.IrrationalSqrtTwo.Basic
 public import DifferentProofs.IrrationalSqrtTwo.Defs
 public import DifferentProofs.IrrationalSqrtTwo.Descent
