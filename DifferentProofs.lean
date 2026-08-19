@@ -34,8 +34,10 @@ public import DifferentProofs.IntegerRectangle.Polynomials
 public import DifferentProofs.IntegerRectangle.Primes
 public import DifferentProofs.IntegerRectangle.RealIntegral
 public import DifferentProofs.IntegerRectangle.ReducibleLink
+public import DifferentProofs.IntegerRectangle.Staircase
 public import DifferentProofs.IntegerRectangle.StepFunction
 public import DifferentProofs.IntegerRectangle.SweepLine
+public import DifferentProofs.IntegerRectangle.Walks
 public import DifferentProofs.IrrationalSqrtTwo.Basic
 public import DifferentProofs.IrrationalSqrtTwo.Defs
 public import DifferentProofs.IrrationalSqrtTwo.Descent

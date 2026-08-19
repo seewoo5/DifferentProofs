@@ -126,6 +126,31 @@ lemma mem_reflectY_cell (S : Rectangle) (sx : Bool) (x y : ℝ) :
     ((x, -y) : ℝ × ℝ) ∈ S.reflectY.cell sx true ↔ ((x, y) : ℝ × ℝ) ∈ S.cell sx false := by
   cases sx <;> simp [reflectY, and_comm]
 
+/-! ### Dimensions under the symmetries of the plane -/
+
+@[simp] lemma reflectX_width (S : Rectangle) : S.reflectX.width = S.width := by
+  simp only [Rectangle.width, Rectangle.reflectX]
+  ring
+
+@[simp] lemma reflectX_height (S : Rectangle) : S.reflectX.height = S.height := rfl
+
+@[simp] lemma reflectY_width (S : Rectangle) : S.reflectY.width = S.width := rfl
+
+@[simp] lemma reflectY_height (S : Rectangle) : S.reflectY.height = S.height := by
+  simp only [Rectangle.height, Rectangle.reflectY]
+  ring
+
+@[simp] lemma transpose_width (S : Rectangle) : S.transpose.width = S.height := rfl
+
+@[simp] lemma transpose_height (S : Rectangle) : S.transpose.height = S.width := rfl
+
+lemma hasIntegerSide_reflectX {S : Rectangle} :
+    S.reflectX.HasIntegerSide ↔ S.HasIntegerSide := by simp [Rectangle.HasIntegerSide]
+
+lemma hasIntegerSide_transpose {S : Rectangle} :
+    S.transpose.HasIntegerSide ↔ S.HasIntegerSide := by
+  simp [Rectangle.HasIntegerSide, or_comm]
+
 end Rectangle
 
 /-! ### Symmetry of tilings -/
@@ -228,5 +253,62 @@ theorem IsTiling.eq_of_mem_cell (hT : IsTiling R T) {sx sy : Bool} {x y : ℝ} {
     (hi : ((x, y) : ℝ × ℝ) ∈ (T i).cell sx sy) (hj : ((x, y) : ℝ × ℝ) ∈ (T j).cell sx sy) :
     i = j :=
   (hT.existsUnique_cell sx sy (hT.cell_subset sx sy i hi)).unique hi hj
+
+/-! ### Proper tilings -/
+
+/-- A family of rectangles is *proper* when each of its members is nondegenerate. Degenerate tiles
+are harmless but carry no information, and every tiling can be pruned down to a proper one
+(`IsTiling.proper`). -/
+def Proper (T : ι → Rectangle) : Prop := ∀ i, (T i).Nondegenerate
+
+omit [Fintype ι] in
+/-- Transposing the plane preserves properness. -/
+lemma properTranspose (hp : Proper T) : Proper fun i ↦ (T i).transpose :=
+  fun i ↦ ⟨(hp i).2, (hp i).1⟩
+
+omit [Fintype ι] in
+/-- Reflecting the plane in the vertical axis preserves properness. -/
+lemma properReflectX (hp : Proper T) : Proper fun i ↦ (T i).reflectX := fun i ↦
+  ⟨by simpa [Rectangle.reflectX] using (hp i).1, (hp i).2⟩
+
+omit [Fintype ι] in
+/-- Reflecting the plane in the horizontal axis preserves properness. -/
+lemma properReflectY (hp : Proper T) : Proper fun i ↦ (T i).reflectY := fun i ↦
+  ⟨(hp i).1, by simpa [Rectangle.reflectY] using (hp i).2⟩
+
+/-- The nondegenerate tiles of a family, reindexed by the indices that carry one. -/
+def properTiles (T : ι → Rectangle) (i : {i : ι // (T i).Nondegenerate}) : Rectangle := T i.1
+
+omit [Fintype ι] in
+/-- Pruning a family of rectangles leaves a proper one. -/
+lemma proper_properTiles (T : ι → Rectangle) : Proper (properTiles T) := fun i ↦ i.2
+
+/-- **Degenerate tiles may be discarded.** The half-open cell of a degenerate rectangle is empty,
+so it contributes nothing to the partition and the nondegenerate tiles alone still tile `R`. -/
+theorem IsTiling.proper (hT : IsTiling R T) (hx : R.x₀ < R.x₁) (hy : R.y₀ < R.y₁) :
+    IsTiling R (properTiles T) := by
+  refine isTiling_of_toSetIoc hx hy (fun i ↦ hT.tile_subset i.1)
+    (fun i j hij ↦ hT.pairwiseDisjoint_toSetIoc (Subtype.coe_ne_coe.mpr hij)) fun z hz ↦ ?_
+  obtain ⟨i, hi, -⟩ := hT.existsUnique_toSetIoc hz
+  exact Set.mem_iUnion.mpr ⟨⟨i, hi.1.1.trans_le hi.1.2, hi.2.1.trans_le hi.2.2⟩, hi⟩
+
+/-- **Two distinct tiles that overlap in height lie one strictly to the left of the other.** The
+point just inside the upper right corner of the leftmost of the two right edges would otherwise
+be in the lower-left cell of both. -/
+lemma IsTiling.separated_x_of_overlap_y (hT : IsTiling R T) (hp : Proper T) {i j : ι}
+    (hij : i ≠ j) (h : max (T i).y₀ (T j).y₀ < min (T i).y₁ (T j).y₁) :
+    (T i).x₁ ≤ (T j).x₀ ∨ (T j).x₁ ≤ (T i).x₀ := by
+  by_contra hcon
+  push Not at hcon
+  have ha₁ : (T i).y₀ ≤ max (T i).y₀ (T j).y₀ := le_max_left _ _
+  have ha₂ : (T j).y₀ ≤ max (T i).y₀ (T j).y₀ := le_max_right _ _
+  have hb₁ : min (T i).y₁ (T j).y₁ ≤ (T i).y₁ := min_le_left _ _
+  have hb₂ : min (T i).y₁ (T j).y₁ ≤ (T j).y₁ := min_le_right _ _
+  have hc₁ : min (T i).x₁ (T j).x₁ ≤ (T i).x₁ := min_le_left _ _
+  have hc₂ : min (T i).x₁ (T j).x₁ ≤ (T j).x₁ := min_le_right _ _
+  exact hij (hT.eq_of_mem_cell (sx := true) (sy := true)
+    (x := min (T i).x₁ (T j).x₁) (y := min (T i).y₁ (T j).y₁)
+    ⟨⟨lt_min (hp i).1 hcon.2, hc₁⟩, by linarith, hb₁⟩
+    ⟨⟨lt_min hcon.1 (hp j).1, hc₂⟩, by linarith, hb₂⟩)
 
 end IntegerRectangle

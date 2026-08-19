@@ -61,6 +61,11 @@ def toSetIoc (R : Rectangle) : Set (ℝ × ℝ) := Ioc R.x₀ R.x₁ ×ˢ Ioc R.
 lemma mem_toSetIoc {R : Rectangle} {z : ℝ × ℝ} :
     z ∈ R.toSetIoc ↔ (R.x₀ < z.1 ∧ z.1 ≤ R.x₁) ∧ (R.y₀ < z.2 ∧ z.2 ≤ R.y₁) := Iff.rfl
 
+/-- Membership of a point given by its coordinates, the form in which the four inequalities are
+usually needed. -/
+lemma mem_toSetIoc' {R : Rectangle} {x y : ℝ} :
+    (x, y) ∈ R.toSetIoc ↔ (R.x₀ < x ∧ x ≤ R.x₁) ∧ R.y₀ < y ∧ y ≤ R.y₁ := Iff.rfl
+
 /-- A rectangle's half-open cell is a measurable subset of the plane. -/
 lemma measurableSet_toSetIoc (R : Rectangle) : MeasurableSet R.toSetIoc :=
   measurableSet_Ioc.prod measurableSet_Ioc
@@ -74,6 +79,14 @@ lemma mem_interior_toSet {R : Rectangle} {z : ℝ × ℝ}
     (h : (R.x₀ < z.1 ∧ z.1 < R.x₁) ∧ (R.y₀ < z.2 ∧ z.2 < R.y₁)) : z ∈ interior R.toSet := by
   rw [Rectangle.toSet, interior_prod_eq, interior_Icc, interior_Icc]
   exact h
+
+/-- A rectangle is *nondegenerate* when it has positive width and positive height — equivalently,
+when its interior is nonempty. Degenerate rectangles have empty half-open cells, so a tiling can
+always be pruned down to its nondegenerate tiles (`IsTiling.proper`). -/
+def Nondegenerate (S : Rectangle) : Prop := S.x₀ < S.x₁ ∧ S.y₀ < S.y₁
+
+noncomputable instance : DecidablePred Nondegenerate :=
+  fun S ↦ inferInstanceAs (Decidable (S.x₀ < S.x₁ ∧ S.y₀ < S.y₁))
 
 /-- A rectangle's width is nonnegative. -/
 lemma width_nonneg (R : Rectangle) : 0 ≤ R.width := sub_nonneg.mpr R.hx

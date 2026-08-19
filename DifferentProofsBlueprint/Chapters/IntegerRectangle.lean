@@ -15,6 +15,7 @@ import DifferentProofs.IntegerRectangle.Polynomials
 import DifferentProofs.IntegerRectangle.Primes
 import DifferentProofs.IntegerRectangle.RealIntegral
 import DifferentProofs.IntegerRectangle.ReducibleLink
+import DifferentProofs.IntegerRectangle.Staircase
 import DifferentProofs.IntegerRectangle.StepFunction
 import DifferentProofs.IntegerRectangle.SweepLine
 
@@ -344,6 +345,90 @@ neither lie on the lattice, and likewise in the other direction; the hypothesis 
 grid. Its lower-left corner is one of them. If neither side of $`R` were an integer, its right
 edge would miss $`X` and its top edge would miss $`Y`, leaving that corner as the only one — an
 odd number.
+:::
+
+Ninth proof: induction (Raphael Robinson). Call a tile an *H-tile* if it is designated by its
+integer width and a *V-tile* if it is designated by its integer height. Cutting every tile into
+unit pieces along its designated side normalizes the tiling: every H-tile is then exactly one unit
+wide and every V-tile exactly one unit tall. The induction runs on the number of H-tiles. Robinson
+grows a vertical strip of width $`1` from an H-tile, expanding it one unit at a time through the
+V-tiles above it until an H-tile blocks the way, then stepping onto that H-tile and carrying on;
+and likewise downwards. The resulting staircase runs from the bottom edge of $`R` to its top edge,
+and deleting it and sliding everything on its right one unit leftwards tiles a rectangle one unit
+narrower with fewer H-tiles.
+
+:::lemma_ "lem:int-rect-normalize" (parent := "grp:int-rect") (lean := "IntegerRectangle.IsTiling.normalized")
+Every tiling by tiles with an integer side refines to a normalized one, in which every tile is one
+unit wide or one unit tall.
+:::
+
+:::proof "lem:int-rect-normalize"
+Discard the degenerate tiles and cut each remaining tile into unit pieces along a side of integer
+length, of which it has at least one, and which is at least one unit long since the tile is
+nondegenerate. The half-open cells of the pieces of a tile partition its own, so the cells of all
+the pieces still partition those of $`R`.
+:::
+
+:::lemma_ "lem:int-rect-column" (parent := "grp:int-rect") (lean := "IntegerRectangle.Staircase.exists_column")
+In a normalized tiling the strip of width $`1` carried by an H-tile runs upwards through whole
+V-tiles until it reaches the top of $`R` or an H-tile starts across it.
+:::
+
+:::proof "lem:int-rect-column"
+Induct on the number of unit levels the strip has risen. Nothing crosses the top edge of the
+H-tile inside the strip, since the only tile below that edge there is the H-tile itself. If
+nothing crosses the height reached so far and no H-tile starts there, then the tile above each
+point of that height starts exactly there, hence is a V-tile and is one unit tall; it therefore
+spans the whole level, nothing crosses the next height, and the strip is still inside $`R`. Each
+level raises the strip by a unit, so it cannot rise forever.
+:::
+
+:::lemma_ "lem:int-rect-staircase" (parent := "grp:int-rect") (lean := "IntegerRectangle.Staircase.exists_strip")
+A normalized tiling with an H-tile has a staircase strip of width $`1` running from the bottom
+edge of $`R` to its top edge and containing an H-tile. Every tile lies to the left of the strip at
+each of its heights, or to its right, or inside it, and none lies to the left at one height and to
+the right at another.
+:::
+
+:::proof "lem:int-rect-staircase"
+Walk down from the given H-tile: while the column below the current H-tile is blocked, step onto
+the H-tile blocking it, which lies strictly lower, so the walk stops at an H-tile whose column
+reaches the bottom of $`R`. From there build the staircase upwards {uses "lem:int-rect-column"}[]
+column by column, each step raising the top edge to a strictly higher one of the finitely many
+heights carrying a horizontal edge of the tiling. A tile meeting a column lies inside it, so it
+meets no other column, and the strip has a single abscissa along it; and consecutive columns
+overlap horizontally, since the H-tile carrying the upper column crosses the lower one. A tile to
+the left of the staircase at one height and to its right at another would have to fit in the gap
+between two consecutive columns, and there is no gap.
+:::
+
+:::lemma_ "lem:int-rect-cut" (parent := "grp:int-rect") (lean := "IntegerRectangle.Staircase.isTiling_cut")
+Cutting a normalized tiling along its staircase strip and sliding everything on the right of the
+strip one unit leftwards tiles the rectangle one unit narrower.
+:::
+
+:::proof "lem:int-rect-cut"
+Each tile is cut at a single abscissa: its right edge if it lies left of the strip, its left edge
+less one if it lies right of the strip, and the left edge of the strip if it lies inside it — and
+since the staircase is a wall {uses "lem:int-rect-staircase"}[] the same alternative holds at all
+of that tile's heights. A point of the shrunken rectangle left of the strip comes from the point
+itself and one to its right from its translate one unit rightwards, so the half-open cells of the
+pieces partition those of the shrunken rectangle.
+:::
+
+:::theorem "thm:int-rect-induction" (parent := "grp:int-rect") (lean := "IntegerRectangle.Staircase.IntegerRectangleTheorem_Staircase") (proofColor := "#fbcfe8")
+A rectangle tiled by rectangles each with an integer side has an integer side.
+:::
+
+:::proof "thm:int-rect-induction"
+Normalize the tiling {uses "lem:int-rect-normalize"}[] and induct on the number of its H-tiles.
+With no H-tile every tile has integer height, hence so does $`R`. Otherwise grow the staircase
+from an H-tile {uses "lem:int-rect-staircase"}[]. If $`R` is narrower than two units then the
+H-tile leaves no room beside it and $`R` is exactly one unit wide. Otherwise cut the staircase out
+{uses "lem:int-rect-cut"}[]: heights never change, so V-tiles stay V-tiles, and an H-tile is
+carried over whole or swallowed by the strip, so the new tiling is normalized and has fewer
+H-tiles — the one the staircase was grown from is gone. Its rectangle is one unit narrower and
+just as tall, so an integer side of it is an integer side of $`R`.
 :::
 
 Tenth proof: induction on reducible links (Richard Bishop and Wagon), Wagon's variation on
