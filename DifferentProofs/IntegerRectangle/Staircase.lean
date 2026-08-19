@@ -488,16 +488,16 @@ private lemma width_cutPiece_of_H (hn : Normalized R T H) (hs : Strip R T H R.y�
         (cutPiece (T j) (cutAt T c j) true).width = 0) := by
   have hw : (T j).x₁ = (T j).x₀ + 1 := x₁_eq_of_H hn hj
   rcases cutAt_spec hn hs j (hn.proper j).2 le_rfl with ⟨he, -⟩ | ⟨he, -⟩ | ⟨he, halign⟩
-  · exact Or.inl (by constructor <;>
-      simp only [cutPiece, cutLeft, cutRight, Rectangle.width, he, min_def, max_def] <;>
-      split_ifs <;> linarith)
-  · exact Or.inr (Or.inl (by constructor <;>
-      simp only [cutPiece, cutLeft, cutRight, Rectangle.width, he, min_def, max_def] <;>
-      split_ifs <;> linarith))
+  · exact Or.inl (by
+      simp only [cutPiece, cutLeft, cutRight, Rectangle.width, he, min_def, max_def]
+      grind)
+  · exact Or.inr (Or.inl (by
+      simp only [cutPiece, cutLeft, cutRight, Rectangle.width, he, min_def, max_def]
+      grind))
   · obtain ⟨h₀, h₁⟩ := halign hj
-    exact Or.inr (Or.inr (by constructor <;>
-      simp only [cutPiece, cutLeft, cutRight, Rectangle.width, he, h₀, h₁, min_def, max_def] <;>
-      split_ifs <;> linarith))
+    exact Or.inr (Or.inr (by
+      simp only [cutPiece, cutLeft, cutRight, Rectangle.width, he, h₀, h₁, min_def, max_def]
+      grind))
 
 /-- A tile that fills the strip at its own height leaves nothing behind. -/
 private lemma width_cutPiece_of_mem_strip (hn : Normalized R T H) {k : ι} (hk : H k)
@@ -508,7 +508,7 @@ private lemma width_cutPiece_of_mem_strip (hn : Normalized R T H) {k : ι} (hk :
     rw [cutAt, if_neg (by rw [hw, hkc]; linarith), if_neg (by rw [hkc]; linarith)]
   cases b <;>
     simp only [cutPiece, cutLeft, cutRight, Rectangle.width, he, ← hkc, hw, min_def, max_def] <;>
-    split_ifs <;> linarith
+    grind
 
 /-- A piece is nondegenerate exactly when it has positive width. -/
 private lemma width_ne_zero_iff {S : Rectangle} : S.x₀ < S.x₁ ↔ S.width ≠ 0 := by
@@ -533,11 +533,7 @@ theorem exists_normalized_cut (hn : Normalized R T H) (hs : Strip R T H R.y₀ R
   · rintro ⟨⟨j, b⟩, hprop⟩ hj
     have hne := width_ne_zero_iff.mp hprop.1
     rcases width_cutPiece_of_H hn hs hj with ⟨h₀, h₁⟩ | ⟨h₀, h₁⟩ | ⟨h₀, h₁⟩ <;> cases b <;>
-      first
-        | exact h₀
-        | exact h₁
-        | exact absurd h₀ hne
-        | exact absurd h₁ hne
+      grind [properTiles]
   · rintro ⟨⟨j, b⟩, hprop⟩ hj
     simpa only [Rectangle.height, properTiles, cutPiece_y₀, cutPiece_y₁] using
       hn.height_one j hj
@@ -552,13 +548,7 @@ theorem exists_normalized_cut (hn : Normalized R T H) (hs : Strip R T H R.y₀ R
       have hne' := width_ne_zero_iff.mp hprop'.1
       have hbb : b = b' := by
         rcases width_cutPiece_of_H hn hs hH with ⟨h₀, h₁⟩ | ⟨h₀, h₁⟩ | ⟨h₀, h₁⟩ <;>
-          cases b <;> cases b' <;>
-          first
-            | rfl
-            | exact absurd h₀ hne
-            | exact absurd h₁ hne
-            | exact absurd h₀ hne'
-            | exact absurd h₁ hne'
+          cases b <;> cases b' <;> grind
       subst hbb
       rfl
     · rintro ⟨⟨⟨⟨j, b⟩, hprop⟩, hH⟩, hmem⟩
@@ -820,9 +810,7 @@ private theorem strip_above_aux (hn : Normalized R T H) :
     have hlt : (T k).y₁ < (T k').y₁ := lt_of_le_of_lt hhi₀ hk'y₁
     have hdrop : ((edgeHeights R T).filter fun a ↦ (T k').y₁ < a ∧ a ≤ R.y₁).card <
         ((edgeHeights R T).filter fun a ↦ (T k).y₁ < a ∧ a ≤ R.y₁).card :=
-      Finset.card_lt_card ⟨fun a ha ↦ by
-        obtain ⟨h₁, h₂, h₃⟩ := Finset.mem_filter.mp ha
-        exact Finset.mem_filter.mpr ⟨h₁, hlt.trans h₂, h₃⟩, fun hcon ↦
+      Finset.card_lt_card ⟨fun a ha ↦ by grind, fun hcon ↦
         absurd (Finset.mem_filter.mp (hcon (Finset.mem_filter.mpr
           ⟨y₁_mem_edgeHeights k', hlt, hn.tiling.tile_y₁_le k'⟩))).2.1 (lt_irrefl _)⟩
     obtain ⟨c', hc', hc'k⟩ := ih _ (hdrop.trans_le hcard) k' hk' le_rfl

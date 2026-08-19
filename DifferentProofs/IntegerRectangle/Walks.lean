@@ -65,8 +65,7 @@ theorem walk_up {P : ι → Prop} {top : ℝ}
     push Not at hover
     refine ih _ (lt_of_lt_of_le (Finset.card_lt_card ⟨fun a ha ↦ ?_, fun hcon ↦ ?_⟩) hcard) s' hs'
       le_rfl y (by rw [hy]; exact hcase) hy₁
-    · obtain ⟨h₁, h₂, h₃⟩ := Finset.mem_filter.mp ha
-      exact Finset.mem_filter.mpr ⟨h₁, hgt.trans h₂, h₃⟩
+    · grind
     · exact absurd (Finset.mem_filter.mp (hcon (Finset.mem_filter.mpr
         ⟨y₁_mem_edgeHeights s', hgt, hover⟩))).2.1 (lt_irrefl _)
 
@@ -89,8 +88,7 @@ theorem walk_down {P : ι → Prop} {bot : ℝ}
     push Not at hunder
     refine ih _ (lt_of_lt_of_le (Finset.card_lt_card ⟨fun a ha ↦ ?_, fun hcon ↦ ?_⟩) hcard) s' hs'
       le_rfl y hy₀ (by rw [hy]; exact hcase)
-    · obtain ⟨h₁, h₂, h₃⟩ := Finset.mem_filter.mp ha
-      exact Finset.mem_filter.mpr ⟨h₁, h₂, h₃.trans hlt⟩
+    · grind
     · exact absurd (Finset.mem_filter.mp (hcon (Finset.mem_filter.mpr
         ⟨y₀_mem_edgeHeights s', hunder, hlt⟩))).2.2 (lt_irrefl _)
 
@@ -109,8 +107,7 @@ theorem walk_right (hT : IsTiling R T) {P : ι → Prop}
     · obtain ⟨j, hj, hgt⟩ := hstep i hi hlt
       refine ih _ (lt_of_lt_of_le (Finset.card_lt_card ⟨fun a ha ↦ ?_, fun hcon ↦ ?_⟩) hcard) j hj
         le_rfl
-      · obtain ⟨h₁, h₂, h₃⟩ := Finset.mem_filter.mp ha
-        exact Finset.mem_filter.mpr ⟨h₁, hgt.trans h₂, h₃⟩
+      · grind
       · exact absurd (Finset.mem_filter.mp (hcon (Finset.mem_filter.mpr
           ⟨x₁_mem_edgeAbscissae j, hgt, hT.tile_x₁_le j⟩))).2.1 (lt_irrefl _)
     · exact ⟨i, hi, heq⟩
@@ -128,8 +125,7 @@ theorem walk_left (hT : IsTiling R T) {P : ι → Prop}
     · obtain ⟨j, hj, hlt'⟩ := hstep i hi hlt
       refine ih _ (lt_of_lt_of_le (Finset.card_lt_card ⟨fun a ha ↦ ?_, fun hcon ↦ ?_⟩) hcard) j hj
         le_rfl
-      · obtain ⟨h₁, h₂, h₃⟩ := Finset.mem_filter.mp ha
-        exact Finset.mem_filter.mpr ⟨h₁, h₂, h₃.trans hlt'⟩
+      · grind
       · exact absurd (Finset.mem_filter.mp (hcon (Finset.mem_filter.mpr
           ⟨x₀_mem_edgeAbscissae j, hT.le_tile_x₀ j, hlt'⟩))).2.2 (lt_irrefl _)
     · exact ⟨i, hi, heq.symm⟩
@@ -152,8 +148,7 @@ theorem walk_down_until {P Goal : ι → Prop}
     obtain ⟨s', hs', hlt⟩ := hstep s hs hgoal
     refine ih _ (lt_of_lt_of_le (Finset.card_lt_card ⟨fun a ha ↦ ?_, fun hcon ↦ ?_⟩) hcard) s' hs'
       le_rfl
-    · obtain ⟨h₁, h₂⟩ := Finset.mem_filter.mp ha
-      exact Finset.mem_filter.mpr ⟨h₁, h₂.trans hlt⟩
+    · grind
     · exact absurd (Finset.mem_filter.mp (hcon (Finset.mem_filter.mpr
         ⟨y₀_mem_edgeHeights s', hlt⟩))).2 (lt_irrefl _)
 
