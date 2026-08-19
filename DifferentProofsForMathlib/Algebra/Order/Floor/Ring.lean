@@ -9,7 +9,11 @@ public import Mathlib.Algebra.Group.ModEq
 public import Mathlib.Algebra.Order.Floor.Ring
 
 /-!
-# Complements on `Int.ceil` and `Int.fract`
+# Complements on `Nat.floor`, `Int.ceil` and `Int.fract`
+
+`Nat.floor_intCast` is the `Nat.floor` companion of `Int.floor_intCast`: the natural floor of a
+cast integer is its truncation. Mathlib has `Nat.floor_natCast` and `Int.floor_intCast` but not
+this mixed case.
 
 `Int.ceil_eq_floor_iff_mem` completes the pair begun by
 `Int.ceil_eq_floor_add_one_iff_notMem`: ceiling and floor agree exactly at the integers.
@@ -20,10 +24,16 @@ a connection between `Int.fract` and `AddCommGroup.ModEq` that is currently miss
 subtracts the other way round (`AddCommGroup.modEq_iff_zsmul'`, `toIcoMod_eq_toIcoMod`), and
 `Int.fract_eq_fract'` records the orientation.
 
-All three are intended for `Mathlib/Algebra/Order/Floor/Ring.lean`.
+All four are intended for `Mathlib/Algebra/Order/Floor/Ring.lean`.
 -/
 
 @[expose] public section
+
+/-- **The natural floor of a cast integer is its truncation**, the `Nat.floor` companion of
+`Int.floor_intCast`. -/
+@[simp] theorem Nat.floor_intCast {R : Type*} [Ring R] [LinearOrder R] [IsOrderedRing R]
+    [FloorRing R] (z : ℤ) : ⌊(z : R)⌋₊ = z.toNat := by
+  rw [← Int.floor_toNat, Int.floor_intCast]
 
 namespace Int
 
