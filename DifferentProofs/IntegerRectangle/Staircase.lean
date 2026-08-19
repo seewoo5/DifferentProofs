@@ -729,6 +729,8 @@ private lemma strip_glue (hn : Normalized R T H) {a m mcap m' v v' : ℝ} {c' : 
       exact hup.mem y (not_le.mp hy) hy₁
   side j y hy₀ hy₁ hjy₀ hjy₁ := by
     by_cases hy : y ≤ m
+    -- heights of the bottom column are answered by `hcol`; a tile inside it reaches at most
+    -- `mcap`, and the glued strip stays at `v` all the way up there
     · rw [if_pos hy]
       rcases hcol j y hjy₀ hjy₁ hy₀ hy with h | h | ⟨h₀, h₁, h₂⟩
       · exact Or.inl h
@@ -738,6 +740,8 @@ private lemma strip_glue (hn : Normalized R T H) {a m mcap m' v v' : ℝ} {c' : 
         · rw [if_pos ht]
         · rw [if_neg ht]
           exact hcap t (not_le.mp ht) (ht₁.trans h₁)
+    -- heights of the staircase are answered by its own trichotomy; a tile inside it lies
+    -- above `m`, where the glued strip agrees with the staircase
     · rw [if_neg hy]
       rcases hup.side j y (not_le.mp hy) hy₁ hjy₀ hjy₁ with h | h | ⟨h₀, h₁, h₂, h₃⟩
       · exact Or.inl h
@@ -746,9 +750,12 @@ private lemma strip_glue (hn : Normalized R T H) {a m mcap m' v v' : ℝ} {c' : 
           fun t ht₀ ht₁ ↦ by rw [if_neg (by linarith : ¬ t ≤ m)]; exact h₂ t ht₀ ht₁, h₃⟩)
   consistent j y y' _ hy₁ _ hy'₁ hjy₀ hjy₁ hjy'₀ hjy'₁ hleft hright := by
     by_cases hy : y ≤ m <;> by_cases hy' : y' ≤ m
+    -- both heights in the bottom column: left and right of one line at once
     · rw [if_pos hy] at hleft
       rw [if_pos hy'] at hright
       linarith [(T j).hx]
+    -- left of the column at `y ≤ m`, right of the staircase at `m < y'`: probe the staircase
+    -- at `min y' m'`, a height of its first column that the tile still spans
     · rw [if_pos hy] at hleft
       rw [if_neg hy'] at hright
       push Not at hy'
@@ -757,10 +764,14 @@ private lemma strip_glue (hn : Normalized R T H) {a m mcap m' v v' : ℝ} {c' : 
       have ht₂ : (T j).y₀ < min y' m' := by linarith
       have htR : min y' m' ≤ R.y₁ := (min_le_left _ _).trans hy'₁
       rcases hup.side j _ ht₀ htR ht₂ ht₁ with h | h | ⟨h₀, -, -, -⟩
+      -- left of the staircase at the probe height, right of it at `y'`: its own consistency
       · exact hup.consistent j _ y' ht₀ htR hy' hy'₁ ht₂ ht₁ hjy'₀ hjy'₁ h hright
+      -- right of the first column: it overlaps the bottom column, so no room for the tile
       · rw [hnext _ ht₀ (min_le_right _ _)] at h
         linarith [(T j).hx]
+      -- inside the staircase: it would start above `m`, but the tile is alive at `y ≤ m`
       · linarith
+    -- the mirror image: left of the staircase at `m < y`, right of the column at `y' ≤ m`
     · rw [if_neg hy] at hleft
       rw [if_pos hy'] at hright
       push Not at hy
@@ -773,6 +784,7 @@ private lemma strip_glue (hn : Normalized R T H) {a m mcap m' v v' : ℝ} {c' : 
         linarith [(T j).hx]
       · exact hup.consistent j y _ hy hy₁ ht₀ htR hjy₀ hjy₁ ht₂ ht₁ hleft h
       · linarith
+    -- both heights on the staircase: its own consistency
     · rw [if_neg hy] at hleft
       rw [if_neg hy'] at hright
       push Not at hy hy'
