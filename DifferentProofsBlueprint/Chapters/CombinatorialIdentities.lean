@@ -2,9 +2,9 @@ import Verso
 import VersoManual
 import VersoBlueprint
 import DifferentProofs.CombinatorialIdentities.Defs
-import DifferentProofs.CombinatorialIdentities.DoubleCounting
-import DifferentProofs.CombinatorialIdentities.HockeyStick
-import DifferentProofs.CombinatorialIdentities.Pascal
+import DifferentProofs.CombinatorialIdentities.HockeyStick.DoubleCounting
+import DifferentProofs.CombinatorialIdentities.HockeyStick.Induction
+import DifferentProofs.CombinatorialIdentities.Pascal.Counting
 
 open Verso.Genre
 open Verso.Genre.Manual

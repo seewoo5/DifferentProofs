@@ -224,8 +224,8 @@ status:
     informal statements, proof sketches, and dependency graph; reusable supporting
     lemmas that could be upstreamed live in `DifferentProofsForMathlib/`.
   # Unresolved proof-development sorries, as of commit 5eb76df (2026-08-20):
-  #   DifferentProofs/InfinitudeOfPrimes/Dirichlet.lean          3
-  #   DifferentProofs/CombinatorialIdentities/Pascal.lean        1
+  #   DifferentProofs/InfinitudeOfPrimes/Dirichlet.lean             3
+  #   DifferentProofs/CombinatorialIdentities/Pascal/Counting.lean   1
   # Every other declaration in the project is sorry-free.
   sorry_count: 4
   sorry_in_definitions: 0
@@ -393,15 +393,15 @@ status:
 
     # --- Combinatorial identities ---
     - declaration: "PascalIdentity_counting"            # IN PROGRESS
-      file: "DifferentProofs/CombinatorialIdentities/Pascal.lean"
+      file: "DifferentProofs/CombinatorialIdentities/Pascal/Counting.lean"
       sorry_count: 1
       axioms: [sorryAx]
     - declaration: "HockeyStickIdentity_induction"
-      file: "DifferentProofs/CombinatorialIdentities/HockeyStick.lean"
+      file: "DifferentProofs/CombinatorialIdentities/HockeyStick/Induction.lean"
       sorry_count: 0
       axioms: *standard_axioms
     - declaration: "HockeyStickIdentity_doubleCounting"
-      file: "DifferentProofs/CombinatorialIdentities/DoubleCounting.lean"
+      file: "DifferentProofs/CombinatorialIdentities/HockeyStick/DoubleCounting.lean"
       sorry_count: 0
       axioms: *standard_axioms
 

@@ -6,7 +6,7 @@ public import DifferentProofs.CombinatorialIdentities.Defs
 
 open Finset
 
-namespace CombinatorialIdentities.DoubleCounting
+namespace CombinatorialIdentities.HockeyStick.DoubleCounting
 
 /-- The largest element of a nonempty finite set of naturals is one of its elements. -/
 private lemma sup_id_mem {S : Finset ℕ} (hS : S.Nonempty) : S.sup id ∈ S := by
@@ -54,9 +54,9 @@ private lemma card_eq_sum_fibers (n k : ℕ) :
   exact Finset.mem_Icc.mpr ⟨le_sup_id hS.2, Finset.sup_le fun x hx =>
     Nat.lt_succ_iff.mp (Finset.mem_range.mp (hS.1 hx))⟩
 
-end CombinatorialIdentities.DoubleCounting
+end CombinatorialIdentities.HockeyStick.DoubleCounting
 
-open CombinatorialIdentities.DoubleCounting in
+open CombinatorialIdentities.HockeyStick.DoubleCounting in
 /-- **Hockey-stick identity**, by counting the `(k + 1)`-element subsets of `{0, 1, …, n + k}`
 in two ways: directly, and after partitioning them according to their largest element `m`,
 which ranges over `k, k + 1, …, n + k`. -/

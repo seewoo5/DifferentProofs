@@ -45,8 +45,8 @@ This project contains formalizations of different proofs of the same mathematica
 
 The hockey-stick identity, $\sum_{i=0}^{n} \binom{i+k}{k} = \binom{n+k+1}{k+1}$.
 
-- [Using induction on n](DifferentProofs/CombinatorialIdentities/HockeyStick.lean)
-- [Using double counting](DifferentProofs/CombinatorialIdentities/DoubleCounting.lean)
+- [Using induction on n](DifferentProofs/CombinatorialIdentities/HockeyStick/Induction.lean)
+- [Using double counting](DifferentProofs/CombinatorialIdentities/HockeyStick/DoubleCounting.lean)
 
 ### Tiling a rectangle
 
