@@ -24,6 +24,8 @@ Combinatorial identities.
 For all $`n, k`, $`\binom{n}{k} + \binom{n}{k+1} = \binom{n+1}{k+1}`.
 :::
 
+Note that `Nat.choose` is "defined" via Pascal's identity. Still the following proofs are valid and compile.
+
 :::theorem "thm:pascal-identity-counting" (parent := "grp:comb-identities") (lean := "PascalIdentity_counting")
 Pascal's identity holds.
 :::
