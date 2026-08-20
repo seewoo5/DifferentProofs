@@ -20,6 +20,7 @@ public import DifferentProofs.InfinitudeOfPrimes.Euler
 public import DifferentProofs.InfinitudeOfPrimes.Goldbach
 public import DifferentProofs.InfinitudeOfPrimes.Saidak
 public import DifferentProofs.InfinitudeOfPrimes.Wunderlich
+public import DifferentProofs.InfinitudeOfPrimes.Zeta
 public import DifferentProofs.IntegerRectangle.Basic
 public import DifferentProofs.IntegerRectangle.BipartiteGraph
 public import DifferentProofs.IntegerRectangle.Cells

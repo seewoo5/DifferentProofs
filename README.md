@@ -21,6 +21,7 @@ This project contains formalizations of different proofs of the same mathematica
 - [Saidak's proof](DifferentProofs/InfinitudeOfPrimes/Saidak.lean)
 - [Wunderlich's proof](DifferentProofs/InfinitudeOfPrimes/Wunderlich.lean)
 - [Infinitely many primes in certain congruence classes](DifferentProofs/InfinitudeOfPrimes/Dirichlet.lean)
+- [Using the irrationality of π² and the Euler product for ζ(2)](DifferentProofs/InfinitudeOfPrimes/Zeta.lean)
 
 ### Irrationality of √2
 
