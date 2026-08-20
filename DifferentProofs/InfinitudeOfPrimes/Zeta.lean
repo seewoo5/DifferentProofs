@@ -30,14 +30,15 @@ theorem InfinitudeOfPrimes_Zeta : InfinitudeOfPrimes := by
   have hconst : ∀ n, N ≤ n → Nat.primesBelow n = Nat.primesBelow N := fun n hn ↦ by
     ext p
     grind [Nat.mem_primesBelow]
-  set q : ℚ := ∏ p ∈ Nat.primesBelow N, (1 - ((p : ℚ) ^ 2)⁻¹)⁻¹ with hq
+  set q : ℚ := ∏ p ∈ Nat.primesBelow N, (1 - (p : ℚ) ^ (-2 : ℤ))⁻¹ with hq
   have hzeta : riemannZeta 2 = (q : ℂ) := by
     refine tendsto_nhds_unique (riemannZeta_eulerProduct (by norm_num)) ?_
     refine Tendsto.congr' ?_ tendsto_const_nhds
     filter_upwards [eventually_ge_atTop N] with n hn
     rw [hconst n hn, hq]
     push_cast
-    exact prod_congr rfl fun p _ ↦ by rw [Complex.cpow_neg]; norm_num
+    exact prod_congr rfl fun p _ ↦ by
+      rw [show (-2 : ℂ) = ((-2 : ℤ) : ℂ) by norm_num, Complex.cpow_intCast]
   rw [riemannZeta_two] at hzeta
   have h : Real.pi ^ 2 / 6 = (q : ℝ) := by exact_mod_cast hzeta
   exact irrational_pi_sq ⟨6 * q, by push_cast; linarith⟩
