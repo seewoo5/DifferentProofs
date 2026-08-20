@@ -1,6 +1,7 @@
 module
 
 public import DifferentProofs.CombinatorialIdentities.Defs
+public import DifferentProofsForMathlib.Data.Finset.Powerset
 
 @[expose] public section
 
@@ -17,14 +18,15 @@ in `{0, 1, …, S.sup id}`. -/
 private lemma le_sup_id {S : Finset ℕ} {k : ℕ} (hcard : #S = k + 1) : k ≤ S.sup id := by
   simpa [hcard] using Finset.card_le_card S.subset_range_sup_succ
 
-/-- Deleting the largest element is a bijection from the `(k + 1)`-element subsets of
-`{0, 1, …, n + k}` whose largest element is `m` onto the `k`-element subsets of `{0, 1, …, m - 1}`;
-reinserting `m` is its inverse. Hence there are `m.choose k` of the former. -/
+/-- A `(k + 1)`-element subset of `{0, 1, …, n + k}` has largest element `m` exactly when it is a
+subset of `{0, 1, …, m}` containing `m`. Deleting `m` therefore leaves a `k`-element subset of
+`{0, 1, …, m - 1}`, so there are `m.choose k` such sets. -/
 private lemma card_fiber (n k m : ℕ) (hm : m ≤ n + k) :
     #{S ∈ (range (n + k + 1)).powersetCard (k + 1) | S.sup id = m} = m.choose k := by
-  rw [show m.choose k = #((range m).powersetCard k) by simp]
-  refine Finset.card_bij' (fun S _ => S.erase m) (fun T _ => insert m T) ?_ ?_ ?_ ?_ <;>
-    grind [sup_id_mem, Finset.card_pos, Finset.le_sup]
+  rw [show {S ∈ (range (n + k + 1)).powersetCard (k + 1) | S.sup id = m}
+      = {S ∈ (range (m + 1)).powersetCard (k + 1) | m ∈ S} by
+    ext S; grind [sup_id_mem, Finset.card_pos, Finset.le_sup]]
+  simpa using Finset.card_filter_mem_powersetCard_succ (self_mem_range_succ m) k
 
 /-- Sorting the `(k + 1)`-element subsets of `{0, 1, …, n + k}` by their largest element. -/
 private lemma card_eq_sum_fibers (n k : ℕ) :
