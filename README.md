@@ -46,6 +46,7 @@ This project contains formalizations of different proofs of the same mathematica
 Pascal's rule, $\binom{n}{k} + \binom{n}{k+1} = \binom{n+1}{k+1}$:
 
 - [Using double counting](DifferentProofs/CombinatorialIdentities/Pascal/Counting.lean)
+- [Using the binomial theorem](DifferentProofs/CombinatorialIdentities/Pascal/Binomial.lean)
 
 The hockey-stick identity, $\sum_{i=0}^{n} \binom{i+k}{k} = \binom{n+k+1}{k+1}$:
 

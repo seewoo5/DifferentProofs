@@ -3,6 +3,7 @@ import VersoManual
 import VersoBlueprint
 import DifferentProofs.CombinatorialIdentities.Defs
 import DifferentProofs.CombinatorialIdentities.HockeyStick.DoubleCounting
+import DifferentProofs.CombinatorialIdentities.Pascal.Binomial
 import DifferentProofs.CombinatorialIdentities.HockeyStick.Induction
 import DifferentProofs.CombinatorialIdentities.Pascal.Counting
 
@@ -35,6 +36,19 @@ element $`n`: deleting $`n` is a bijection between those that do and the subsets
 cardinality $`k` of $`\{0, 1, \dots, n-1\}`, of which there are $`\binom{n}{k}`,
 while those that do not are exactly the subsets of cardinality $`k + 1` of
 $`\{0, 1, \dots, n-1\}`, of which there are $`\binom{n}{k+1}`.
+:::
+
+:::theorem "thm:pascal-identity-binomial" (parent := "grp:comb-identities") (lean := "PascalIdentity_binomial")
+Pascal's identity holds.
+:::
+
+:::proof "thm:pascal-identity-binomial"
+Compare the coefficients of $`X^{k+1}` on the two sides of
+$`(1 + X)^{n+1} = (1 + X)(1 + X)^n`.
+By the binomial theorem, which is proved by induction on $`n`, the coefficient of $`X^j`
+in $`(1 + X)^n` is $`\binom{n}{j}`. So the left-hand side contributes $`\binom{n+1}{k+1}`,
+while multiplying by $`1 + X` adds a copy of the coefficients shifted by one, making the
+right-hand side $`\binom{n}{k+1} + \binom{n}{k}`.
 :::
 
 :::definition "def:hockey-stick-identity" (parent := "grp:comb-identities") (lean := "HockeyStickIdentity")

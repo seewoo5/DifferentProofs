@@ -219,8 +219,8 @@ status:
     pair for the classes 1 and 3 mod 4), the irrationality of sqrt 2 (3 proofs),
     Fermat's theorem on sums of two squares (4 proofs), the Basel problem (2 proofs),
     the integer-rectangle tiling theorem of Wagon (12 of his 14 proofs), and two
-    combinatorial identities (Pascal's rule, and the hockey-stick identity two
-    ways). A Verso blueprint under `DifferentProofsBlueprint/` records the
+    combinatorial identities (Pascal's rule and the hockey-stick identity, each
+    proved two ways). A Verso blueprint under `DifferentProofsBlueprint/` records the
     informal statements, proof sketches, and dependency graph; reusable supporting
     lemmas that could be upstreamed live in `DifferentProofsForMathlib/`.
   # Unresolved proof-development sorries, as of commit 5eb76df (2026-08-20):
@@ -395,6 +395,10 @@ status:
       file: "DifferentProofs/CombinatorialIdentities/Pascal/Counting.lean"
       sorry_count: 0
       axioms: *standard_axioms
+    - declaration: "PascalIdentity_binomial"
+      file: "DifferentProofs/CombinatorialIdentities/Pascal/Binomial.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
     - declaration: "HockeyStickIdentity_induction"
       file: "DifferentProofs/CombinatorialIdentities/HockeyStick/Induction.lean"
       sorry_count: 0
@@ -562,7 +566,7 @@ alignment:
       lean: "PascalIdentity"
       module: "DifferentProofs.CombinatorialIdentities.Defs"
       status: "proved"
-      note: "Proved by double counting."
+      note: "Proved two ways: double counting, and the binomial theorem."
     - source: "Hockey-stick identity"
       lean: "HockeyStickIdentity"
       module: "DifferentProofs.CombinatorialIdentities.Defs"

@@ -17,8 +17,8 @@ theorem PascalIdentity_counting : PascalIdentity := by
   calc n.choose k + n.choose (k + 1)
       = #{S ∈ (range (n + 1)).powersetCard (k + 1) | n ∈ S}
         + #{S ∈ (range (n + 1)).powersetCard (k + 1) | n ∉ S} := by
-        rw [Finset.card_filter_mem_powersetCard_succ (self_mem_range_succ n),
-          Finset.filter_notMem_powersetCard, show (range (n + 1)).erase n = range n by grind]
-        simp
+          rw [Finset.card_filter_mem_powersetCard_succ (self_mem_range_succ n),
+            Finset.filter_notMem_powersetCard, show (range (n + 1)).erase n = range n by grind]
+          simp only [card_powersetCard, card_range]
     _ = #((range (n + 1)).powersetCard (k + 1)) := Finset.card_filter_add_card_filter_not _
-    _ = (n + 1).choose (k + 1) := by simp
+    _ = (n + 1).choose (k + 1) := by simp only [card_powersetCard, card_range]
