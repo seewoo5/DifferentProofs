@@ -20,26 +20,29 @@ Combinatorial identities.
 :::
 
 :::definition "def:pascal-identity" (parent := "grp:comb-identities") (lean := "PascalIdentity")
-Pascal's identity says that
-$`\binom{n}{k} + \binom{n}{k+1} = \binom{n+1}{k+1}`.
+For all $`n, k`, $`\binom{n}{k} + \binom{n}{k+1} = \binom{n+1}{k+1}`.
 :::
 
 :::theorem "thm:pascal-identity-counting" (parent := "grp:comb-identities") (lean := "PascalIdentity_counting")
-Pascal's identity holds by a counting argument.
+Pascal's identity holds.
 :::
 
 :::proof "thm:pascal-identity-counting"
-Count subsets of cardinality $`k + 1` in a set with $`n + 1` elements,
-according to whether they contain a distinguished element.
+Count the subsets of cardinality $`k + 1` of $`\{0, 1, \dots, n\}` in two ways.
+There are $`\binom{n+1}{k+1}` of them.
+On the other hand, split them according to whether they contain the distinguished
+element $`n`: deleting $`n` is a bijection between those that do and the subsets of
+cardinality $`k` of $`\{0, 1, \dots, n-1\}`, of which there are $`\binom{n}{k}`,
+while those that do not are exactly the subsets of cardinality $`k + 1` of
+$`\{0, 1, \dots, n-1\}`, of which there are $`\binom{n}{k+1}`.
 :::
 
 :::definition "def:hockey-stick-identity" (parent := "grp:comb-identities") (lean := "HockeyStickIdentity")
-The hockey-stick identity says that
-$`\sum_{i=0}^{n} \binom{i+k}{k} = \binom{n+k+1}{k+1}`.
+For all $`n, k`, $`\sum_{i=0}^{n} \binom{i+k}{k} = \binom{n+k+1}{k+1}`.
 :::
 
 :::theorem "thm:hockey-stick-identity-induction" (parent := "grp:comb-identities") (lean := "HockeyStickIdentity_induction")
-The hockey-stick identity holds by induction.
+The hockey-stick identity holds.
 :::
 
 :::proof "thm:hockey-stick-identity-induction"
@@ -48,7 +51,7 @@ Pascal's identity at the end of the diagonal.
 :::
 
 :::theorem "thm:hockey-stick-identity-double-counting" (parent := "grp:comb-identities") (lean := "HockeyStickIdentity_doubleCounting")
-The hockey-stick identity holds by double counting.
+The hockey-stick identity holds.
 :::
 
 :::proof "thm:hockey-stick-identity-double-counting"

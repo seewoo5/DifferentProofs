@@ -43,7 +43,11 @@ This project contains formalizations of different proofs of the same mathematica
 
 ### Combinatorial identities
 
-The hockey-stick identity, $\sum_{i=0}^{n} \binom{i+k}{k} = \binom{n+k+1}{k+1}$.
+Pascal's rule, $\binom{n}{k} + \binom{n}{k+1} = \binom{n+1}{k+1}$:
+
+- [Using double counting](DifferentProofs/CombinatorialIdentities/Pascal/Counting.lean)
+
+The hockey-stick identity, $\sum_{i=0}^{n} \binom{i+k}{k} = \binom{n+k+1}{k+1}$:
 
 - [Using induction on n](DifferentProofs/CombinatorialIdentities/HockeyStick/Induction.lean)
 - [Using double counting](DifferentProofs/CombinatorialIdentities/HockeyStick/DoubleCounting.lean)
