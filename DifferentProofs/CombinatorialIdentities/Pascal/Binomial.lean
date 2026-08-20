@@ -16,9 +16,9 @@ theorem PascalIdentity_binomial : PascalIdentity := by
   rw [PascalIdentity]
   intro n k
   calc n.choose k + n.choose (k + 1)
-      = ((1 + X : ℕ[X]) * (1 + X) ^ n).coeff (k + 1) := by
+      = ((1 + X) * (1 + X) ^ n).coeff (k + 1) := by
         rw [add_mul, one_mul, Polynomial.coeff_add, Polynomial.coeff_X_mul,
           Polynomial.coeff_one_add_X_pow, Polynomial.coeff_one_add_X_pow]
         simp [Nat.add_comm]
-    _ = ((1 + X : ℕ[X]) ^ (n + 1)).coeff (k + 1) := by rw [pow_succ']
+    _ = ((1 + X) ^ (n + 1)).coeff (k + 1) := by rw [pow_succ']
     _ = (n + 1).choose (k + 1) := Polynomial.coeff_one_add_X_pow ℕ (n + 1) (k + 1)
