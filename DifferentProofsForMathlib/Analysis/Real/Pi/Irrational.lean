@@ -52,30 +52,27 @@ private lemma hasDerivAt_pi_mul (x : ℝ) : HasDerivAt (fun y : ℝ ↦ π * y) 
 /-- Integrating by parts twice: if `u` vanishes at both endpoints of `[0, 1]`, then
 `∫ u'' * sin (π * x) = -π ^ 2 * ∫ u * sin (π * x)`.
 
-Rather than invoking integration by parts twice and collecting boundary terms, the proof
-exhibits the combined antiderivative `F = u' * sin (π * x) - π * u * cos (π * x)` of the sum
-`u'' * sin (π * x) + π ^ 2 * u * sin (π * x)` and evaluates it by the fundamental theorem of
-calculus; `F` vanishes at both endpoints because `sin 0 = sin π = 0` and `u 0 = u 1 = 0`. -/
+The first integration by parts moves the derivative off `u'`; its boundary term vanishes
+because `sin 0 = sin π = 0`. The second moves it off `u`; its boundary term vanishes
+because `u 0 = u 1 = 0`. -/
 private lemma integral_deriv_two_mul_sin {u u' u'' : ℝ → ℝ}
     (hu : ∀ x, HasDerivAt u (u' x) x) (hu' : ∀ x, HasDerivAt u' (u'' x) x)
     (hc : Continuous u'') (h0 : u 0 = 0) (h1 : u 1 = 0) :
     ∫ x in (0 : ℝ)..1, u'' x * sin (π * x) = -π ^ 2 * ∫ x in (0 : ℝ)..1, u x * sin (π * x) := by
-  have hi1 : IntervalIntegrable (fun x ↦ u'' x * sin (π * x)) volume 0 1 :=
-    (hc.mul (by fun_prop)).intervalIntegrable _ _
-  have hi2 : IntervalIntegrable (fun x ↦ π ^ 2 * (u x * sin (π * x))) volume 0 1 :=
-    (continuous_const.mul ((continuous_iff_continuousAt.2 fun x ↦ (hu x).continuousAt).mul
-      (by fun_prop))).intervalIntegrable _ _
-  have hF : ∀ x ∈ uIcc (0 : ℝ) 1,
-      HasDerivAt (fun y ↦ u' y * sin (π * y) - π * (u y * cos (π * y)))
-        (u'' x * sin (π * x) + π ^ 2 * (u x * sin (π * x))) x := fun x _ ↦
-    (((hu' x).mul (hasDerivAt_pi_mul x).sin).sub
-      (((hu x).mul (hasDerivAt_pi_mul x).cos).const_mul π)).congr_deriv (by ring)
-  have key : (∫ x in (0 : ℝ)..1, u'' x * sin (π * x)) +
-      π ^ 2 * ∫ x in (0 : ℝ)..1, u x * sin (π * x) = 0 := by
-    rw [← intervalIntegral.integral_const_mul, ← integral_add hi1 hi2,
-      integral_eq_sub_of_hasDerivAt hF (hi1.add hi2)]
-    simp [h0, h1]
-  linarith
+  have ibp1 := intervalIntegral.integral_mul_deriv_eq_deriv_mul (a := 0) (b := 1)
+    (fun x _ ↦ (hasDerivAt_pi_mul x).sin.congr_deriv (mul_comm _ _)) (fun x _ ↦ hu' x)
+    ((by fun_prop : Continuous fun x : ℝ ↦ π * cos (π * x)).intervalIntegrable _ _)
+    (hc.intervalIntegrable _ _)
+  have ibp2 := intervalIntegral.integral_mul_deriv_eq_deriv_mul (a := 0) (b := 1)
+    (fun x _ ↦ (hasDerivAt_pi_mul x).cos.congr_deriv (by ring)) (fun x _ ↦ hu x)
+    ((by fun_prop : Continuous fun x : ℝ ↦ -(π * sin (π * x))).intervalIntegrable _ _)
+    ((continuous_iff_continuousAt.2 fun x ↦ (hu' x).continuousAt).intervalIntegrable _ _)
+  simp only [mul_one, mul_zero, sin_pi, sin_zero, zero_mul, sub_zero, zero_sub, h0, h1, neg_mul,
+    mul_assoc, intervalIntegral.integral_const_mul, intervalIntegral.integral_neg, neg_neg]
+    at ibp1 ibp2
+  simp_rw [mul_comm (u'' _), mul_comm (u _)]
+  rw [ibp1, ibp2]
+  ring
 
 private lemma I_zero : I 0 = 2 / π := by
   have h : ∀ x ∈ uIcc (0 : ℝ) 1,
