@@ -2,6 +2,7 @@ import Verso
 import VersoManual
 import VersoBlueprint
 import DifferentProofs.CombinatorialIdentities.Defs
+import DifferentProofs.CombinatorialIdentities.DoubleCounting
 import DifferentProofs.CombinatorialIdentities.HockeyStick
 import DifferentProofs.CombinatorialIdentities.Pascal
 
@@ -44,4 +45,18 @@ The hockey-stick identity holds by induction.
 :::proof "thm:hockey-stick-identity-induction"
 Induct on $`n`. The successor step adds the last summand and then uses
 Pascal's identity at the end of the diagonal.
+:::
+
+:::theorem "thm:hockey-stick-identity-double-counting" (parent := "grp:comb-identities") (lean := "HockeyStickIdentity_doubleCounting")
+The hockey-stick identity holds by double counting.
+:::
+
+:::proof "thm:hockey-stick-identity-double-counting"
+Count the subsets of cardinality $`k + 1` of $`\{0, 1, \dots, n + k\}` in two ways.
+There are $`\binom{n+k+1}{k+1}` of them.
+On the other hand, sort them by their largest element $`m`, which ranges over
+$`k, k+1, \dots, n+k`: deleting $`m` is a bijection between the subsets with largest
+element $`m` and the subsets of cardinality $`k` of $`\{0, 1, \dots, m-1\}`, of which
+there are $`\binom{m}{k}`. Summing over $`m = i + k` for $`0 \le i \le n` gives the
+left-hand side.
 :::

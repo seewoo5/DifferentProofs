@@ -41,6 +41,13 @@ This project contains formalizations of different proofs of the same mathematica
 - [Using Parseval's identity](DifferentProofs/BaselProblem/Parseval.lean)
 - [Using Cauchy's cotangent squeeze](DifferentProofs/BaselProblem/Cauchy.lean)
 
+### Combinatorial identities
+
+The hockey-stick identity, $\sum_{i=0}^{n} \binom{i+k}{k} = \binom{n+k+1}{k+1}$.
+
+- [Using induction on n](DifferentProofs/CombinatorialIdentities/HockeyStick.lean)
+- [Using double counting](DifferentProofs/CombinatorialIdentities/DoubleCounting.lean)
+
 ### Tiling a rectangle
 
 A rectangle tiled by rectangles each having an integer side has an integer side

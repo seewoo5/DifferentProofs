@@ -219,16 +219,15 @@ status:
     pair for the classes 1 and 3 mod 4), the irrationality of sqrt 2 (3 proofs),
     Fermat's theorem on sums of two squares (4 proofs), the Basel problem (2 proofs),
     the integer-rectangle tiling theorem of Wagon (12 of his 14 proofs), and two
-    combinatorial identities (statements only, proofs still open). A Verso blueprint
-    under `DifferentProofsBlueprint/` records the informal statements, proof sketches,
-    and dependency graph; reusable supporting lemmas that could be upstreamed live in
-    `DifferentProofsForMathlib/`.
+    combinatorial identities (the hockey-stick identity two ways; Pascal's rule is
+    still open). A Verso blueprint under `DifferentProofsBlueprint/` records the
+    informal statements, proof sketches, and dependency graph; reusable supporting
+    lemmas that could be upstreamed live in `DifferentProofsForMathlib/`.
   # Unresolved proof-development sorries, as of commit 5eb76df (2026-08-20):
   #   DifferentProofs/InfinitudeOfPrimes/Dirichlet.lean          3
   #   DifferentProofs/CombinatorialIdentities/Pascal.lean        1
-  #   DifferentProofs/CombinatorialIdentities/HockeyStick.lean   1
   # Every other declaration in the project is sorry-free.
-  sorry_count: 5
+  sorry_count: 4
   sorry_in_definitions: 0
   axioms: &standard_axioms
     - propext
@@ -392,15 +391,19 @@ status:
       sorry_count: 0
       axioms: *standard_axioms
 
-    # --- Combinatorial identities (statements only so far) ---
+    # --- Combinatorial identities ---
     - declaration: "PascalIdentity_counting"            # IN PROGRESS
       file: "DifferentProofs/CombinatorialIdentities/Pascal.lean"
       sorry_count: 1
       axioms: [sorryAx]
-    - declaration: "HockeyStickIdentity_induction"      # IN PROGRESS
+    - declaration: "HockeyStickIdentity_induction"
       file: "DifferentProofs/CombinatorialIdentities/HockeyStick.lean"
-      sorry_count: 1
-      axioms: [propext, Classical.choice, Quot.sound, sorryAx]
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "HockeyStickIdentity_doubleCounting"
+      file: "DifferentProofs/CombinatorialIdentities/DoubleCounting.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
 
 # how it was produced. Extra per-entry fields are allowed.
 automation:                    # [required]
@@ -564,8 +567,8 @@ alignment:
     - source: "Hockey-stick identity"
       lean: "HockeyStickIdentity"
       module: "DifferentProofs.CombinatorialIdentities.Defs"
-      status: "in-progress"
-      note: "Statement only; `HockeyStickIdentity_induction` is still `sorry`."
+      status: "proved"
+      note: "Proved two ways: induction on `n`, and double counting."
 
     # Wagon's fourteen proofs, in the paper's order.
     - source: "Wagon, Proof 1 (complex double integral, de Bruijn)"
