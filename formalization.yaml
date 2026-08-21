@@ -128,6 +128,15 @@ sources:                       # [required] list of sources or an original proof
     license: "CC BY-SA (Math StackExchange contributor content)"
     author_endorsement: "not-contacted"
 
+  - title: "Euclid-style proofs that there are infinitely many primes congruent to 1 and to 3 mod 4"
+    authors: []
+    id: ""                     # classical special cases of Dirichlet's theorem
+    type: "folklore"
+    location: ""
+    relationship: "formalizes"
+    license: ""
+    author_endorsement: "n/a"
+
   - title: "Proofs of Fermat's little theorem (Wikipedia)"
     authors: []                # collectively authored
     id: "https://en.wikipedia.org/wiki/Proofs_of_Fermat%27s_little_theorem"
@@ -215,28 +224,20 @@ status:
     statement, so that the proofs can be compared side by side. Each theorem family
     fixes one `Prop`-valued statement in a `Defs.lean` file, and every proof in that
     family proves exactly that `Prop`. Currently covered: Fermat's little theorem
-    (4 proofs), the infinitude of primes (7 proofs, plus an in-progress Dirichlet-style
-    pair for the classes 1 and 3 mod 4), the irrationality of sqrt 2 (3 proofs),
+    (4 proofs), the infinitude of primes (9 proofs, including a Dirichlet-style pair
+    for the classes 1 and 3 mod 4), the irrationality of sqrt 2 (3 proofs),
     Fermat's theorem on sums of two squares (4 proofs), the Basel problem (2 proofs),
     the integer-rectangle tiling theorem of Wagon (12 of his 14 proofs), and two
     combinatorial identities (Pascal's rule and the hockey-stick identity, each
     proved two ways). A Verso blueprint under `DifferentProofsBlueprint/` records the
     informal statements, proof sketches, and dependency graph; reusable supporting
     lemmas that could be upstreamed live in `DifferentProofsForMathlib/`.
-  # Unresolved proof-development sorries, as of commit 5eb76df (2026-08-20):
-  #   DifferentProofs/InfinitudeOfPrimes/Dirichlet.lean   3
-  # Every other declaration in the project is sorry-free.
-  sorry_count: 3
+  sorry_count: 0
   sorry_in_definitions: 0
   axioms: &standard_axioms
     - propext
     - Classical.choice
     - Quot.sound
-  # `sorryAx` additionally occurs in exactly the five unfinished proofs counted above
-  # and in the four results below that depend on them; it appears in no other
-  # declaration. Verified with `#print axioms` against a `lake env lean` file
-  # importing `DifferentProofs`.
-  #
   # No result in this project has literature dependencies: every proof is complete
   # down to mathlib and the three standard axioms. The project does not use
   # leanprover/comparator, so `comparator_config` is omitted throughout.
@@ -288,14 +289,14 @@ status:
       file: "DifferentProofs/InfinitudeOfPrimes/Zeta.lean"
       sorry_count: 0
       axioms: *standard_axioms
-    - declaration: "InfinitudeOfPrimes_from_one_four"   # IN PROGRESS
+    - declaration: "InfinitudeOfPrimes_from_one_four"
       file: "DifferentProofs/InfinitudeOfPrimes/Dirichlet.lean"
-      sorry_count: 1
-      axioms: [propext, Classical.choice, Quot.sound, sorryAx]
-    - declaration: "InfinitudeOfPrimes_from_three_four" # IN PROGRESS
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "InfinitudeOfPrimes_from_three_four"
       file: "DifferentProofs/InfinitudeOfPrimes/Dirichlet.lean"
-      sorry_count: 2
-      axioms: [propext, Classical.choice, Quot.sound, sorryAx]
+      sorry_count: 0
+      axioms: *standard_axioms
 
     # --- Irrationality of sqrt 2 (statement: `IrrationalSqrtTwo`) ---
     - declaration: "IrrationalSqrtTwo_Descent"
@@ -504,7 +505,7 @@ fidelity:
     - Wunderlich's argument is adapted: the formalization uses F_37 = 73 * 149 * 2221
       as its concrete Fibonacci number with three distinct prime factors.
     - The Dirichlet-style file covers only the residue classes 1 and 3 mod 4, not
-      Dirichlet's theorem in general, and its proofs are still incomplete.
+      Dirichlet's theorem in general.
     - Reusable supporting results are stated in mathlib-friendly generality under
       `DifferentProofsForMathlib/`, mirroring mathlib's directory layout, rather
       than in the narrow form each proof needs.
@@ -541,7 +542,7 @@ alignment:
       lean: "InfinitudeOfPrimes"
       module: "DifferentProofs.InfinitudeOfPrimes.Defs"
       status: "proved"
-      note: "Proved seven ways; the Dirichlet-style variants for 1 and 3 mod 4 are in progress."
+      note: "Proved nine ways, including Dirichlet-style variants for the classes 1 and 3 mod 4."
     - source: "Irrationality of sqrt 2"
       lean: "IrrationalSqrtTwo"
       module: "DifferentProofs.IrrationalSqrtTwo.Defs"
