@@ -283,6 +283,9 @@ private lemma alkauskas_step (d : ℤ) {p : ℕ} (hp : p.Prime) :
   rw [coeff_W_f d hp.pos, coeff_W_partialProduct hp a ha1] at key
   exact ⟨a p, by linarith [key]⟩
 
+end FermatLittleTheorem.Alkauskas
+
+open FermatLittleTheorem.Alkauskas in
 theorem FermatLittleTheorem_Alkauskas : FermatLittleTheorem := by
   apply FermatLittleTheoremNat_impl_FermatLittleTheorem
   intro p a hp
@@ -293,5 +296,3 @@ theorem FermatLittleTheorem_Alkauskas : FermatLittleTheorem := by
       rw [Nat.modEq_iff_dvd, show (((d ^ p + 1 : ℕ) : ℤ) - ((d + 1) ^ p : ℕ)) =
           -(((d : ℤ) + 1) ^ p - (d : ℤ) ^ p - 1) by push_cast; ring]
       exact (alkauskas_step (d : ℤ) hp).neg_right
-
-end FermatLittleTheorem.Alkauskas

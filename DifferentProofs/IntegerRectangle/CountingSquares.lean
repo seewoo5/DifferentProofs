@@ -81,6 +81,9 @@ theorem sum_cellCount (hT : IsTiling R T) (a b : ℝ) :
   simp only [cellCount]
   exact_mod_cast key
 
+end IntegerRectangle.CountingSquares
+
+open IntegerRectangle IntegerRectangle.CountingSquares in
 /-- **Counting-squares proof** (Ruzsa, Gilbert) of the integer-rectangle tiling theorem. Base the
 half-unit grid at the lower-left corner of `R`. Every tile has an integer side, hence covers an
 even number of squares, and therefore so does `R`. The corner of `R` has grid coordinate `0`, so
@@ -95,5 +98,3 @@ theorem IntegerRectangleTheorem_CountingSquares : IntegerRectangleTheorem := by
       fun ⟨n, hh⟩ ↦ (even_cellIndex_sub R.y₀ (by simpa [Rectangle.height] using hh)).mul_left _
   simpa only [Rectangle.HasIntegerSide, Rectangle.width, Rectangle.height, cellCount,
     cellIndex_self, sub_zero, Int.even_mul, even_cellIndex_iff] using hR
-
-end IntegerRectangle.CountingSquares

@@ -3,7 +3,7 @@
   "solution_module": "DifferentProofs",
   "theorem_names": [
     "FermatLittleTheorem_Binomial",
-    "FermatLittleTheorem.Alkauskas.FermatLittleTheorem_Alkauskas",
+    "FermatLittleTheorem_Alkauskas",
     "FermatLittleTheorem_Lagrange",
     "FermatLittleTheorem_Dynamical"
   ],

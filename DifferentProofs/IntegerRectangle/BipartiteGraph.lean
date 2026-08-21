@@ -91,6 +91,9 @@ private lemma mem_latticeIcc_iff_mem_latticeIcc {a b u w : ℝ} (hu : u ∈ Set.
 
 /-! ### The proof -/
 
+end IntegerRectangle.BipartiteGraph
+
+open IntegerRectangle IntegerRectangle.BipartiteGraph in
 /-- **Bipartite-graph proof** (Wagon's variation on Paterson's Eulerian-path proof) of the
 integer-rectangle tiling theorem. Take for `X` and `Y` the lattices through the lower-left corner
 of `R`, so that a tile with an integer side has both or neither of its edges in that direction on
@@ -116,5 +119,3 @@ theorem IntegerRectangleTheorem_BipartiteGraph : IntegerRectangleTheorem := by
     if_pos ((mem_latticeIcc le_rfl R.hy).mpr ⟨0, by simp⟩),
     if_neg fun hy ↦ hcon.2 ((mem_latticeIcc R.hy le_rfl).mp hy)] at key
   simp at key
-
-end IntegerRectangle.BipartiteGraph

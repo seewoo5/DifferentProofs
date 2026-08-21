@@ -42,6 +42,9 @@ private lemma integral_Icc_e_eq_zero_iff {a b : ℝ} (hab : a ≤ b) :
     mul_right_inj' Complex.two_pi_I_ne_zero]
   norm_cast
 
+end IntegerRectangle.ComplexIntegral
+
+open IntegerRectangle IntegerRectangle.ComplexIntegral in
 /-- **Complex double-integral proof** (de Bruijn) of the integer-rectangle tiling theorem. -/
 theorem IntegerRectangleTheorem_ComplexIntegral : IntegerRectangleTheorem := by
   intro ι _ R T hT hsides
@@ -52,5 +55,3 @@ theorem IntegerRectangleTheorem_ComplexIntegral : IntegerRectangleTheorem := by
     (integral_Icc_e_eq_zero_iff (T i).hx).mpr (integral_Icc_e_eq_zero_iff (T i).hy).mpr
   exact (hT.prod_integral_dichotomy hint htile).imp
     (integral_Icc_e_eq_zero_iff R.hx).mp (integral_Icc_e_eq_zero_iff R.hy).mp
-
-end IntegerRectangle.ComplexIntegral

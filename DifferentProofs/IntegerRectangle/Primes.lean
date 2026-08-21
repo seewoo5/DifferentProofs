@@ -113,6 +113,9 @@ private lemma exists_forall_le_abs_sub {x : ℝ} (h : ¬∃ n : ℤ, x = n) :
     ∃ δ > 0, ∀ n : ℤ, δ ≤ |x - n| :=
   ⟨|x - round x|, abs_sub_pos.mpr fun heq ↦ h ⟨round x, heq⟩, round_le x⟩
 
+end IntegerRectangle.Primes
+
+open IntegerRectangle IntegerRectangle.Primes in
 /-- **Prime-numbers proof** (Robinson) of the integer-rectangle tiling theorem. -/
 theorem IntegerRectangleTheorem_Primes : IntegerRectangleTheorem := by
   intro ι _ R T hT hsides
@@ -132,5 +135,3 @@ theorem IntegerRectangleTheorem_Primes : IntegerRectangleTheorem := by
   rcases exists_side_near_int hT hsides hp with ⟨n, hn⟩ | ⟨n, hn⟩
   · exact absurd hn (not_lt.mpr (hpw.le.trans (hw n)))
   · exact absurd hn (not_lt.mpr (hph.le.trans (hh n)))
-
-end IntegerRectangle.Primes

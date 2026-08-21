@@ -12,6 +12,6 @@ guarantees and how to run it.
 
 @[expose] public section
 
-theorem BaselProblem.Cauchy.BaselProblem_Cauchy : BaselProblem := sorry
+theorem BaselProblem_Cauchy : BaselProblem := sorry
 
-theorem BaselProblem.BaselProblem_Parseval : BaselProblem := sorry
+theorem BaselProblem_Parseval : BaselProblem := sorry

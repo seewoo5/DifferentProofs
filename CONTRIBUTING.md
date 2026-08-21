@@ -21,13 +21,50 @@ and blueprint where appropriate.
 Also record the new theorem in the Comparator challenge, so that CI checks it
 proves the intended statement and nothing weaker. This means adding the
 statement to `DifferentProofsChallenge/<Topic>.lean` and the theorem's fully
-qualified name — several proofs live in a namespace, so for example
-`IntegerRectangle.Polynomials.IntegerRectangleTheorem_Polynomials` rather than
-the short form in the source file — to `comparator/<Topic>.json`. See the
+qualified name to `comparator/<Topic>.json`. Headline theorems live in the root
+namespace (see [Namespaces](#namespaces) below), so that is the same short name
+the source file uses, for example `IntegerRectangleTheorem_Polynomials`. See the
 [README](README.md#verifying-that-the-proofs-prove-the-same-thing) for what the
 check guarantees and how to run it locally. Every headline theorem in the
 project is listed, so a new one should be too; a proof that still contains a
 `sorry` cannot be, since Comparator rejects `sorryAx`.
+
+## Namespaces
+
+Namespacing follows the directory layout, with one exception for the headline
+names that the rest of the project refers to.
+
+- The statement definitions in `DifferentProofs/<Topic>/Defs.lean`, the
+  statement-level bridging results in `<Topic>/Basic.lean`, and the headline
+  theorem of each proof live in the **root** namespace. Their names already
+  say which theorem family and which proof they belong to — `BaselProblem`,
+  `BaselProblem_Cauchy`, `IntegerRectangleTheorem_Polynomials` — and those are
+  the names used in `comparator/<Topic>.json`, in the blueprint's
+  `(lean := "...")` options, and in `formalization.yaml`.
+- Everything else is namespaced after the module it lives in. Definitions and
+  lemmas used by a single proof go in `namespace <Topic>.<Proof>`, mirroring the
+  path under `DifferentProofs/`, as in `InfinitudeOfPrimes.Saidak` or
+  `CombinatorialIdentities.HockeyStick.DoubleCounting`. Material shared by
+  several proofs of one family goes in `namespace <Topic>`.
+
+So a proof file closes its namespace before stating its headline theorem:
+
+```lean
+namespace InfinitudeOfPrimes.Saidak
+
+def a : ℕ → ℕ
+  | 0 => 2
+  | n + 1 => a n * (a n + 1)
+
+end InfinitudeOfPrimes.Saidak
+
+open InfinitudeOfPrimes.Saidak in
+theorem InfinitudeOfPrimes_Saidak : InfinitudeOfPrimes := ...
+```
+
+A proof that needs no helpers needs no namespace, and states its theorem
+directly. Material under `DifferentProofsForMathlib/` follows mathlib's
+namespaces instead of this scheme.
 
 ## Formalizations that may belong in mathlib
 

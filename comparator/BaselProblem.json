@@ -2,8 +2,8 @@
   "challenge_module": "DifferentProofsChallenge.BaselProblem",
   "solution_module": "DifferentProofs",
   "theorem_names": [
-    "BaselProblem.Cauchy.BaselProblem_Cauchy",
-    "BaselProblem.BaselProblem_Parseval"
+    "BaselProblem_Cauchy",
+    "BaselProblem_Parseval"
   ],
   "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"],
   "enable_nanoda": false

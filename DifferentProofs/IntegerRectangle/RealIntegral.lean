@@ -57,6 +57,9 @@ private lemma integral_Icc_sinShift_self_eq_zero_iff {b s : ℝ} (hsb : s ≤ b)
   exact exists_congr fun n ↦ by
     rw [mul_comm (2 * π) (b - s), mul_left_inj' two_pi_pos.ne', eq_comm]
 
+end IntegerRectangle.RealIntegral
+
+open IntegerRectangle IntegerRectangle.RealIntegral in
 /-- **Real double-integral proof** of the integer-rectangle tiling theorem. -/
 theorem IntegerRectangleTheorem_RealIntegral : IntegerRectangleTheorem := by
   intro ι _ R T hT hsides
@@ -68,5 +71,3 @@ theorem IntegerRectangleTheorem_RealIntegral : IntegerRectangleTheorem := by
   exact (hT.prod_integral_dichotomy hint htile).imp
     (integral_Icc_sinShift_self_eq_zero_iff R.hx).mp
     (integral_Icc_sinShift_self_eq_zero_iff R.hy).mp
-
-end IntegerRectangle.RealIntegral

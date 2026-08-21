@@ -16,6 +16,8 @@ public import Mathlib.SetTheory.Cardinal.Finite
 
 open scoped unitInterval
 
+namespace FermatLittleTheorem.Dynamical
+
 noncomputable def T (n : ℕ) (x : I) : I :=
   if x = 1 then 1 else ⟨Int.fract (n * (x : ℝ)), unitInterval.fract_mem _⟩
 
@@ -275,6 +277,9 @@ private lemma prime_dvd_card_of_fixedpointfree_periodic_map
   rw [← Equiv.Perm.iterate_eq_pow]
   exact congr_fun hpow x
 
+end FermatLittleTheorem.Dynamical
+
+open FermatLittleTheorem.Dynamical in
 theorem FermatLittleTheorem_Dynamical : FermatLittleTheorem := by
   apply FermatLittleTheoremNat_impl_FermatLittleTheorem
   intro p a hp

@@ -131,6 +131,9 @@ private lemma wind_fixed {p : ℕ} (hp : p.Prime) (hp4 : p % 4 = 1) :
 
 /-! ### Assembling the proof -/
 
+end SumOfTwoSquares.Zagier
+
+open SumOfTwoSquares.Zagier in
 /-- **Zagier's one-sentence proof** of Fermat's theorem on sums of two squares. -/
 theorem FermatSumOfTwoSquares_Zagier : FermatSumOfTwoSquares := by
   intro p hp hp4
@@ -148,5 +151,3 @@ theorem FermatSumOfTwoSquares_Zagier : FermatSumOfTwoSquares := by
   refine ⟨x.natAbs, (2 * y).natAbs, ?_⟩
   zify [sq_abs]
   linear_combination heq
-
-end SumOfTwoSquares.Zagier

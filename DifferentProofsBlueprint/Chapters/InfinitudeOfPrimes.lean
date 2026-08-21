@@ -70,11 +70,11 @@ are infinite {uses "def:inf-primes"}[].
 
 Second proof is by Goldbach, using Fermat numbers $`F_n = 2^{2^n} + 1` and their pairwise coprimality.
 
-:::definition "def:fermat-number" (parent := "grp:inf-primes") (lean := "Fermat")
+:::definition "def:fermat-number" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes.Goldbach.Fermat")
 The $`n`-th Fermat number is $`F_n = 2^{2^n} + 1`.
 :::
 
-:::lemma_ "lem:fermat-ge-two" (parent := "grp:inf-primes") (lean := "Fermat_gt_two")
+:::lemma_ "lem:fermat-ge-two" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes.Goldbach.Fermat_gt_two")
 For all natural numbers $`n`, the Fermat number $`F_n` is at least $`2`.
 This is about {uses "def:fermat-number"}[].
 :::
@@ -83,7 +83,7 @@ This is about {uses "def:fermat-number"}[].
 Since $`2^{2^n} \ge 1`, adding one gives $`F_n \ge 2`.
 :::
 
-:::lemma_ "lem:fermat-odd" (parent := "grp:inf-primes") (lean := "Fermat_odd")
+:::lemma_ "lem:fermat-odd" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes.Goldbach.Fermat_odd")
 Every Fermat number is odd. This is about {uses "def:fermat-number"}[].
 :::
 
@@ -92,7 +92,7 @@ The exponent $`2^n` is positive, so $`2^{2^n}` is even and
 $`2^{2^n}+1` is odd.
 :::
 
-:::lemma_ "lem:fermat-recurrence" (parent := "grp:inf-primes") (lean := "Fermat_recurrence")
+:::lemma_ "lem:fermat-recurrence" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes.Goldbach.Fermat_recurrence")
 For all $`n`, the Fermat numbers satisfy
 $`F_{n+1} = \prod_{k=0}^{n} F_k + 2`. This uses
 {uses "def:fermat-number"}[].
@@ -103,7 +103,7 @@ Inductively prove that $`\prod_{k<n} F_k = F_n - 2`, then rewrite the next
 product using the difference-of-squares identity.
 :::
 
-:::lemma_ "lem:fermat-coprime" (parent := "grp:inf-primes") (lean := "Fermat_coprime")
+:::lemma_ "lem:fermat-coprime" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes.Goldbach.Fermat_coprime")
 For all $`n`, $`F_{n+1}` is coprime to $`\prod_{k=0}^{n} F_k`.
 This depends on {uses "lem:fermat-recurrence"}[] and {uses "lem:fermat-odd"}[].
 :::
@@ -113,7 +113,7 @@ The recurrence writes $`F_{n+1}` as the product plus $`2`. The product is odd,
 so the only possible common divisor with $`2` is $`1`.
 :::
 
-:::lemma_ "lem:fermat-pairwise-coprime" (parent := "grp:inf-primes") (lean := "Fermat_pairwise_coprime")
+:::lemma_ "lem:fermat-pairwise-coprime" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes.Goldbach.Fermat_pairwise_coprime")
 Distinct Fermat numbers are coprime. This follows from
 {uses "lem:fermat-coprime"}[].
 :::
@@ -135,7 +135,7 @@ distinct, producing infinitely many primes.
 
 Third proof is by Euler, using the divergence of the harmonic series and the Euler product formula.
 
-:::theorem "thm:harmonic-unbounded" (parent := "grp:inf-primes") (lean := "harmonic_unbounded")
+:::theorem "thm:harmonic-unbounded" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes.Euler.harmonic_unbounded")
 The harmonic series is unbounded.
 :::
 
@@ -144,7 +144,7 @@ Use the inequality $`\log(n+1) \le H_n` and the fact that the logarithm is
 unbounded.
 :::
 
-:::theorem "thm:euler-prod-ge-harmonic" (parent := "grp:inf-primes") (lean := "prod_prime_div_prime_sub_one_ge_harmonic")
+:::theorem "thm:euler-prod-ge-harmonic" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes.Euler.prod_prime_div_prime_sub_one_ge_harmonic")
 The finite Euler product over primes at most $`n` is at least the $`n`-th
 harmonic number.
 :::
@@ -167,12 +167,12 @@ would be fixed. But the product over primes below a sufficiently large bound
 
 Fourth proof is by Saidak, using the sequence $`a_0 = 2` and $`a_{n+1} = a_n(a_n+1)`.
 
-:::definition "def:saidak-sequence" (parent := "grp:inf-primes") (lean := "a")
+:::definition "def:saidak-sequence" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes.Saidak.a")
 Saidak's sequence is defined by $`a_0 = 2` and
 $`a_{n+1} = a_n(a_n+1)`.
 :::
 
-:::lemma_ "lem:saidak-ge-two" (parent := "grp:inf-primes") (lean := "a_ge_two")
+:::lemma_ "lem:saidak-ge-two" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes.Saidak.a_ge_two")
 Every term of Saidak's sequence is at least $`2`. This is about
 {uses "def:saidak-sequence"}[].
 :::
@@ -182,7 +182,7 @@ The base case is $`2`; the inductive step multiplies two positive factors and
 stays at least $`2`.
 :::
 
-:::lemma_ "lem:saidak-primeFactors-card" (parent := "grp:inf-primes") (lean := "a_primeFactors_card_ge")
+:::lemma_ "lem:saidak-primeFactors-card" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes.Saidak.a_primeFactors_card_ge")
 For every $`n`, the term $`a_n` has at least $`n+1` distinct prime divisors.
 This uses {uses "def:saidak-sequence"}[] and {uses "lem:saidak-ge-two"}[].
 :::
@@ -204,7 +204,7 @@ $`a_n` would be bounded by that finite set, contradicting the previous lemma
 
 Fifth proof is by Wunderlich, using Fibonacci numbers, their coprimality, and the fact that $`F_{37}` has three distinct prime factors.
 
-:::lemma_ "lem:fib-37-factorization" (parent := "grp:inf-primes") (lean := "fib_37")
+:::lemma_ "lem:fib-37-factorization" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes.Wunderlich.fib_37")
 The Fibonacci number $`F_{37}` factors as $`73 \cdot 149 \cdot 2221`.
 :::
 
@@ -212,7 +212,7 @@ The Fibonacci number $`F_{37}` factors as $`73 \cdot 149 \cdot 2221`.
 This is a direct computation.
 :::
 
-:::lemma_ "lem:fib-prime-ge-two" (parent := "grp:inf-primes") (lean := "fib_prime_ge_two")
+:::lemma_ "lem:fib-prime-ge-two" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes.Wunderlich.fib_prime_ge_two")
 For any odd prime $`p`, the Fibonacci number $`F_p` is at least $`2`.
 :::
 
@@ -221,7 +221,7 @@ An odd prime is at least $`3`, and the Fibonacci sequence is monotone, so
 $`F_p \ge F_3 = 2`.
 :::
 
-:::lemma_ "lem:fib-coprime-distinct-primes" (parent := "grp:inf-primes") (lean := "fib_coprime_of_distinct_primes")
+:::lemma_ "lem:fib-coprime-distinct-primes" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes.Wunderlich.fib_coprime_of_distinct_primes")
 If $`p` and $`q` are distinct primes, then $`F_p` and $`F_q` are coprime.
 :::
 
@@ -263,7 +263,7 @@ There are infinitely many prime numbers.
 This follows from {uses "thm:inf-primes-cong-one-four"}[].
 :::
 
-:::lemma_ "lem:nat-three-mod-four-div-of-prime-three-mod-four" (parent := "grp:inf-primes") (lean := "nat_three_mod_four_div_of_prime_three_mod_four")
+:::lemma_ "lem:nat-three-mod-four-div-of-prime-three-mod-four" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes.Dirichlet.nat_three_mod_four_div_of_prime_three_mod_four")
 If a natural number is congruent to $`3` modulo $`4`, then it has a prime factor that is congruent to $`3` modulo $`4`.
 :::
 

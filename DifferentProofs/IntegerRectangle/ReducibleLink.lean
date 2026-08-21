@@ -840,6 +840,9 @@ private theorem step_of_reducible_transpose {n : ℕ} (ih : ∀ m, m < n → IH 
     (hl.imp fun i hi ↦ ?_))
   simpa using (hsides i).resolve_left hi
 
+end IntegerRectangle.ReducibleLink
+
+open IntegerRectangle IntegerRectangle.ReducibleLink in
 /-- **Reducible-link proof** (Bishop–Wagon) of the integer-rectangle tiling theorem, by strong
 induction on the number of tiles. A degenerate `R` has a zero side; a tiling that is not proper
 loses a degenerate tile; if every tile has integer width, or every tile integer height, the
@@ -873,5 +876,3 @@ theorem IntegerRectangleTheorem_ReducibleLink : IntegerRectangleTheorem := by
       · exact step_of_reducible_transpose ih hcard hT hp hRx hRy hsides l hl
   intro ι _ R T hT hsides
   exact main (Fintype.card ι) ι R T le_rfl hT hsides
-
-end IntegerRectangle.ReducibleLink

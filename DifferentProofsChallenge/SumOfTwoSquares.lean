@@ -16,6 +16,6 @@ theorem FermatSumOfTwoSquares_QuadraticReciprocity : FermatSumOfTwoSquares := so
 
 theorem FermatSumOfTwoSquares_Wilson : FermatSumOfTwoSquares := sorry
 
-theorem SumOfTwoSquares.Zagier.FermatSumOfTwoSquares_Zagier : FermatSumOfTwoSquares := sorry
+theorem FermatSumOfTwoSquares_Zagier : FermatSumOfTwoSquares := sorry
 
-theorem SumOfTwoSquares.Jacobi.FermatSumOfTwoSquares_Jacobi : FermatSumOfTwoSquares := sorry
+theorem FermatSumOfTwoSquares_Jacobi : FermatSumOfTwoSquares := sorry

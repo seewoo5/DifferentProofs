@@ -260,6 +260,9 @@ private lemma tendsto_basel_bound (c : ℝ) :
   field_simp
   ring
 
+end BaselProblem.Cauchy
+
+open BaselProblem.Cauchy in
 theorem BaselProblem_Cauchy : BaselProblem := by
   have hsummable := summable_one_div_nat_pow.mpr one_lt_two
   set L := ∑' k : ℕ, (1 : ℝ) / (k : ℝ) ^ 2 with hLdef
@@ -330,5 +333,3 @@ theorem BaselProblem_Cauchy : BaselProblem := by
     tendsto_of_tendsto_of_tendsto_of_le_of_le hgπ hhπ hgD hDh
   change L = π ^ 2 / 6
   exact tendsto_nhds_unique hDL hDπ
-
-end BaselProblem.Cauchy

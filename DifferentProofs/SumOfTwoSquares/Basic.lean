@@ -15,6 +15,8 @@ only in how they establish `IsSquare (-1 : ZMod p)`.
 
 @[expose] public section
 
+namespace SumOfTwoSquares
+
 /-- **Thue's descent.** If `-1` is a square modulo a prime `p`, then `p` is a sum of two
 squares of natural numbers. The proof is a pigeonhole argument: with `r = ⌊√p⌋`, the `(r+1)²`
 pairs `(s, t)` with `0 ≤ s, t ≤ r` cannot inject into `ZMod p` via `(s, t) ↦ s - u·t`, where
@@ -46,3 +48,5 @@ theorem sq_add_sq_of_isSquare_neg_one {p : ℕ} (hp : p.Prime) (h : IsSquare (-1
     exact hdvd
   · nlinarith [Nat.pow_le_pow_left (show a.natAbs ≤ Nat.sqrt p by lia) 2,
       Nat.pow_le_pow_left (show b.natAbs ≤ Nat.sqrt p by lia) 2]
+
+end SumOfTwoSquares

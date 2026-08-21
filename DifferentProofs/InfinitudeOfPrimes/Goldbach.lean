@@ -9,6 +9,7 @@ public import DifferentProofs.InfinitudeOfPrimes.Defs
 
 @[expose] public section
 
+namespace InfinitudeOfPrimes.Goldbach
 
 def Fermat (n : ℕ) : ℕ := 2 ^ (2 ^ n) + 1
 
@@ -47,6 +48,9 @@ lemma Fermat_pairwise_coprime : Pairwise (fun m n => (Fermat m).Coprime (Fermat 
   exact (Fermat_coprime k).symm.coprime_dvd_left
     (Finset.dvd_prod_of_mem _ (Finset.mem_range.mpr (by lia)))
 
+end InfinitudeOfPrimes.Goldbach
+
+open InfinitudeOfPrimes.Goldbach in
 theorem InfinitudeOfPrimes_Goldbach : InfinitudeOfPrimes := by
   apply Set.infinite_of_injective_forall_mem (f := fun n => (Fermat n).minFac)
   · intro m n (h : (Fermat m).minFac = (Fermat n).minFac)
