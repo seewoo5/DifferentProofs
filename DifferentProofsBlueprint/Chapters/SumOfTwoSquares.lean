@@ -31,7 +31,7 @@ Two of the proofs below reduce the theorem to the same elementary descent: once 
 to be a square modulo $`p`, a pigeonhole argument recovers the two squares. They differ only in
 how they exhibit a square root of $`-1`.
 
-:::lemma_ "lem:sos-thue" (parent := "grp:sos") (lean := "sq_add_sq_of_isSquare_neg_one")
+:::lemma_ "lem:sos-thue" (parent := "grp:sos") (lean := "SumOfTwoSquares.sq_add_sq_of_isSquare_neg_one")
 Thue's descent: if $`-1` is a square modulo a prime $`p`, then $`p = a^2 + b^2` for some
 natural numbers $`a, b`.
 :::
@@ -73,7 +73,7 @@ square, and the descent {uses "lem:sos-thue"}[] gives $`p = a^2 + b^2`.
 
 Third proof: Zagier's "one-sentence" involution proof.
 
-:::theorem "thm:sos-zagier" (parent := "grp:sos") (lean := "SumOfTwoSquares.Zagier.FermatSumOfTwoSquares_Zagier") (proofColor := "#fde68a")
+:::theorem "thm:sos-zagier" (parent := "grp:sos") (lean := "FermatSumOfTwoSquares_Zagier") (proofColor := "#fde68a")
 Every prime $`p \equiv 1 \pmod 4` is a sum of two squares.
 :::
 
@@ -89,7 +89,7 @@ $`x^2 + 4y^2 = p`, i.e. $`p = x^2 + (2y)^2`.
 
 Fourth proof: Alpoge's proof via Jacobi sums.
 
-:::theorem "thm:sos-jacobi" (parent := "grp:sos") (lean := "SumOfTwoSquares.Jacobi.FermatSumOfTwoSquares_Jacobi") (proofColor := "#fde68a")
+:::theorem "thm:sos-jacobi" (parent := "grp:sos") (lean := "FermatSumOfTwoSquares_Jacobi") (proofColor := "#fde68a")
 Every prime $`p \equiv 1 \pmod 4` is a sum of two squares.
 :::
 

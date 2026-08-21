@@ -134,6 +134,9 @@ private lemma integral_Icc_checker_self_eq_zero_iff {b s : ℝ} (hsb : s ≤ b) 
     integral_checker_add_int s s n, zero_add, integral_checker_shift s r n] at hzero
   exact absurd hzero (integral_checker_pos hr0 hr1).ne'
 
+end IntegerRectangle.Checkerboard
+
+open IntegerRectangle IntegerRectangle.Checkerboard in
 /-- **Checkerboard proof** (Rochberg–Stein) of the integer-rectangle tiling theorem. -/
 theorem IntegerRectangleTheorem_Checkerboard : IntegerRectangleTheorem := by
   intro ι _ R T hT hsides
@@ -142,5 +145,3 @@ theorem IntegerRectangleTheorem_Checkerboard : IntegerRectangleTheorem := by
       (integral_Icc_checker_eq_zero_of_int (T i).hy R.y₀)).imp
     (integral_Icc_checker_self_eq_zero_iff R.hx).mp
     (integral_Icc_checker_self_eq_zero_iff R.hy).mp
-
-end IntegerRectangle.Checkerboard

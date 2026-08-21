@@ -944,6 +944,9 @@ private theorem hasIntegerSide_of_normalized : ∀ n : ℕ, IH n := by
       simp only [Rectangle.width, Int.cast_one]
       linarith
 
+end IntegerRectangle.Staircase
+
+open IntegerRectangle IntegerRectangle.Staircase in
 /-- **Robinson's proof** of the integer-rectangle tiling theorem, by induction on the number of
 H-tiles. Cutting every tile into unit pieces along its integer side normalizes the tiling, and
 the induction then runs on normalized tilings. -/
@@ -955,5 +958,3 @@ theorem IntegerRectangleTheorem_Staircase : IntegerRectangleTheorem := by
   · exact Or.inr ⟨0, by simp [Rectangle.height, ← hRy]⟩
   exact hasIntegerSide_of_normalized _ _ R (pieceTiles T) (PieceCutsWidth T) le_rfl
     (hT.normalized hRx hRy hsides)
-
-end IntegerRectangle.Staircase

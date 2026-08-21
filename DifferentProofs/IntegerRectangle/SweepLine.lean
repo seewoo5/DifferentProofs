@@ -372,6 +372,9 @@ private lemma isLocallyConstant_fract_sweepTrunc (hT : IsTiling R T)
 
 end Sweep
 
+end IntegerRectangle.SweepLine
+
+open IntegerRectangle IntegerRectangle.SweepLine in
 /-- **Sweep-line proof** (Bachman–Yannakakis) of the integer-rectangle tiling theorem. -/
 theorem IntegerRectangleTheorem_SweepLine : IntegerRectangleTheorem := by
   intro ι _ R T hT hsides
@@ -382,5 +385,3 @@ theorem IntegerRectangleTheorem_SweepLine : IntegerRectangleTheorem := by
   simp only [sweepTrunc, min_self, min_eq_left R.hy, sweep_top hT hy hheight,
     sweep_eq_zero hT le_rfl, Int.fract_zero] at hconst
   exact (Int.fract_eq_zero_iff.mp hconst).imp fun n hn ↦ hn.symm
-
-end IntegerRectangle.SweepLine

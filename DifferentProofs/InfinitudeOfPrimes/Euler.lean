@@ -11,6 +11,8 @@ public import Mathlib.Tactic.NormNum.Prime
 
 open Finset
 
+namespace InfinitudeOfPrimes.Euler
+
 theorem harmonic_unbounded : ∀ M : ℝ, ∃ n : ℕ, harmonic n > M := fun M ↦
   let ⟨n, hn⟩ := ((Real.tendsto_log_atTop.comp <| tendsto_natCast_atTop_atTop.comp <|
     Filter.tendsto_add_atTop_nat 1).eventually_gt_atTop M).exists
@@ -65,6 +67,9 @@ theorem prod_prime_div_prime_sub_one_ge_harmonic (n : ℕ) :
         pow_pos (by positivity : 0 < (i : ℚ) + 1 + 1) (Nat.log (i + 1 + 1) n + 1),
         inv_pos.mpr (pow_pos (by positivity : 0 < (i : ℚ) + 1 + 1) (Nat.log (i + 1 + 1) n + 1))]
 
+end InfinitudeOfPrimes.Euler
+
+open InfinitudeOfPrimes.Euler in
 theorem InfinitudeOfPrimes_Euler : InfinitudeOfPrimes := by
   intro hfin
   obtain ⟨N, hN⟩ : ∃ N, ∀ p, Nat.Prime p → p ≤ N :=

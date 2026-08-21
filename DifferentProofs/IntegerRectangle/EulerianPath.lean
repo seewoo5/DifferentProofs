@@ -137,6 +137,9 @@ theorem exists_reachable_corner (hT : IsTiling R T) (hsides : ∀ i, (T i).HasIn
     if_neg (hnot hcon.2.2)] at key
   simp at key
 
+end IntegerRectangle.EulerianPath
+
+open IntegerRectangle IntegerRectangle.EulerianPath in
 /-- **Eulerian-path proof** (Paterson) of the integer-rectangle tiling theorem. A walk in `Γ`
 joins the lower-left corner of `R` to another of its corners, and moves by a vector with integer
 entries; whichever corner it reaches, that is an integer side of `R`. -/
@@ -146,5 +149,3 @@ theorem IntegerRectangleTheorem_EulerianPath : IntegerRectangleTheorem := by
   · exact .inl (Int.fract_eq_fract'.mp (congrArg Prod.fst (fracts_eq_of_reachable h)))
   · exact .inr (Int.fract_eq_fract'.mp (congrArg Prod.snd (fracts_eq_of_reachable h)))
   · exact .inl (Int.fract_eq_fract'.mp (congrArg Prod.fst (fracts_eq_of_reachable h)))
-
-end IntegerRectangle.EulerianPath

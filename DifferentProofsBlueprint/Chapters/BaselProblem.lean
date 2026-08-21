@@ -27,7 +27,7 @@ $`1 / 0 = 0` by convention.
 
 First proof uses Parseval's identity, applied to the function $`f(x) = x` on $`(-\pi, \pi]`.
 
-:::theorem "thm:basel-parseval" (parent := "grp:basel") (lean := "BaselProblem.BaselProblem_Parseval") (proofColor := "#fbcfe8")
+:::theorem "thm:basel-parseval" (parent := "grp:basel") (lean := "BaselProblem_Parseval") (proofColor := "#fbcfe8")
 $`\sum_{n \geq 1} \frac{1}{n^2} = \frac{\pi^2}{6}`.
 :::
 
@@ -122,7 +122,7 @@ From $`0 < \sin x < x` we get
 $`\frac{1}{x^2} < \frac{1}{\sin^2 x} = 1 + \cot^2 x`.
 :::
 
-:::theorem "thm:basel-cauchy" (parent := "grp:basel") (lean := "BaselProblem.Cauchy.BaselProblem_Cauchy") (proofColor := "#fbcfe8")
+:::theorem "thm:basel-cauchy" (parent := "grp:basel") (lean := "BaselProblem_Cauchy") (proofColor := "#fbcfe8")
 $`\sum_{n \geq 1} \frac{1}{n^2} = \frac{\pi^2}{6}`.
 :::
 

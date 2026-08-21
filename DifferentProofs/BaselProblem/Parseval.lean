@@ -9,7 +9,7 @@ public import Mathlib.Analysis.PSeries
 
 open Real Complex MeasureTheory intervalIntegral Set
 
-namespace BaselProblem
+namespace BaselProblem.Parseval
 
 private lemma neg_pi_lt_pi : (-π : ℝ) < π := neg_lt_self pi_pos
 
@@ -46,6 +46,9 @@ private lemma coeff_norm_sq (n : ℤ) :
     rw [hd, show 1 / (2 * π * |(n : ℝ)|) * (2 * π) = 1 / |(n : ℝ)| by field_simp,
       div_pow, one_pow, sq_abs]
 
+end BaselProblem.Parseval
+
+open BaselProblem.Parseval in
 theorem BaselProblem_Parseval : BaselProblem := by
   have hL2 : MemLp (fun x : ℝ ↦ (x : ℂ)) 2 (volume.restrict (Ioc (-π) π)) := by
     refine MemLp.of_bound Complex.continuous_ofReal.aestronglyMeasurable π ?_
@@ -72,5 +75,3 @@ theorem BaselProblem_Parseval : BaselProblem := by
   have h2S := hconv.symm.trans hp
   rw [show (π - -π)⁻¹ * (2 * π ^ 3 / 3) = π ^ 2 / 3 by field_simp; ring] at h2S
   linarith [h2S]
-
-end BaselProblem

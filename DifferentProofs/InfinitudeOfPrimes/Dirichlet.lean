@@ -25,6 +25,8 @@ theorem InfinitudeOfPrimes_cong_one_four : InfinitudeOfPrimes_cong 1 4 := by
 theorem InfinitudeOfPrimes_from_one_four : InfinitudeOfPrimes :=
   InfinitudeOfPrimes_cong_impl_InfinitudeOfPrimes InfinitudeOfPrimes_cong_one_four
 
+namespace InfinitudeOfPrimes.Dirichlet
+
 /-- A natural number congruent to `3` mod `4` has a prime factor congruent to `3` mod `4`: it is
 odd, and a product of primes that are all `1` mod `4` is again `1` mod `4`. -/
 lemma nat_three_mod_four_div_of_prime_three_mod_four (n : ℕ) (hn : n ≡ 3 [MOD 4]) :
@@ -41,6 +43,9 @@ lemma nat_three_mod_four_div_of_prime_three_mod_four (n : ℕ) (hn : n ≡ 3 [MO
       obtain ⟨q, hq, hq3, hqd⟩ := ih (by lia)
       exact ⟨q, hq, hq3, hqd.mul_left p⟩
 
+end InfinitudeOfPrimes.Dirichlet
+
+open InfinitudeOfPrimes.Dirichlet in
 /-- **Infinitely many primes are congruent to `3` mod `4`**, because `4 * M - 1` is congruent to
 `3` mod `4` and so has a prime factor congruent to `3` mod `4`. -/
 theorem InfinitudeOfPrimes_cong_three_four : InfinitudeOfPrimes_cong 3 4 := by

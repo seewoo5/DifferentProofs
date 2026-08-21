@@ -50,6 +50,9 @@ private lemma fract_sub_eq_zero_iff {a b : ℝ} :
     Int.fract b - Int.fract a = 0 ↔ ∃ n : ℤ, b - a = n := by
   rw [sub_eq_zero, Int.fract_eq_fract]
 
+end IntegerRectangle.StepFunction
+
+open IntegerRectangle IntegerRectangle.StepFunction in
 /-- **Step-function proof** (Hochster–Maté) of the integer-rectangle tiling theorem: the fg-area
 dichotomy for the sawtooth `Int.fract` in both coordinates. -/
 theorem IntegerRectangleTheorem_StepFunction : IntegerRectangleTheorem := by
@@ -57,5 +60,3 @@ theorem IntegerRectangleTheorem_StepFunction : IntegerRectangleTheorem := by
   exact (dichotomy hT Int.fract Int.fract fun i ↦ (hsides i).imp
       fract_sub_eq_zero_iff.mpr fract_sub_eq_zero_iff.mpr).imp
     fract_sub_eq_zero_iff.mp fract_sub_eq_zero_iff.mp
-
-end IntegerRectangle.StepFunction

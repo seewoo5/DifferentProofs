@@ -37,6 +37,9 @@ private lemma apply_mem_gaussianInt {p : ℕ} {χ : MulChar (ZMod p) ℂ} (hχ4 
     exact hi ▸ pow_mem (RingHom.mem_range.mpr ⟨⟨0, 1⟩, by simp [GaussianInt.toComplex_def']⟩) i
   · exact χ.map_nonunit hu ▸ zero_mem _
 
+end SumOfTwoSquares.Jacobi
+
+open SumOfTwoSquares.Jacobi in
 /-- Fermat's theorem on sums of two squares, via Jacobi sums: the Jacobi sum of a quartic
 character on `ZMod p` is a Gaussian integer of norm `p` (Alpoge's proof). -/
 theorem FermatSumOfTwoSquares_Jacobi : FermatSumOfTwoSquares := by
@@ -64,5 +67,3 @@ theorem FermatSumOfTwoSquares_Jacobi : FermatSumOfTwoSquares := by
   have hnorm : g.norm = (p : ℤ) := by exact_mod_cast hmul
   exact ⟨g.re.natAbs, g.im.natAbs, by
     simpa [GaussianInt.natAbs_norm_eq, sq] using congrArg Int.natAbs hnorm⟩
-
-end SumOfTwoSquares.Jacobi

@@ -32,7 +32,7 @@ set_option linter.style.longLine false
 Wagon's theorem on tiling a rectangle by rectangles with an integer side.
 :::
 
-:::definition "def:int-rect" (parent := "grp:int-rect") (lean := "IntegerRectangle.IntegerRectangleTheorem")
+:::definition "def:int-rect" (parent := "grp:int-rect") (lean := "IntegerRectangleTheorem")
 Stan Wagon's theorem (*Fourteen Proofs of a Result About Tiling a Rectangle*, Amer. Math. Monthly
 $`94` (1987) 601–617) states: whenever a rectangle is tiled by finitely many rectangles, each of
 which has at least one integer side, then the tiled rectangle has at least one integer side. Here a
@@ -62,7 +62,7 @@ only if a factor does.
 
 First proof: a complex double integral, de Bruijn's original method.
 
-:::theorem "thm:int-rect-complex" (parent := "grp:int-rect") (lean := "IntegerRectangle.ComplexIntegral.IntegerRectangleTheorem_ComplexIntegral") (proofColor := "#fbcfe8")
+:::theorem "thm:int-rect-complex" (parent := "grp:int-rect") (lean := "IntegerRectangleTheorem_ComplexIntegral") (proofColor := "#fbcfe8")
 A rectangle tiled by rectangles each with an integer side has an integer side.
 :::
 
@@ -77,7 +77,7 @@ what makes the criterion an exact "integer side" statement, with no reflected so
 
 Second proof: a real double integral (Wagon's specialization of the first).
 
-:::theorem "thm:int-rect-real" (parent := "grp:int-rect") (lean := "IntegerRectangle.RealIntegral.IntegerRectangleTheorem_RealIntegral") (proofColor := "#fbcfe8")
+:::theorem "thm:int-rect-real" (parent := "grp:int-rect") (lean := "IntegerRectangleTheorem_RealIntegral") (proofColor := "#fbcfe8")
 A rectangle tiled by rectangles each with an integer side has an integer side.
 :::
 
@@ -93,7 +93,7 @@ forces an integer side of $`R`.
 
 Third proof: a checkerboard colouring (Rochberg–Stein), the discretization of the second.
 
-:::theorem "thm:int-rect-checker" (parent := "grp:int-rect") (lean := "IntegerRectangle.Checkerboard.IntegerRectangleTheorem_Checkerboard") (proofColor := "#fbcfe8")
+:::theorem "thm:int-rect-checker" (parent := "grp:int-rect") (lean := "IntegerRectangleTheorem_Checkerboard") (proofColor := "#fbcfe8")
 A rectangle tiled by rectangles each with an integer side has an integer side.
 :::
 
@@ -138,7 +138,7 @@ from the auxiliary tiling, here without having to check that the translated tile
 translated rectangle.
 :::
 
-:::theorem "thm:int-rect-counting" (parent := "grp:int-rect") (lean := "IntegerRectangle.CountingSquares.IntegerRectangleTheorem_CountingSquares") (proofColor := "#fbcfe8")
+:::theorem "thm:int-rect-counting" (parent := "grp:int-rect") (lean := "IntegerRectangleTheorem_CountingSquares") (proofColor := "#fbcfe8")
 A rectangle tiled by rectangles each with an integer side has an integer side.
 :::
 
@@ -159,7 +159,7 @@ off the x-lattice, and move a horizontal grid line by $`t` when its y-coordinate
 y-lattice; leave lattice lines fixed. The perturbed areas become honest polynomials in $`t`; the
 fg-area formalizes them without separately constructing the auxiliary tiling.
 
-:::theorem "thm:int-rect-polynomials" (parent := "grp:int-rect") (lean := "IntegerRectangle.Polynomials.IntegerRectangleTheorem_Polynomials") (proofColor := "#fbcfe8")
+:::theorem "thm:int-rect-polynomials" (parent := "grp:int-rect") (lean := "IntegerRectangleTheorem_Polynomials") (proofColor := "#fbcfe8")
 A rectangle tiled by rectangles each with an integer side has an integer side.
 :::
 
@@ -230,7 +230,7 @@ $`\lfloor p x_1\rfloor - \lfloor p x_0\rfloor = pm`; then $`p(x_1 - x_0) - pm` i
 two floor remainders, each in $`[0,1)`, so $`|`width$` - m| < 1/p`.
 :::
 
-:::theorem "thm:int-rect-primes" (parent := "grp:int-rect") (lean := "IntegerRectangle.Primes.IntegerRectangleTheorem_Primes") (proofColor := "#fbcfe8")
+:::theorem "thm:int-rect-primes" (parent := "grp:int-rect") (lean := "IntegerRectangleTheorem_Primes") (proofColor := "#fbcfe8")
 A rectangle tiled by rectangles each with an integer side has an integer side.
 :::
 
@@ -301,7 +301,7 @@ tile has an even number of corners in $`Z`, and by the double count
 hence not the only one.
 :::
 
-:::theorem "thm:int-rect-euler" (parent := "grp:int-rect") (lean := "IntegerRectangle.EulerianPath.IntegerRectangleTheorem_EulerianPath") (proofColor := "#fbcfe8")
+:::theorem "thm:int-rect-euler" (parent := "grp:int-rect") (lean := "IntegerRectangleTheorem_EulerianPath") (proofColor := "#fbcfe8")
 A rectangle tiled by rectangles each with an integer side has an integer side.
 :::
 
@@ -333,7 +333,7 @@ times the number of its horizontal edges over $`Y`, so by hypothesis every tile 
 of them, and the double count {uses "lem:int-rect-double-count"}[] applies.
 :::
 
-:::theorem "thm:int-rect-bipartite" (parent := "grp:int-rect") (lean := "IntegerRectangle.BipartiteGraph.IntegerRectangleTheorem_BipartiteGraph") (proofColor := "#fbcfe8")
+:::theorem "thm:int-rect-bipartite" (parent := "grp:int-rect") (lean := "IntegerRectangleTheorem_BipartiteGraph") (proofColor := "#fbcfe8")
 A rectangle tiled by rectangles each with an integer side has an integer side.
 :::
 
@@ -416,7 +416,7 @@ itself and one to its right from its translate one unit rightwards, so the half-
 pieces partition those of the shrunken rectangle.
 :::
 
-:::theorem "thm:int-rect-induction" (parent := "grp:int-rect") (lean := "IntegerRectangle.Staircase.IntegerRectangleTheorem_Staircase") (proofColor := "#fbcfe8")
+:::theorem "thm:int-rect-induction" (parent := "grp:int-rect") (lean := "IntegerRectangleTheorem_Staircase") (proofColor := "#fbcfe8")
 A rectangle tiled by rectangles each with an integer side has an integer side.
 :::
 
@@ -483,7 +483,7 @@ ends — contradicting the assertion for the previous V-tile. But at the right e
 assertion is absurd, since the H-tiles reach that height too.
 :::
 
-:::theorem "thm:int-rect-links" (parent := "grp:int-rect") (lean := "IntegerRectangle.ReducibleLink.IntegerRectangleTheorem_ReducibleLink") (proofColor := "#fbcfe8")
+:::theorem "thm:int-rect-links" (parent := "grp:int-rect") (lean := "IntegerRectangleTheorem_ReducibleLink") (proofColor := "#fbcfe8")
 A rectangle tiled by rectangles each with an integer side has an integer side.
 :::
 
@@ -552,7 +552,7 @@ $`G(c) - L(c)` is minus the width born at $`c` with integral top, and each such 
 non-integral bottom and integral top — integer width again.
 :::
 
-:::theorem "thm:int-rect-sweep" (parent := "grp:int-rect") (lean := "IntegerRectangle.SweepLine.IntegerRectangleTheorem_SweepLine") (proofColor := "#fbcfe8")
+:::theorem "thm:int-rect-sweep" (parent := "grp:int-rect") (lean := "IntegerRectangleTheorem_SweepLine") (proofColor := "#fbcfe8")
 A rectangle tiled by rectangles each with an integer side has an integer side.
 :::
 
@@ -607,7 +607,7 @@ The fg-area of every tile is a product with a vanishing factor, so by additivity
 a factor does.
 :::
 
-:::theorem "thm:int-rect-step" (parent := "grp:int-rect") (lean := "IntegerRectangle.StepFunction.IntegerRectangleTheorem_StepFunction") (proofColor := "#fbcfe8")
+:::theorem "thm:int-rect-step" (parent := "grp:int-rect") (lean := "IntegerRectangleTheorem_StepFunction") (proofColor := "#fbcfe8")
 A rectangle tiled by rectangles each with an integer side has an integer side.
 :::
 

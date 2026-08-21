@@ -13,6 +13,7 @@ public import Mathlib.Data.Nat.Fib.Basic
 
 @[expose] public section
 
+namespace InfinitudeOfPrimes.Wunderlich
 
 lemma fib_37 : Nat.fib 37 = 73 * 149 * 2221 := by simp [Nat.fib]
 
@@ -25,6 +26,9 @@ lemma fib_coprime_of_distinct_primes {p q : ℕ}
     Nat.Coprime (Nat.fib p) (Nat.fib q) := by
   rw [Nat.Coprime, ← Nat.fib_gcd, (Nat.coprime_primes hp hq).mpr hpq]; rfl
 
+end InfinitudeOfPrimes.Wunderlich
+
+open InfinitudeOfPrimes.Wunderlich in
 theorem InfinitudeOfPrimes_Wunderlich : InfinitudeOfPrimes := fun hfin => by
   set S := hfin.toFinset
   have h2S : 2 ∈ S := hfin.mem_toFinset.mpr Nat.prime_two

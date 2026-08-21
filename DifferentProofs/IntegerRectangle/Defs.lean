@@ -70,11 +70,12 @@ structure IsTiling {ι : Type} [Fintype ι] (R : Rectangle) (T : ι → Rectangl
   interiorDisjoint :
     Pairwise fun i j ↦ Disjoint (interior (T i).toSet) (interior (T j).toSet)
 
+end IntegerRectangle
+
+open IntegerRectangle in
 /-- **The integer-rectangle tiling theorem** (Wagon). If a rectangle is tiled by finitely many
 rectangles, each having at least one integer side, then the tiled rectangle has at least one
 integer side. -/
 def IntegerRectangleTheorem : Prop :=
   ∀ {ι : Type} [Fintype ι] (R : Rectangle) (T : ι → Rectangle),
     IsTiling R T → (∀ i, (T i).HasIntegerSide) → R.HasIntegerSide
-
-end IntegerRectangle

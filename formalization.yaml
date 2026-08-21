@@ -255,7 +255,7 @@ status:
       file: "DifferentProofs/FermatLittleTheorem/Dynamical.lean"
       sorry_count: 0
       axioms: *standard_axioms
-    - declaration: "FermatLittleTheorem.Alkauskas.FermatLittleTheorem_Alkauskas"
+    - declaration: "FermatLittleTheorem_Alkauskas"
       file: "DifferentProofs/FermatLittleTheorem/Alkauskas.lean"
       sorry_count: 0
       axioms: *standard_axioms
@@ -321,72 +321,72 @@ status:
       file: "DifferentProofs/SumOfTwoSquares/Wilson.lean"
       sorry_count: 0
       axioms: *standard_axioms
-    - declaration: "SumOfTwoSquares.Zagier.FermatSumOfTwoSquares_Zagier"
+    - declaration: "FermatSumOfTwoSquares_Zagier"
       file: "DifferentProofs/SumOfTwoSquares/Zagier.lean"
       sorry_count: 0
       axioms: *standard_axioms
-    - declaration: "SumOfTwoSquares.Jacobi.FermatSumOfTwoSquares_Jacobi"
+    - declaration: "FermatSumOfTwoSquares_Jacobi"
       file: "DifferentProofs/SumOfTwoSquares/Jacobi.lean"
       sorry_count: 0
       axioms: *standard_axioms
 
     # --- Basel problem (statement: `BaselProblem`) ---
-    - declaration: "BaselProblem.BaselProblem_Parseval"
+    - declaration: "BaselProblem_Parseval"
       file: "DifferentProofs/BaselProblem/Parseval.lean"
       sorry_count: 0
       axioms: *standard_axioms
-    - declaration: "BaselProblem.Cauchy.BaselProblem_Cauchy"
+    - declaration: "BaselProblem_Cauchy"
       file: "DifferentProofs/BaselProblem/Cauchy.lean"
       sorry_count: 0
       axioms: *standard_axioms
 
     # --- Integer-rectangle tiling theorem (statement: `IntegerRectangleTheorem`);
     #     numbering follows Wagon's paper.
-    - declaration: "IntegerRectangle.ComplexIntegral.IntegerRectangleTheorem_ComplexIntegral"
+    - declaration: "IntegerRectangleTheorem_ComplexIntegral"
       file: "DifferentProofs/IntegerRectangle/ComplexIntegral.lean"
       sorry_count: 0
       axioms: *standard_axioms
-    - declaration: "IntegerRectangle.RealIntegral.IntegerRectangleTheorem_RealIntegral"
+    - declaration: "IntegerRectangleTheorem_RealIntegral"
       file: "DifferentProofs/IntegerRectangle/RealIntegral.lean"
       sorry_count: 0
       axioms: *standard_axioms
-    - declaration: "IntegerRectangle.Checkerboard.IntegerRectangleTheorem_Checkerboard"
+    - declaration: "IntegerRectangleTheorem_Checkerboard"
       file: "DifferentProofs/IntegerRectangle/Checkerboard.lean"
       sorry_count: 0
       axioms: *standard_axioms
-    - declaration: "IntegerRectangle.CountingSquares.IntegerRectangleTheorem_CountingSquares"
+    - declaration: "IntegerRectangleTheorem_CountingSquares"
       file: "DifferentProofs/IntegerRectangle/CountingSquares.lean"
       sorry_count: 0
       axioms: *standard_axioms
-    - declaration: "IntegerRectangle.Polynomials.IntegerRectangleTheorem_Polynomials"
+    - declaration: "IntegerRectangleTheorem_Polynomials"
       file: "DifferentProofs/IntegerRectangle/Polynomials.lean"
       sorry_count: 0
       axioms: *standard_axioms
-    - declaration: "IntegerRectangle.Primes.IntegerRectangleTheorem_Primes"
+    - declaration: "IntegerRectangleTheorem_Primes"
       file: "DifferentProofs/IntegerRectangle/Primes.lean"
       sorry_count: 0
       axioms: *standard_axioms
-    - declaration: "IntegerRectangle.EulerianPath.IntegerRectangleTheorem_EulerianPath"
+    - declaration: "IntegerRectangleTheorem_EulerianPath"
       file: "DifferentProofs/IntegerRectangle/EulerianPath.lean"
       sorry_count: 0
       axioms: *standard_axioms
-    - declaration: "IntegerRectangle.BipartiteGraph.IntegerRectangleTheorem_BipartiteGraph"
+    - declaration: "IntegerRectangleTheorem_BipartiteGraph"
       file: "DifferentProofs/IntegerRectangle/BipartiteGraph.lean"
       sorry_count: 0
       axioms: *standard_axioms
-    - declaration: "IntegerRectangle.Staircase.IntegerRectangleTheorem_Staircase"
+    - declaration: "IntegerRectangleTheorem_Staircase"
       file: "DifferentProofs/IntegerRectangle/Staircase.lean"
       sorry_count: 0
       axioms: *standard_axioms
-    - declaration: "IntegerRectangle.ReducibleLink.IntegerRectangleTheorem_ReducibleLink"
+    - declaration: "IntegerRectangleTheorem_ReducibleLink"
       file: "DifferentProofs/IntegerRectangle/ReducibleLink.lean"
       sorry_count: 0
       axioms: *standard_axioms
-    - declaration: "IntegerRectangle.SweepLine.IntegerRectangleTheorem_SweepLine"
+    - declaration: "IntegerRectangleTheorem_SweepLine"
       file: "DifferentProofs/IntegerRectangle/SweepLine.lean"
       sorry_count: 0
       axioms: *standard_axioms
-    - declaration: "IntegerRectangle.StepFunction.IntegerRectangleTheorem_StepFunction"
+    - declaration: "IntegerRectangleTheorem_StepFunction"
       file: "DifferentProofs/IntegerRectangle/StepFunction.lean"
       sorry_count: 0
       axioms: *standard_axioms
@@ -559,7 +559,7 @@ alignment:
       status: "proved"
       note: "Proved two ways."
     - source: "Wagon, statement: a rectangle tiled by rectangles each having an integer side has an integer side"
-      lean: "IntegerRectangle.IntegerRectangleTheorem"
+      lean: "IntegerRectangleTheorem"
       module: "DifferentProofs.IntegerRectangle.Defs"
       status: "proved"
       note: "Proved twelve ways, following Wagon's numbering."
@@ -576,52 +576,52 @@ alignment:
 
     # Wagon's fourteen proofs, in the paper's order.
     - source: "Wagon, Proof 1 (complex double integral, de Bruijn)"
-      lean: "IntegerRectangle.ComplexIntegral.IntegerRectangleTheorem_ComplexIntegral"
+      lean: "IntegerRectangleTheorem_ComplexIntegral"
       module: "DifferentProofs.IntegerRectangle.ComplexIntegral"
       status: "proved"
       note: ""
     - source: "Wagon, Proof 2 (real double integral)"
-      lean: "IntegerRectangle.RealIntegral.IntegerRectangleTheorem_RealIntegral"
+      lean: "IntegerRectangleTheorem_RealIntegral"
       module: "DifferentProofs.IntegerRectangle.RealIntegral"
       status: "proved"
       note: ""
     - source: "Wagon, Proof 3 (checkerboard colouring, Rochberg-Stein)"
-      lean: "IntegerRectangle.Checkerboard.IntegerRectangleTheorem_Checkerboard"
+      lean: "IntegerRectangleTheorem_Checkerboard"
       module: "DifferentProofs.IntegerRectangle.Checkerboard"
       status: "proved"
       note: ""
     - source: "Wagon, Proof 4 (counting squares, Ruzsa-Gilbert)"
-      lean: "IntegerRectangle.CountingSquares.IntegerRectangleTheorem_CountingSquares"
+      lean: "IntegerRectangleTheorem_CountingSquares"
       module: "DifferentProofs.IntegerRectangle.CountingSquares"
       status: "proved"
       note: ""
     - source: "Wagon, Proof 5 (polynomials, Douady)"
-      lean: "IntegerRectangle.Polynomials.IntegerRectangleTheorem_Polynomials"
+      lean: "IntegerRectangleTheorem_Polynomials"
       module: "DifferentProofs.IntegerRectangle.Polynomials"
       status: "proved"
       note: ""
     - source: "Wagon, Proof 6 (prime numbers, Robinson)"
-      lean: "IntegerRectangle.Primes.IntegerRectangleTheorem_Primes"
+      lean: "IntegerRectangleTheorem_Primes"
       module: "DifferentProofs.IntegerRectangle.Primes"
       status: "proved"
       note: ""
     - source: "Wagon, Proof 7 (Eulerian path, Paterson)"
-      lean: "IntegerRectangle.EulerianPath.IntegerRectangleTheorem_EulerianPath"
+      lean: "IntegerRectangleTheorem_EulerianPath"
       module: "DifferentProofs.IntegerRectangle.EulerianPath"
       status: "proved"
       note: ""
     - source: "Wagon, Proof 8 (bipartite graph)"
-      lean: "IntegerRectangle.BipartiteGraph.IntegerRectangleTheorem_BipartiteGraph"
+      lean: "IntegerRectangleTheorem_BipartiteGraph"
       module: "DifferentProofs.IntegerRectangle.BipartiteGraph"
       status: "proved"
       note: ""
     - source: "Wagon, Proof 9 (induction on the number of H-tiles, Robinson)"
-      lean: "IntegerRectangle.Staircase.IntegerRectangleTheorem_Staircase"
+      lean: "IntegerRectangleTheorem_Staircase"
       module: "DifferentProofs.IntegerRectangle.Staircase"
       status: "proved"
       note: ""
     - source: "Wagon, Proof 10 (induction on reducible links, Bishop-Wagon)"
-      lean: "IntegerRectangle.ReducibleLink.IntegerRectangleTheorem_ReducibleLink"
+      lean: "IntegerRectangleTheorem_ReducibleLink"
       module: "DifferentProofs.IntegerRectangle.ReducibleLink"
       status: "proved"
       note: ""
@@ -633,12 +633,12 @@ alignment:
         Needs planar duality and a min-cut theorem for planar graphs (the existence
         direction of Hex duality), which mathlib does not have.
     - source: "Wagon, Proof 12 (sweep line, Bachman-Yannakakis)"
-      lean: "IntegerRectangle.SweepLine.IntegerRectangleTheorem_SweepLine"
+      lean: "IntegerRectangleTheorem_SweepLine"
       module: "DifferentProofs.IntegerRectangle.SweepLine"
       status: "proved"
       note: ""
     - source: "Wagon, Proof 13 (step functions, Hochster-Mate)"
-      lean: "IntegerRectangle.StepFunction.IntegerRectangleTheorem_StepFunction"
+      lean: "IntegerRectangleTheorem_StepFunction"
       module: "DifferentProofs.IntegerRectangle.StepFunction"
       status: "proved"
       note: ""

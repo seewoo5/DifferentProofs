@@ -139,6 +139,9 @@ private lemma areaPoly_coeff_two (a b : ℝ) (S : Rectangle) :
   simp only [coeff_add, coeff_C_mul_X_pow, coeff_C_mul_X, coeff_C]
   norm_num
 
+end IntegerRectangle.Polynomials
+
+open IntegerRectangle IntegerRectangle.Polynomials in
 /-- **Polynomial proof** (Douady) of the integer-rectangle tiling theorem. The perturbed area of
 each tile is a polynomial that is linear or constant in the perturbation parameter, while a
 tiled rectangle with no integer side would have a genuinely quadratic one; comparing `X ^ 2`
@@ -168,5 +171,3 @@ theorem IntegerRectangleTheorem_Polynomials : IntegerRectangleTheorem := by
     rw [← areaPoly_coeff_two, ← hsum, finsetSum_coeff]
     exact (Finset.sum_eq_zero fun i _ ↦ htile i).symm
   simp [fgArea, nonLatticeIndicator, hx, hy] at h2
-
-end IntegerRectangle.Polynomials

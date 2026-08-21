@@ -14,7 +14,7 @@ Comparator check guarantees and how to run it.
 
 theorem FermatLittleTheorem_Binomial : FermatLittleTheorem := sorry
 
-theorem FermatLittleTheorem.Alkauskas.FermatLittleTheorem_Alkauskas : FermatLittleTheorem := sorry
+theorem FermatLittleTheorem_Alkauskas : FermatLittleTheorem := sorry
 
 theorem FermatLittleTheorem_Lagrange : FermatLittleTheorem := sorry
 

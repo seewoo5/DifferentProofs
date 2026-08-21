@@ -14,7 +14,7 @@ Wilson's theorem gives `(p-1)! ≡ -1 (mod p)`. Pairing `k` with `p - k` rewrite
 
 @[expose] public section
 
-open Finset in
+open SumOfTwoSquares Finset in
 open scoped Nat in
 /-- Fermat's theorem on sums of two squares, via Wilson's theorem: pairing `k` with `p - k` in
 `(p-1)! ≡ -1 (mod p)` shows that `(p/2)!` is a square root of `-1` when `p ≡ 1 (mod 4)`. -/

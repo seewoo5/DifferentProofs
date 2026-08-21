@@ -84,7 +84,7 @@ $`1 - a_{N+1}x^{N+1}` leaves all lower coefficients fixed, and the integer
 $`a_{N+1}` can be chosen to match the coefficient of $`x^{N+1}`.
 :::
 
-:::theorem "thm:flt-alkauskas" (parent := "grp:flt") (lean := "FermatLittleTheorem.Alkauskas.FermatLittleTheorem_Alkauskas") (proofColor := "#ddd6fe")
+:::theorem "thm:flt-alkauskas" (parent := "grp:flt") (lean := "FermatLittleTheorem_Alkauskas") (proofColor := "#ddd6fe")
 For any prime $`p` and integer $`a`, one has $`a^p \equiv a \pmod p`.
 :::
 
@@ -99,12 +99,12 @@ congruences over $`d` proves the natural-number form, then the reduction
 Fourth proof is by a dynamical argument, using the map $`T_n : [0,1] \to [0,1]`
 defined by $`T_n(x) = \{nx\}` for $`0 \le x < 1` and $`T_n(1) = 1`, and considering the fixed points of $`T_{a^p}` that are not fixed by $`T_a`.
 
-:::definition "def:T" (parent := "grp:flt") (lean := "T")
+:::definition "def:T" (parent := "grp:flt") (lean := "FermatLittleTheorem.Dynamical.T")
 For a natural number $`n`, define $`T_n : [0,1] \to [0,1]` by
 $`T_n(x) = \{nx\}` for $`0 \le x < 1` and $`T_n(1) = 1`.
 :::
 
-:::lemma_ "lem:T-comp-eq-mul" (parent := "grp:flt") (lean := "T_comp_eq_mul")
+:::lemma_ "lem:T-comp-eq-mul" (parent := "grp:flt") (lean := "FermatLittleTheorem.Dynamical.T_comp_eq_mul")
 For natural numbers $`m` and $`n`, the maps satisfy
 $`T_m \circ T_n = T_{mn}`. This is a consequence of {uses "def:T"}[].
 :::
@@ -115,7 +115,7 @@ $`\{m\{nx\}\} = \{mnx\}` because the difference is an integer.
 The endpoint $`1` is fixed by definition.
 :::
 
-:::lemma_ "lem:T-num-fp-eq" (parent := "grp:flt") (lean := "T_num_fp_eq")
+:::lemma_ "lem:T-num-fp-eq" (parent := "grp:flt") (lean := "FermatLittleTheorem.Dynamical.T_num_fp_eq")
 For any $`n \ge 2`, the map $`T_n` has exactly $`n` fixed points.
 This counts the fixed points of {uses "def:T"}[].
 :::

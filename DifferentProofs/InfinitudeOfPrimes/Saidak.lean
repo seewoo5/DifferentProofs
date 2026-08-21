@@ -10,6 +10,7 @@ public import DifferentProofs.InfinitudeOfPrimes.Defs
 
 @[expose] public section
 
+namespace InfinitudeOfPrimes.Saidak
 
 def a : ℕ → ℕ
   | 0 => 2
@@ -31,6 +32,9 @@ lemma a_primeFactors_card_ge (n : ℕ) : n + 1 ≤ (a n).primeFactors.card := by
       Finset.card_union_of_disjoint hco.disjoint_primeFactors]
     lia
 
+end InfinitudeOfPrimes.Saidak
+
+open InfinitudeOfPrimes.Saidak in
 theorem InfinitudeOfPrimes_Saidak : InfinitudeOfPrimes := fun hfin => by
   have h1 : (a hfin.toFinset.card).primeFactors.card ≤ hfin.toFinset.card :=
     Finset.card_le_card fun _ hp => hfin.mem_toFinset.mpr (Nat.prime_of_mem_primeFactors hp)
