@@ -10,6 +10,8 @@
     "IntegerRectangle.Primes.IntegerRectangleTheorem_Primes",
     "IntegerRectangle.EulerianPath.IntegerRectangleTheorem_EulerianPath",
     "IntegerRectangle.BipartiteGraph.IntegerRectangleTheorem_BipartiteGraph",
+    "IntegerRectangle.Staircase.IntegerRectangleTheorem_Staircase",
+    "IntegerRectangle.ReducibleLink.IntegerRectangleTheorem_ReducibleLink",
     "IntegerRectangle.SweepLine.IntegerRectangleTheorem_SweepLine",
     "IntegerRectangle.StepFunction.IntegerRectangleTheorem_StepFunction"
   ],

@@ -30,21 +30,22 @@ Comparator finds all the theorems in one environment.
 
 ## Coverage
 
-All 37 headline theorems have a challenge statement. Six are excluded from the configs because
-they are not proved yet, and Comparator would reject them for using `sorryAx`:
+Every headline theorem in the project is checked — all 42 of them, with no exclusions:
 
-| Theorem | Reason |
+| Topic | Theorems |
 | --- | --- |
-| `PascalIdentity_counting` | `sorry` in `CombinatorialIdentities/Pascal.lean` |
-| `HockeyStickIdentity_induction` | `sorry` in `CombinatorialIdentities/HockeyStick.lean` |
-| `InfinitudeOfPrimes_cong_one_four` | `sorry` in `InfinitudeOfPrimes/Dirichlet.lean` |
-| `InfinitudeOfPrimes_cong_three_four` | `sorry` in `InfinitudeOfPrimes/Dirichlet.lean` |
-| `InfinitudeOfPrimes_from_one_four` | depends on `InfinitudeOfPrimes_cong_one_four` |
-| `InfinitudeOfPrimes_from_three_four` | depends on `InfinitudeOfPrimes_cong_three_four` |
+| `BaselProblem` | 2 |
+| `CombinatorialIdentities` | 4 |
+| `FermatLittleTheorem` | 4 |
+| `InfinitudeOfPrimes` | 11 |
+| `IntegerRectangle` | 12 |
+| `IrrationalSqrtTwo` | 5 |
+| `SumOfTwoSquares` | 4 |
 
-`CombinatorialIdentities` has no config at all, as neither of its theorems is proved. When one
-of these proofs is finished, add its name to the relevant config — or add
-`comparator/CombinatorialIdentities.json` — and the check starts enforcing it.
+A *headline* theorem is one whose statement is a `Prop` from the topic's `Defs.lean` — the
+result the project claims — as opposed to a supporting lemma. Bridging results such as
+`InfinitudeOfPrimes_iff_InfinitudeOfPrimes'`, whose statement relates two of those `Prop`s
+rather than being one, are not checked.
 
 ## Adding a new proof
 

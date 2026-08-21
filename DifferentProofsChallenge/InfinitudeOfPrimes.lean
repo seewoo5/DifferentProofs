@@ -30,3 +30,5 @@ theorem InfinitudeOfPrimes_from_one_four : InfinitudeOfPrimes := sorry
 theorem InfinitudeOfPrimes_cong_three_four : InfinitudeOfPrimes_cong 3 4 := sorry
 
 theorem InfinitudeOfPrimes_from_three_four : InfinitudeOfPrimes := sorry
+
+theorem InfinitudeOfPrimes_Zeta : InfinitudeOfPrimes := sorry

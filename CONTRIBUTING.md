@@ -23,8 +23,9 @@ proves the intended statement and nothing weaker. This means adding the
 statement to `DifferentProofsChallenge/<Topic>.lean` and the theorem's fully
 qualified name to `comparator/<Topic>.json`. See
 [comparator/README.md](comparator/README.md) for what the check guarantees and
-how to run it locally. A proof that still contains a `sorry` cannot be listed
-yet; leave it out of the config and note it in the coverage table there.
+how to run it locally. Every headline theorem in the project is listed, so a
+new one should be too; a proof that still contains a `sorry` cannot be, since
+Comparator rejects `sorryAx`.
 
 ## Formalizations that may belong in mathlib
 

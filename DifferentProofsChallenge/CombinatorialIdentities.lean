@@ -13,4 +13,8 @@ Each theorem below records the statement that the correspondingly named declarat
 
 theorem PascalIdentity_counting : PascalIdentity := sorry
 
+theorem PascalIdentity_binomial : PascalIdentity := sorry
+
+theorem HockeyStickIdentity_doubleCounting : HockeyStickIdentity := sorry
+
 theorem HockeyStickIdentity_induction : HockeyStickIdentity := sorry

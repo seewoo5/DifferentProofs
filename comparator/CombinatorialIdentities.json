@@ -1,0 +1,12 @@
+{
+  "challenge_module": "DifferentProofsChallenge.CombinatorialIdentities",
+  "solution_module": "DifferentProofs",
+  "theorem_names": [
+    "PascalIdentity_counting",
+    "PascalIdentity_binomial",
+    "HockeyStickIdentity_doubleCounting",
+    "HockeyStickIdentity_induction"
+  ],
+  "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"],
+  "enable_nanoda": false
+}
