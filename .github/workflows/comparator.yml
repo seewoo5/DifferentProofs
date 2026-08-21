@@ -24,7 +24,24 @@ jobs:
         with:
           repository: leanprover/comparator
           ref: 07bc4ea40f2266dcb861820a2ec1fa3244ed307f
+          # Full history, so the cherry-pick below can reach the fix commit.
+          fetch-depth: 0
           path: comparator
+
+      # landrun's flag parser keeps scanning past positional arguments, so it
+      # swallows the first bare `--` in the command tail — which is exactly the
+      # separator Comparator hands `lean4export` between the module name and the
+      # declaration names. Without it every export dies with "unknown module
+      # prefix", because the declaration names arrive as modules.
+      #
+      # Upstream fixed this in 9badaf4 by passing its own `--` terminator before
+      # the sandboxed command. That landed during the v4.33.0-rc cycle, after
+      # the last v4.32.0 commit, so no pin exists that both matches this
+      # project's toolchain and carries the fix. Drop this step once
+      # `lean-toolchain` moves to v4.33.0 or later and the pin above passes it.
+      - name: Apply upstream landrun flag-terminator fix (leanprover/comparator#60)
+        working-directory: comparator
+        run: git cherry-pick --no-commit 9badaf470d8f724346d33738bd273efacd78df76
 
       - name: Check out landrun
         uses: actions/checkout@v5
