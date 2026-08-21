@@ -53,6 +53,6 @@ name = "DifferentProofsBlueprint"
 
 # Comparator challenge statements. Deliberately outside `defaultTargets`: every
 # declaration here is a `sorry`, so `lake build` would report nothing but warnings.
-# Comparator builds these modules itself. See `comparator/README.md`.
+# Comparator builds these modules itself. See `README.md`.
 [[lean_lib]]
 name = "DifferentProofsChallenge"

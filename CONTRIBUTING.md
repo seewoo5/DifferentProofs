@@ -21,11 +21,13 @@ and blueprint where appropriate.
 Also record the new theorem in the Comparator challenge, so that CI checks it
 proves the intended statement and nothing weaker. This means adding the
 statement to `DifferentProofsChallenge/<Topic>.lean` and the theorem's fully
-qualified name to `comparator/<Topic>.json`. See
-[comparator/README.md](comparator/README.md) for what the check guarantees and
-how to run it locally. Every headline theorem in the project is listed, so a
-new one should be too; a proof that still contains a `sorry` cannot be, since
-Comparator rejects `sorryAx`.
+qualified name — several proofs live in a namespace, so for example
+`IntegerRectangle.Polynomials.IntegerRectangleTheorem_Polynomials` rather than
+the short form in the source file — to `comparator/<Topic>.json`. See the
+[README](README.md#verifying-that-the-proofs-prove-the-same-thing) for what the
+check guarantees and how to run it locally. Every headline theorem in the
+project is listed, so a new one should be too; a proof that still contains a
+`sorry` cannot be, since Comparator rejects `sorryAx`.
 
 ## Formalizations that may belong in mathlib
 
@@ -174,4 +176,5 @@ lake build DifferentProofsChallenge
 ```
 
 Running Comparator itself is optional locally — CI runs it on every pull
-request — but [comparator/README.md](comparator/README.md) explains how.
+request — but the
+[README](README.md#verifying-that-the-proofs-prove-the-same-thing) explains how.

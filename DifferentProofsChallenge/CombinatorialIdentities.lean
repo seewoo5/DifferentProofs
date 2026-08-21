@@ -6,7 +6,8 @@ public import DifferentProofs.CombinatorialIdentities.Defs
 # Comparator challenge: combinatorial identities
 
 Each theorem below records the statement that the correspondingly named declaration in
-`DifferentProofs.CombinatorialIdentities.*` is required to prove. See `comparator/README.md`.
+`DifferentProofs.CombinatorialIdentities.*` is required to prove. See `README.md` for what the
+Comparator check guarantees and how to run it.
 -/
 
 @[expose] public section

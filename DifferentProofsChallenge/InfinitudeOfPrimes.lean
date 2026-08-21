@@ -6,7 +6,8 @@ public import DifferentProofs.InfinitudeOfPrimes.Defs
 # Comparator challenge: infinitude of primes
 
 Each theorem below records the statement that the correspondingly named declaration in
-`DifferentProofs.InfinitudeOfPrimes.*` is required to prove. See `comparator/README.md`.
+`DifferentProofs.InfinitudeOfPrimes.*` is required to prove. See `README.md` for what the Comparator
+check guarantees and how to run it.
 -/
 
 @[expose] public section

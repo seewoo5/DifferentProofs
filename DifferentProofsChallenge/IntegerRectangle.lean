@@ -6,7 +6,8 @@ public import DifferentProofs.IntegerRectangle.Defs
 # Comparator challenge: tiling a rectangle
 
 Each theorem below records the statement that the correspondingly named declaration in
-`DifferentProofs.IntegerRectangle.*` is required to prove. See `comparator/README.md`.
+`DifferentProofs.IntegerRectangle.*` is required to prove. See `README.md` for what the Comparator
+check guarantees and how to run it.
 
 Listed in the order of Stan Wagon's *Fourteen Proofs of a Result About Tiling a Rectangle*,
 keeping its numbering, so the gaps show which of the fourteen are still to come.

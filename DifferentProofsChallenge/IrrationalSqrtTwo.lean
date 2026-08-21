@@ -6,7 +6,8 @@ public import DifferentProofs.IrrationalSqrtTwo.Defs
 # Comparator challenge: irrationality of `√2`
 
 Each theorem below records the statement that the correspondingly named declaration in
-`DifferentProofs.IrrationalSqrtTwo.*` is required to prove. See `comparator/README.md`.
+`DifferentProofs.IrrationalSqrtTwo.*` is required to prove. See `README.md` for what the Comparator
+check guarantees and how to run it.
 -/
 
 @[expose] public section
