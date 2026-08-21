@@ -1,0 +1,13 @@
+{
+  "challenge_module": "DifferentProofsChallenge.IrrationalSqrtTwo",
+  "solution_module": "DifferentProofs",
+  "theorem_names": [
+    "IrrationalSqrtTwo_Descent",
+    "IrrationalSqrtTwoNat_Descent",
+    "IrrationalSqrtTwo_Valuation",
+    "IrrationalSqrtTwoNat_Valuation",
+    "IrrationalSqrtTwo_FermatLastTheorem"
+  ],
+  "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"],
+  "enable_nanoda": false
+}

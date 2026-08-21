@@ -1,0 +1,9 @@
+module  -- shake: keep-all --deprecated_module: ignore
+
+public import DifferentProofsChallenge.BaselProblem
+public import DifferentProofsChallenge.CombinatorialIdentities
+public import DifferentProofsChallenge.FermatLittleTheorem
+public import DifferentProofsChallenge.InfinitudeOfPrimes
+public import DifferentProofsChallenge.IntegerRectangle
+public import DifferentProofsChallenge.IrrationalSqrtTwo
+public import DifferentProofsChallenge.SumOfTwoSquares

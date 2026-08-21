@@ -18,6 +18,17 @@ When adding a new proof, please make the Lean statement match the intended
 mathematics carefully, add the relevant imports, and update the project index
 and blueprint where appropriate.
 
+Also record the new theorem in the Comparator challenge, so that CI checks it
+proves the intended statement and nothing weaker. This means adding the
+statement to `DifferentProofsChallenge/<Topic>.lean` and the theorem's fully
+qualified name — several proofs live in a namespace, so for example
+`IntegerRectangle.Polynomials.IntegerRectangleTheorem_Polynomials` rather than
+the short form in the source file — to `comparator/<Topic>.json`. See the
+[README](README.md#verifying-that-the-proofs-prove-the-same-thing) for what the
+check guarantees and how to run it locally. Every headline theorem in the
+project is listed, so a new one should be too; a proof that still contains a
+`sorry` cannot be, since Comparator rejects `sorryAx`.
+
 ## Formalizations that may belong in mathlib
 
 Sometimes a proof may require a useful fact that is not yet available in
@@ -156,3 +167,14 @@ lake build
 
 For changes that affect the blueprint, also check that the blueprint still
 builds and renders correctly.
+
+If you added or restated a theorem, check that the challenge statements still
+elaborate:
+
+```sh
+lake build DifferentProofsChallenge
+```
+
+Running Comparator itself is optional locally — CI runs it on every pull
+request — but the
+[README](README.md#verifying-that-the-proofs-prove-the-same-thing) explains how.

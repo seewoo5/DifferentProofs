@@ -74,6 +74,52 @@ fourteen proofs are still to come.
 - Proof 12: [Sweep line (Bachman–Yannakakis)](DifferentProofs/IntegerRectangle/SweepLine.lean)
 - Proof 13: [Step functions (Hochster–Maté)](DifferentProofs/IntegerRectangle/StepFunction.lean)
 
+## Verifying that the proofs prove the same thing
+
+Because the point of the project is that these proofs establish *the same*
+result, CI runs [Comparator](https://github.com/leanprover/comparator) over
+every headline theorem. For each one it re-checks, without trusting the proof
+file, that the proof establishes exactly the statement recorded in
+[`DifferentProofsChallenge/`](DifferentProofsChallenge), that it uses no axioms
+beyond `propext`, `Quot.sound`, and `Classical.choice`, and that the proof term
+is accepted by a fresh run of the Lean kernel. Each `comparator/<Topic>.json`
+lists the theorems to check for one topic.
+
+Running it locally is optional — CI runs it on every pull request. Check
+Comparator out *outside* this repository, since the directory name `comparator`
+is taken here by the configs. It has to be built against the same Lean version
+as this project, because the two share a Lean installation and `lean4export`
+reads the project's `.olean` files; the commit below is the last one on v4.32.0,
+and should be bumped together with `lean-toolchain`.
+
+```sh
+git clone https://github.com/leanprover/comparator ../comparator-tool
+git -C ../comparator-tool checkout 07bc4ea40f2266dcb861820a2ec1fa3244ed307f
+git -C ../comparator-tool cherry-pick --no-commit 9badaf470d8f724346d33738bd273efacd78df76
+lake -d ../comparator-tool build lean4export comparator
+```
+
+That cherry-pick is [leanprover/comparator#60](https://github.com/leanprover/comparator/pull/60),
+which makes Comparator pass its own `--` terminator before the sandboxed command. Without it
+landrun's flag parser swallows the `--` that separates `lean4export`'s module argument from its
+declaration names, and every export fails with "unknown module prefix". The fix landed after the
+last v4.32.0 commit, so it has to be applied on top of the pin; drop it when `lean-toolchain`
+moves to v4.33.0 or later.
+
+Then, from the root of this project, run one topic at a time:
+
+```sh
+TOOL=$(realpath ../comparator-tool)
+COMPARATOR_LANDRUN=$TOOL/scripts/fake-landrun.sh \
+COMPARATOR_LEAN4EXPORT=$TOOL/.lake/packages/lean4export/.lake/build/bin/lean4export \
+  lake env "$TOOL/.lake/build/bin/comparator" comparator/IrrationalSqrtTwo.json
+```
+
+`fake-landrun.sh` is the shim Comparator ships for development, which runs the
+builds unsandboxed. On Linux, build [landrun](https://github.com/Zouuup/landrun)
+instead and point `COMPARATOR_LANDRUN` at it. Each topic takes roughly half a
+minute to a few minutes once the project is built.
+
 ## Building and serving the blueprint locally
 
 The [blueprint](https://seewoo5.github.io/DifferentProofs/) is built with
