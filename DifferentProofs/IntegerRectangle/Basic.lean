@@ -61,6 +61,11 @@ def toSetIoc (R : Rectangle) : Set (ℝ × ℝ) := Ioc R.x₀ R.x₁ ×ˢ Ioc R.
 lemma mem_toSetIoc {R : Rectangle} {z : ℝ × ℝ} :
     z ∈ R.toSetIoc ↔ (R.x₀ < z.1 ∧ z.1 ≤ R.x₁) ∧ (R.y₀ < z.2 ∧ z.2 ≤ R.y₁) := Iff.rfl
 
+/-- Membership of a point given by its coordinates, the form in which the four inequalities are
+usually needed. -/
+lemma mem_toSetIoc' {R : Rectangle} {x y : ℝ} :
+    (x, y) ∈ R.toSetIoc ↔ (R.x₀ < x ∧ x ≤ R.x₁) ∧ R.y₀ < y ∧ y ≤ R.y₁ := Iff.rfl
+
 /-- A rectangle's half-open cell is a measurable subset of the plane. -/
 lemma measurableSet_toSetIoc (R : Rectangle) : MeasurableSet R.toSetIoc :=
   measurableSet_Ioc.prod measurableSet_Ioc
@@ -74,6 +79,14 @@ lemma mem_interior_toSet {R : Rectangle} {z : ℝ × ℝ}
     (h : (R.x₀ < z.1 ∧ z.1 < R.x₁) ∧ (R.y₀ < z.2 ∧ z.2 < R.y₁)) : z ∈ interior R.toSet := by
   rw [Rectangle.toSet, interior_prod_eq, interior_Icc, interior_Icc]
   exact h
+
+/-- A rectangle is *nondegenerate* when it has positive width and positive height — equivalently,
+when its interior is nonempty. Degenerate rectangles have empty half-open cells, so a tiling can
+always be pruned down to its nondegenerate tiles (`IsTiling.proper`). -/
+def Nondegenerate (S : Rectangle) : Prop := S.x₀ < S.x₁ ∧ S.y₀ < S.y₁
+
+noncomputable instance : DecidablePred Nondegenerate :=
+  fun S ↦ inferInstanceAs (Decidable (S.x₀ < S.x₁ ∧ S.y₀ < S.y₁))
 
 /-- A rectangle's width is nonnegative. -/
 lemma width_nonneg (R : Rectangle) : 0 ≤ R.width := sub_nonneg.mpr R.hx
@@ -94,7 +107,7 @@ end Rectangle
 
 section Tiles
 
-variable {ι : Type*} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
+variable {ι : Type} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
 
 /-- Each tile of a tiling is contained in the tiled rectangle. -/
 lemma IsTiling.tile_subset (hT : IsTiling R T) (i : ι) : (T i).toSet ⊆ R.toSet :=
@@ -138,7 +151,7 @@ partition the half-open cell of the tiled rectangle, with no null sets involved.
 
 section Partition
 
-variable {ι : Type*} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
+variable {ι : Type} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
 
 /-- **Half-open cells of a tiling are pairwise disjoint.** A common point of two cells could be
 nudged down and to the left into the interiors of both tiles. -/
@@ -198,7 +211,7 @@ lemma aedisjoint_toSet_of_disjoint_interior {A B : Rectangle}
 
 /-- **Additivity of the plane integral over a tiling.** If `T` tiles `R` and `f` is integrable on
 `R`, then the integral of `f` over `R` is the sum of the integrals over the tiles. -/
-theorem IsTiling.setIntegral_eq_sum {ι : Type*} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
+theorem IsTiling.setIntegral_eq_sum {ι : Type} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
     {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] (hT : IsTiling R T) {f : ℝ × ℝ → E}
     (hf : IntegrableOn f R.toSet volume) :
     ∫ z in R.toSet, f z = ∑ i, ∫ z in (T i).toSet, f z := by
@@ -216,8 +229,8 @@ theorem Rectangle.setIntegral_prod_mul (R : Rectangle) {L : Type*} [RCLike L] (g
 /-- **The dichotomy engine.** Suppose `T` tiles `R`, the product `g z.1 · h z.2` is integrable over
 `R`, and for every tile at least one of its width-integral of `g` or its height-integral of `h`
 vanishes. Then the same dichotomy holds for the ambient rectangle `R`. -/
-theorem IsTiling.prod_integral_dichotomy {ι : Type*} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
-    {L : Type*} [RCLike L] {g h : ℝ → L} (hT : IsTiling R T)
+theorem IsTiling.prod_integral_dichotomy {ι : Type} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
+    {L : Type} [RCLike L] {g h : ℝ → L} (hT : IsTiling R T)
     (hint : IntegrableOn (fun z : ℝ × ℝ ↦ g z.1 * h z.2) R.toSet volume)
     (htile : ∀ i, (∫ x in Icc (T i).x₀ (T i).x₁, g x) = 0 ∨
       (∫ y in Icc (T i).y₀ (T i).y₁, h y) = 0) :

@@ -15,32 +15,32 @@ experimental.module = true
 name = "checkdecls"
 git = "https://github.com/PatrickMassot/checkdecls.git"
 
-# Pin verso to the reachable v4.30.0 tag. VersoBlueprint v4.30.0 transitively
+# Pin verso to the reachable v4.32.0 tag. VersoBlueprint v4.32.0 transitively
 # pins verso to an orphaned commit (not on any branch/tag), which a normal
 # `git fetch` cannot retrieve, breaking fresh checkouts. This direct require
 # overrides that inherited pin with the equivalent tagged release.
 [[require]]
 name = "verso"
 git = "https://github.com/leanprover/verso"
-rev = "v4.30.0"
+rev = "v4.32.0"
 
 [[require]]
 name = "VersoBlueprint"
 git = "https://github.com/leanprover/verso-blueprint"
-rev = "v4.30.0"
+rev = "v4.32.0"
 
 # Override VersoBlueprint's inherited verso pin: it points at a bare SHA on a
 # branch that verso force-pushed/GC'd, so lake can no longer fetch it. The
-# stable v4.30.0 tag is identical in src/verso to that orphaned commit.
+# stable v4.32.0 tag is identical in src/verso to that orphaned commit.
 [[require]]
 name = "verso"
 git = "https://github.com/leanprover/verso"
-rev = "v4.30.0"
+rev = "v4.32.0"
 
 [[require]]
 name = "mathlib"
 git = "https://github.com/leanprover-community/mathlib4.git"
-rev = "v4.30.0"
+rev = "v4.32.0"
 
 [[lean_lib]]
 name = "DifferentProofs"

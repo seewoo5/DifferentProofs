@@ -48,7 +48,7 @@ private lemma card_latticePoints (p : ℕ) (S : Rectangle) :
   have hy := Int.floor_mono (mul_le_mul_of_nonneg_right S.hy p.cast_nonneg)
   simp [latticePoints, Int.card_Ioc, hx, hy]
 
-variable {ι : Type*} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
+variable {ι : Type} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
 
 /-- **Additivity of the lattice count over a tiling.** The half-open cells of the tiles partition
 the half-open cell of `R` (`IsTiling.iUnion_toSetIoc`, `IsTiling.pairwiseDisjoint_toSetIoc`), and
@@ -114,7 +114,7 @@ private lemma exists_forall_le_abs_sub {x : ℝ} (h : ¬∃ n : ℤ, x = n) :
   ⟨|x - round x|, abs_sub_pos.mpr fun heq ↦ h ⟨round x, heq⟩, round_le x⟩
 
 /-- **Prime-numbers proof** (Robinson) of the integer-rectangle tiling theorem. -/
-theorem IntegerRectangleTheorem_Primes.{u} : IntegerRectangleTheorem.{u} := by
+theorem IntegerRectangleTheorem_Primes : IntegerRectangleTheorem := by
   intro ι _ R T hT hsides
   by_contra hcon
   rw [Rectangle.HasIntegerSide, not_or] at hcon

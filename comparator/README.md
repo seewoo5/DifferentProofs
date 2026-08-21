@@ -57,19 +57,20 @@ Use the fully qualified name. Several proofs live in a namespace, so the name in
 for example `IntegerRectangle.Polynomials.IntegerRectangleTheorem_Polynomials`, not the short
 form that appears in the source file.
 
-Comparator compares signatures syntactically, universe parameter *names* included. That only
-matters for a universe-polymorphic statement — currently just `IntegerRectangleTheorem` — where
-an auto-bound name would otherwise depend on incidental file layout, since a preceding
-`variable {ι : Type*}` line claims `u_1` and pushes the theorem to `u_2`. Both the proof files
-and the challenge therefore write `.{u}` out explicitly. Keep doing that for any new
-universe-polymorphic statement; if a statement mismatch is reported for a theorem whose type
-looks identical, a universe name is the first thing to check.
+Comparator compares signatures syntactically, universe parameter *names* included. No statement
+here is universe-polymorphic today — `IntegerRectangleTheorem` deliberately fixes its tile-index
+type to `Type` — so the question does not currently arise. Should one become polymorphic, write
+its universe parameters out explicitly (`theorem foo.{u} : Bar.{u}`) in both the proof file and
+the challenge, rather than letting them be auto-bound: an auto-bound name depends on incidental
+file layout, since a preceding `variable {ι : Type*}` line claims `u_1` and pushes the theorem
+to `u_2`. If a statement mismatch is ever reported for a theorem whose type looks identical, a
+universe name is the first thing to check.
 
 ## Running it locally
 
 Comparator has to be built against the same Lean version as this project, because the two share
 a Lean installation and `lean4export` reads the project's `.olean` files. Commit
-`1cfc5d8ad183bf65efe7accd0efc175b6b8f25b6` is the last one on v4.30.0; bump it together with
+`07bc4ea40f2266dcb861820a2ec1fa3244ed307f` is the last one on v4.32.0; bump it together with
 `lean-toolchain`.
 
 Check the tool out *outside* this repository — the directory name `comparator` is already taken
@@ -77,7 +78,7 @@ here by the configs — and build it. Below it lives next to the project as `../
 
 ```sh
 git clone https://github.com/leanprover/comparator ../comparator-tool
-git -C ../comparator-tool checkout 1cfc5d8ad183bf65efe7accd0efc175b6b8f25b6
+git -C ../comparator-tool checkout 07bc4ea40f2266dcb861820a2ec1fa3244ed307f
 lake -d ../comparator-tool build lean4export comparator
 ```
 

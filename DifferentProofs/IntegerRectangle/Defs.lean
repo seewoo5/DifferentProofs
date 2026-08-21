@@ -59,8 +59,11 @@ end Rectangle
 
 /-- `IsTiling R T` says that the finite family of rectangles `T` tiles the rectangle `R`: the
 tiles cover `R` and have pairwise-disjoint interiors. This is Wagon's notion of a tiling, "a
-covering with interior pairwise-disjoint sets". -/
-structure IsTiling {ι : Type*} [Fintype ι] (R : Rectangle) (T : ι → Rectangle) : Prop where
+covering with interior pairwise-disjoint sets".
+
+The index type intentionally lives in `Type`: every finite family can be reindexed by `Fin n`, and
+fixing its universe prevents independent tile-index universes from appearing across the proofs. -/
+structure IsTiling {ι : Type} [Fintype ι] (R : Rectangle) (T : ι → Rectangle) : Prop where
   /-- The tiles cover the ambient rectangle exactly. -/
   cover : R.toSet = ⋃ i, (T i).toSet
   /-- Distinct tiles have disjoint interiors. -/
@@ -71,7 +74,7 @@ structure IsTiling {ι : Type*} [Fintype ι] (R : Rectangle) (T : ι → Rectang
 rectangles, each having at least one integer side, then the tiled rectangle has at least one
 integer side. -/
 def IntegerRectangleTheorem : Prop :=
-  ∀ {ι : Type*} [Fintype ι] (R : Rectangle) (T : ι → Rectangle),
+  ∀ {ι : Type} [Fintype ι] (R : Rectangle) (T : ι → Rectangle),
     IsTiling R T → (∀ i, (T i).HasIntegerSide) → R.HasIntegerSide
 
 end IntegerRectangle

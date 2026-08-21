@@ -17,13 +17,13 @@ jobs:
 
       # Comparator's toolchain must match this project's, because the two share
       # a Lean installation and `lean4export` has to read the project's oleans.
-      # This is the last Comparator commit on v4.30.0; bump it together with
+      # This is the last Comparator commit on v4.32.0; bump it together with
       # `lean-toolchain`.
       - name: Check out Comparator
         uses: actions/checkout@v5
         with:
           repository: leanprover/comparator
-          ref: 1cfc5d8ad183bf65efe7accd0efc175b6b8f25b6
+          ref: 07bc4ea40f2266dcb861820a2ec1fa3244ed307f
           path: comparator
 
       - name: Check out landrun

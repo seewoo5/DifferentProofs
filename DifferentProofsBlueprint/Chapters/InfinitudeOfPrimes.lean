@@ -10,6 +10,7 @@ import DifferentProofs.InfinitudeOfPrimes.Euler
 import DifferentProofs.InfinitudeOfPrimes.Goldbach
 import DifferentProofs.InfinitudeOfPrimes.Saidak
 import DifferentProofs.InfinitudeOfPrimes.Wunderlich
+import DifferentProofs.InfinitudeOfPrimes.Zeta
 
 open Verso.Genre
 open Verso.Genre.Manual
@@ -287,4 +288,37 @@ There are infinitely many prime numbers.
 
 :::proof "thm:inf-primes-from-three-four"
 This follows from {uses "thm:inf-primes-cong-three-four"}[].
+:::
+
+The seventh proof combines the Euler product for $`\zeta(2)` with the irrationality of $`\pi^2`.
+
+:::theorem "thm:irrational-pi-sq" (parent := "grp:inf-primes") (lean := "irrational_pi_sq")
+Niven's theorem: $`\pi^2` is irrational.
+:::
+
+:::proof "thm:irrational-pi-sq"
+Set $`I_n = \int_0^1 (x-x^2)^n \sin(\pi x)\,dx`. Since $`(x-x^2)^n` vanishes at both endpoints,
+integrating by parts twice gives
+$`\pi^2 I_{n+2} = 2(n+2)(2n+3) I_{n+1} - (n+2)(n+1) I_n`.
+Suppose $`\pi^2 = a/b` with $`a`, $`b` integers and $`b > 0`. The recursion then shows that the
+integers defined by $`A_0 = 2`, $`A_1 = 4b` and $`A_{n+2} = 2(2n+3) b A_{n+1} - ab A_n` satisfy
+$`A_n \cdot n! = b^n \pi^{2n+1} I_n`. This is Niven's assertion that
+$`\pi \int_0^1 a^n x^n (1-x)^n \sin(\pi x)/n!\,dx` is an integer, which he reads off from the
+auxiliary function $`g = b^n \sum_k (-1)^k \pi^{2n-2k} f^{(2k)}` for $`f(x) = x^n(1-x)^n/n!`;
+the telescoping property of $`g` is exactly the recursion above.
+The integrand of $`I_n` is positive on $`(0,1)`, so each $`A_n` is a positive integer and
+$`A_n \ge 1`. But $`0 \le x - x^2 \le 1/4` and $`\sin(\pi x) \le 1` on $`[0,1]` give
+$`I_n \le 4^{-n}`, hence $`A_n \le \pi (a/4)^n / n!`, which tends to $`0`. Contradiction.
+:::
+
+:::theorem "thm:inf-primes-zeta" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_Zeta") (proofColor := "#fed7aa")
+There are infinitely many prime numbers.
+:::
+
+:::proof "thm:inf-primes-zeta"
+If there were only finitely many primes, the partial Euler products
+$`\prod_{p < n} (1 - p^{-2})^{-1}` would be constant for large $`n`, so Euler's product formula
+$`\zeta(2) = \prod_p (1 - p^{-2})^{-1}` would exhibit $`\zeta(2)` as a finite product of
+rational numbers, hence as a rational number. But $`\zeta(2) = \pi^2/6` and $`\pi^2` is
+irrational {uses "thm:irrational-pi-sq"}[], a contradiction.
 :::

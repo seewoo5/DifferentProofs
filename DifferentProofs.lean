@@ -1,11 +1,13 @@
-module  -- shake: keep-all
+module  -- shake: keep-all --deprecated_module: ignore
 
 public import DifferentProofs.BaselProblem.Cauchy
 public import DifferentProofs.BaselProblem.Defs
 public import DifferentProofs.BaselProblem.Parseval
 public import DifferentProofs.CombinatorialIdentities.Defs
-public import DifferentProofs.CombinatorialIdentities.HockeyStick
-public import DifferentProofs.CombinatorialIdentities.Pascal
+public import DifferentProofs.CombinatorialIdentities.HockeyStick.DoubleCounting
+public import DifferentProofs.CombinatorialIdentities.HockeyStick.Induction
+public import DifferentProofs.CombinatorialIdentities.Pascal.Binomial
+public import DifferentProofs.CombinatorialIdentities.Pascal.Counting
 public import DifferentProofs.FermatLittleTheorem.Alkauskas
 public import DifferentProofs.FermatLittleTheorem.Basic
 public import DifferentProofs.FermatLittleTheorem.Binomial
@@ -20,8 +22,10 @@ public import DifferentProofs.InfinitudeOfPrimes.Euler
 public import DifferentProofs.InfinitudeOfPrimes.Goldbach
 public import DifferentProofs.InfinitudeOfPrimes.Saidak
 public import DifferentProofs.InfinitudeOfPrimes.Wunderlich
+public import DifferentProofs.InfinitudeOfPrimes.Zeta
 public import DifferentProofs.IntegerRectangle.Basic
 public import DifferentProofs.IntegerRectangle.BipartiteGraph
+public import DifferentProofs.IntegerRectangle.Cells
 public import DifferentProofs.IntegerRectangle.Checkerboard
 public import DifferentProofs.IntegerRectangle.ComplexIntegral
 public import DifferentProofs.IntegerRectangle.CornerCount
@@ -32,8 +36,11 @@ public import DifferentProofs.IntegerRectangle.GridRefinement
 public import DifferentProofs.IntegerRectangle.Polynomials
 public import DifferentProofs.IntegerRectangle.Primes
 public import DifferentProofs.IntegerRectangle.RealIntegral
+public import DifferentProofs.IntegerRectangle.ReducibleLink
+public import DifferentProofs.IntegerRectangle.Staircase
 public import DifferentProofs.IntegerRectangle.StepFunction
 public import DifferentProofs.IntegerRectangle.SweepLine
+public import DifferentProofs.IntegerRectangle.Walks
 public import DifferentProofs.IrrationalSqrtTwo.Basic
 public import DifferentProofs.IrrationalSqrtTwo.Defs
 public import DifferentProofs.IrrationalSqrtTwo.Descent

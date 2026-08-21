@@ -39,7 +39,7 @@ namespace IntegerRectangle.EulerianPath
 
 /-! ### Paterson's graph -/
 
-variable {ι : Type*} {R : Rectangle} {T : ι → Rectangle} {p q : ℝ × ℝ}
+variable {ι : Type} {R : Rectangle} {T : ι → Rectangle} {p q : ℝ × ℝ}
 
 /-- `IsSide S p q` says that `p` and `q` are the two ends of one of the two sides of `S` that
 Paterson's graph uses: the horizontal sides of `S` when its width is an integer, the vertical
@@ -76,8 +76,8 @@ private lemma fracts_eq_of_adj (h : Adj T p q) : fracts p = fracts q :=
 /-- **A walk in `Γ` moves by a vector with integer entries.** Each of its edges is a side of a
 tile whose length is an integer, and which is parallel to an axis. -/
 theorem fracts_eq_of_reachable (h : Reachable T p q) : fracts p = fracts q :=
-  Relation.reflTransGen_of_equivalence (r := fun p q ↦ fracts p = fracts q)
-    ⟨fun _ ↦ rfl, Eq.symm, Eq.trans⟩ (fun _ _ ↦ fracts_eq_of_adj) h
+  Relation.reflTransGen_le_of_equivalence_of_le (r := fun p q ↦ fracts p = fracts q)
+    ⟨fun _ ↦ rfl, Eq.symm, Eq.trans⟩ (fun _ _ ↦ fracts_eq_of_adj) p q h
 
 /-! ### The component of the lower-left corner -/
 
@@ -140,7 +140,7 @@ theorem exists_reachable_corner (hT : IsTiling R T) (hsides : ∀ i, (T i).HasIn
 /-- **Eulerian-path proof** (Paterson) of the integer-rectangle tiling theorem. A walk in `Γ`
 joins the lower-left corner of `R` to another of its corners, and moves by a vector with integer
 entries; whichever corner it reaches, that is an integer side of `R`. -/
-theorem IntegerRectangleTheorem_EulerianPath.{u} : IntegerRectangleTheorem.{u} := by
+theorem IntegerRectangleTheorem_EulerianPath : IntegerRectangleTheorem := by
   intro ι _ R T hT hsides
   obtain h | h | h := exists_reachable_corner hT hsides
   · exact .inl (Int.fract_eq_fract'.mp (congrArg Prod.fst (fracts_eq_of_reachable h)))

@@ -43,7 +43,7 @@ private lemma integral_Icc_e_eq_zero_iff {a b : ℝ} (hab : a ≤ b) :
   norm_cast
 
 /-- **Complex double-integral proof** (de Bruijn) of the integer-rectangle tiling theorem. -/
-theorem IntegerRectangleTheorem_ComplexIntegral.{u} : IntegerRectangleTheorem.{u} := by
+theorem IntegerRectangleTheorem_ComplexIntegral : IntegerRectangleTheorem := by
   intro ι _ R T hT hsides
   have hint : IntegrableOn (fun z : ℝ × ℝ ↦ e z.1 * e z.2) R.toSet volume :=
     R.integrableOn_of_continuous (by unfold e; fun_prop)

@@ -1,0 +1,660 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+# formalization.yaml (v0.4): repo-root metadata for formalization projects.
+# Requiredness/conformance:
+#   - Fields marked [required] should be present and filled.
+#   - Fields not marked [required] are examples/recommended metadata only; they may be omitted.
+#   - Projects may add extra YAML keys at any level. Readers should tolerate unknown keys.
+# This is a lightweight reporting schema, not a closed validation schema.
+
+version: "v0.4"
+
+# project - the formalization itself (not the source).
+project:
+  name: "Different Proofs"     # [required]
+  authors:                     # [required] who did the formalization
+    - "Seewoo Lee"
+  responsible_maintainers:     # people responsible for the formalization repository
+    - "Seewoo Lee"
+  license: "Apache-2.0"        # [required]
+
+# This repository is the substantive formalization; no packaging layer is involved,
+# so `repository.substantive_formalization` is deliberately omitted.
+
+# sources - what was formalized. Sources may be articles, books, web posts,
+# folklore, conversations, or anything else; no arXiv record is assumed.
+#
+# This project formalizes several *different* proofs of each of a handful of
+# results, so the source list is correspondingly long. Where a proof is genuinely
+# classical and the project worked from the standard textbook argument rather than
+# a specific paper, the entry is typed `folklore` and carries no identifier; no
+# citation is asserted that the repository itself does not record.
+sources:                       # [required] list of sources or an original proof
+  - title: "Fourteen Proofs of a Result About Tiling a Rectangle"
+    authors: ["Stan Wagon"]
+    id: "Amer. Math. Monthly 94 (1987), no. 7, 601-617; https://www.jstor.org/stable/2322213"
+    type: "article"
+    location: "Proofs 1-10, 12, 13 of the fourteen (11 and 14 not yet formalized)"
+    relationship: "formalizes"
+    license: ""
+    author_endorsement: "not-contacted"
+
+  - title: "A curious proof of Fermat's little theorem"
+    authors: ["Giedrius Alkauskas"]
+    id: "arXiv:0801.0805"
+    type: "article"
+    location: "whole paper"
+    relationship: "formalizes"
+    license: ""
+    author_endorsement: "not-contacted"
+
+  - title: "A one-sentence proof that every prime p = 1 (mod 4) is a sum of two squares"
+    authors: ["Don Zagier"]
+    id: "Amer. Math. Monthly 97 (1990), no. 2, 144"
+    type: "article"
+    location: "whole paper"
+    relationship: "formalizes"
+    license: ""
+    author_endorsement: "not-contacted"
+
+  - title: "One mod four primes are sums of two squares"
+    authors: ["Levent Alpöge"]
+    id: "https://alpo.ge/fun/one%20mod%20four%20primes%20are%20sums%20of%20two%20squares.pdf"
+    type: "article"
+    location: "whole note"
+    relationship: "formalizes"
+    license: ""
+    author_endorsement: "not-contacted"
+
+  - title: "A New Proof of Euclid's Theorem"
+    authors: ["Filip Saidak"]
+    id: "Amer. Math. Monthly 113 (2006), no. 10, 937-938; doi:10.2307/27642094"
+    type: "article"
+    location: "whole paper"
+    relationship: "formalizes"
+    license: ""
+    author_endorsement: "not-contacted"
+
+  - title: "Another proof of the infinite primes theorem"
+    authors: ["Marvin C. Wunderlich"]
+    id: "Amer. Math. Monthly 72 (1965), no. 3, 305"
+    type: "article"
+    location: "whole paper (formalized with F_37 = 73 * 149 * 2221)"
+    relationship: "adapts"
+    license: ""
+    author_endorsement: "not-contacted"
+
+  - title: "Identity (18 + 17*sqrt 2)^3 + (18 - 17*sqrt 2)^3 = 42^3, giving the irrationality of sqrt 2 from Fermat's Last Theorem for exponent 3"
+    authors: ["Frazer Jarvis", "Tom Meekin"]
+    id: "https://math.stackexchange.com/a/4438248"
+    type: "web post"
+    location: "the cited answer"
+    relationship: "formalizes"
+    license: ""
+    author_endorsement: "not-contacted"
+
+  - title: "Euclid's proof of the infinitude of primes"
+    authors: ["Euclid"]
+    id: "Elements, Book IX, Proposition 20"
+    type: "book"
+    location: "Book IX, Proposition 20"
+    relationship: "formalizes"
+    license: ""
+    author_endorsement: "n/a"
+
+  - title: "Goldbach's proof of the infinitude of primes via the pairwise coprimality of the Fermat numbers"
+    authors: ["Christian Goldbach"]
+    id: ""                     # letter to Euler, 1730; worked from the standard modern account
+    type: "folklore"
+    location: ""
+    relationship: "formalizes"
+    license: ""
+    author_endorsement: "n/a"
+
+  - title: "Euler's proof of the infinitude of primes from the divergence of the harmonic series and the Euler product"
+    authors: ["Leonhard Euler"]
+    id: ""
+    type: "folklore"
+    location: ""
+    relationship: "formalizes"
+    license: ""
+    author_endorsement: "n/a"
+
+  - title: "Infinitude of primes from the irrationality of pi^2 and the Euler product for zeta(2)"
+    authors: []                # answer posted under a Math StackExchange pseudonym
+    id: "https://math.stackexchange.com/a/50012/350772"
+    type: "web post"
+    location: "the cited answer"
+    relationship: "formalizes"
+    license: "CC BY-SA (Math StackExchange contributor content)"
+    author_endorsement: "not-contacted"
+
+  - title: "Euclid-style proofs that there are infinitely many primes congruent to 1 and to 3 mod 4"
+    authors: []
+    id: ""                     # classical special cases of Dirichlet's theorem
+    type: "folklore"
+    location: ""
+    relationship: "formalizes"
+    license: ""
+    author_endorsement: "n/a"
+
+  - title: "Proofs of Fermat's little theorem (Wikipedia)"
+    authors: []                # collectively authored
+    id: "https://en.wikipedia.org/wiki/Proofs_of_Fermat%27s_little_theorem"
+    type: "web post"
+    location: >-
+      "Multinomial proofs" (the binomial/Frobenius induction), "Proofs using group
+      theory - Standard proof" (Lagrange's theorem), and "Proof using dynamical
+      systems" (the fixed-point count for T_n(x) = {n x} on [0,1])
+    relationship: "formalizes"
+    license: "CC BY-SA 4.0"
+    author_endorsement: "n/a"
+
+  - title: "Classical proofs of the irrationality of sqrt 2: infinite descent, and the 2-adic valuation argument"
+    authors: []
+    id: ""
+    type: "folklore"
+    location: ""
+    relationship: "formalizes"
+    license: ""
+    author_endorsement: "n/a"
+
+  - title: "Classical proofs of Fermat's theorem on sums of two squares via quadratic reciprocity and via Wilson's theorem"
+    authors: []
+    id: ""
+    type: "folklore"
+    location: ""
+    relationship: "formalizes"
+    license: ""
+    author_endorsement: "n/a"
+
+  - title: "Classical solutions of the Basel problem: Parseval's identity for the Fourier series of x, and Cauchy's cotangent squeeze"
+    authors: ["Augustin-Louis Cauchy"]
+    id: ""
+    type: "folklore"
+    location: ""
+    relationship: "formalizes"
+    license: ""
+    author_endorsement: "n/a"
+
+  - title: "Pascal's rule and the hockey-stick identity for binomial coefficients"
+    authors: []
+    id: ""
+    type: "folklore"
+    location: ""
+    relationship: "formalizes"
+    license: ""
+    author_endorsement: "n/a"
+
+# related_formalizations - prior or parallel formalizations, if known.
+# Mathlib is both a dependency of this project and a prior formalization of several
+# of the same statements; this project deliberately reproves them by other routes.
+related_formalizations:
+  - name: "mathlib4"
+    id: "https://github.com/leanprover-community/mathlib4"
+    revision: "v4.32.0"
+    relationship: "builds-on"
+    # Mathlib declarations with the same mathematical content as statements proved
+    # here. None of them is used to prove its counterpart in this project.
+    overlapping_declarations:
+      - "Nat.exists_infinite_primes (infinitude of primes)"
+      - "ZMod.pow_card (Fermat's little theorem)"
+      - "irrational_sqrt_two (irrationality of sqrt 2)"
+      - "Nat.Prime.sq_add_sq (Fermat's theorem on sums of two squares)"
+      - "hasSum_zeta_two (the Basel problem)"
+    note: >-
+      Mathlib is this project's library dependency, and it is also a prior
+      formalization of several of the same statements. The overlapping declarations
+      listed above are not used here: each theorem family declares its own
+      `Prop`-valued statement in a `*/Defs.lean` file, and every proof in this
+      project proves that `Prop` afresh rather than deriving it from the mathlib
+      counterpart. Some of those proofs may well coincide mathematically with
+      mathlib's; the point is that they are carried out independently, not
+      re-exported. Other mathlib results are of course used freely inside the
+      proofs.
+
+# classification - what area of mathematics the formalized result belongs to.
+classification:
+  arxiv: ["math.NT", "math.CO", "math.HO", "cs.LO"]
+  msc2020: ["11A41", "11A07", "11E25", "11J72", "11M06", "05A19", "05B45", "52C20", "68V20"]
+
+# project status
+status:
+  scope: >-
+    Formalizations of several genuinely different proofs of the same mathematical
+    statement, so that the proofs can be compared side by side. Each theorem family
+    fixes one `Prop`-valued statement in a `Defs.lean` file, and every proof in that
+    family proves exactly that `Prop`. Currently covered: Fermat's little theorem
+    (4 proofs), the infinitude of primes (9 proofs, including a Dirichlet-style pair
+    for the classes 1 and 3 mod 4), the irrationality of sqrt 2 (3 proofs),
+    Fermat's theorem on sums of two squares (4 proofs), the Basel problem (2 proofs),
+    the integer-rectangle tiling theorem of Wagon (12 of his 14 proofs), and two
+    combinatorial identities (Pascal's rule and the hockey-stick identity, each
+    proved two ways). A Verso blueprint under `DifferentProofsBlueprint/` records the
+    informal statements, proof sketches, and dependency graph; reusable supporting
+    lemmas that could be upstreamed live in `DifferentProofsForMathlib/`.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: &standard_axioms
+    - propext
+    - Classical.choice
+    - Quot.sound
+  # No result in this project has literature dependencies: every proof is complete
+  # down to mathlib and the three standard axioms. The project does not use
+  # leanprover/comparator, so `comparator_config` is omitted throughout.
+  main_results:
+    # --- Fermat's little theorem (statement: `FermatLittleTheorem`) ---
+    - declaration: "FermatLittleTheorem_Binomial"
+      file: "DifferentProofs/FermatLittleTheorem/Binomial.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "FermatLittleTheorem_Lagrange"
+      file: "DifferentProofs/FermatLittleTheorem/Lagrange.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "FermatLittleTheorem_Dynamical"
+      file: "DifferentProofs/FermatLittleTheorem/Dynamical.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "FermatLittleTheorem.Alkauskas.FermatLittleTheorem_Alkauskas"
+      file: "DifferentProofs/FermatLittleTheorem/Alkauskas.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+
+    # --- Infinitude of primes (statement: `InfinitudeOfPrimes`) ---
+    - declaration: "InfinitudeOfPrimes_Euclid"
+      file: "DifferentProofs/InfinitudeOfPrimes/Euclid.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "InfinitudeOfPrimes_Euclid'"
+      file: "DifferentProofs/InfinitudeOfPrimes/Euclid.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "InfinitudeOfPrimes_Goldbach"
+      file: "DifferentProofs/InfinitudeOfPrimes/Goldbach.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "InfinitudeOfPrimes_Euler"
+      file: "DifferentProofs/InfinitudeOfPrimes/Euler.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "InfinitudeOfPrimes_Saidak"
+      file: "DifferentProofs/InfinitudeOfPrimes/Saidak.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "InfinitudeOfPrimes_Wunderlich"
+      file: "DifferentProofs/InfinitudeOfPrimes/Wunderlich.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "InfinitudeOfPrimes_Zeta"
+      file: "DifferentProofs/InfinitudeOfPrimes/Zeta.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "InfinitudeOfPrimes_from_one_four"
+      file: "DifferentProofs/InfinitudeOfPrimes/Dirichlet.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "InfinitudeOfPrimes_from_three_four"
+      file: "DifferentProofs/InfinitudeOfPrimes/Dirichlet.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+
+    # --- Irrationality of sqrt 2 (statement: `IrrationalSqrtTwo`) ---
+    - declaration: "IrrationalSqrtTwo_Descent"
+      file: "DifferentProofs/IrrationalSqrtTwo/Descent.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "IrrationalSqrtTwo_Valuation"
+      file: "DifferentProofs/IrrationalSqrtTwo/Valuation.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "IrrationalSqrtTwo_FermatLastTheorem"
+      file: "DifferentProofs/IrrationalSqrtTwo/FermatLastTheorem.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+
+    # --- Fermat's theorem on sums of two squares (statement: `FermatSumOfTwoSquares`) ---
+    - declaration: "FermatSumOfTwoSquares_QuadraticReciprocity"
+      file: "DifferentProofs/SumOfTwoSquares/QuadraticReciprocity.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "FermatSumOfTwoSquares_Wilson"
+      file: "DifferentProofs/SumOfTwoSquares/Wilson.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "SumOfTwoSquares.Zagier.FermatSumOfTwoSquares_Zagier"
+      file: "DifferentProofs/SumOfTwoSquares/Zagier.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "SumOfTwoSquares.Jacobi.FermatSumOfTwoSquares_Jacobi"
+      file: "DifferentProofs/SumOfTwoSquares/Jacobi.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+
+    # --- Basel problem (statement: `BaselProblem`) ---
+    - declaration: "BaselProblem.BaselProblem_Parseval"
+      file: "DifferentProofs/BaselProblem/Parseval.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "BaselProblem.Cauchy.BaselProblem_Cauchy"
+      file: "DifferentProofs/BaselProblem/Cauchy.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+
+    # --- Integer-rectangle tiling theorem (statement: `IntegerRectangleTheorem`);
+    #     numbering follows Wagon's paper.
+    - declaration: "IntegerRectangle.ComplexIntegral.IntegerRectangleTheorem_ComplexIntegral"
+      file: "DifferentProofs/IntegerRectangle/ComplexIntegral.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "IntegerRectangle.RealIntegral.IntegerRectangleTheorem_RealIntegral"
+      file: "DifferentProofs/IntegerRectangle/RealIntegral.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "IntegerRectangle.Checkerboard.IntegerRectangleTheorem_Checkerboard"
+      file: "DifferentProofs/IntegerRectangle/Checkerboard.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "IntegerRectangle.CountingSquares.IntegerRectangleTheorem_CountingSquares"
+      file: "DifferentProofs/IntegerRectangle/CountingSquares.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "IntegerRectangle.Polynomials.IntegerRectangleTheorem_Polynomials"
+      file: "DifferentProofs/IntegerRectangle/Polynomials.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "IntegerRectangle.Primes.IntegerRectangleTheorem_Primes"
+      file: "DifferentProofs/IntegerRectangle/Primes.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "IntegerRectangle.EulerianPath.IntegerRectangleTheorem_EulerianPath"
+      file: "DifferentProofs/IntegerRectangle/EulerianPath.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "IntegerRectangle.BipartiteGraph.IntegerRectangleTheorem_BipartiteGraph"
+      file: "DifferentProofs/IntegerRectangle/BipartiteGraph.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "IntegerRectangle.Staircase.IntegerRectangleTheorem_Staircase"
+      file: "DifferentProofs/IntegerRectangle/Staircase.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "IntegerRectangle.ReducibleLink.IntegerRectangleTheorem_ReducibleLink"
+      file: "DifferentProofs/IntegerRectangle/ReducibleLink.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "IntegerRectangle.SweepLine.IntegerRectangleTheorem_SweepLine"
+      file: "DifferentProofs/IntegerRectangle/SweepLine.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "IntegerRectangle.StepFunction.IntegerRectangleTheorem_StepFunction"
+      file: "DifferentProofs/IntegerRectangle/StepFunction.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+
+    # --- Combinatorial identities ---
+    - declaration: "PascalIdentity_counting"
+      file: "DifferentProofs/CombinatorialIdentities/Pascal/Counting.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "PascalIdentity_binomial"
+      file: "DifferentProofs/CombinatorialIdentities/Pascal/Binomial.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "HockeyStickIdentity_induction"
+      file: "DifferentProofs/CombinatorialIdentities/HockeyStick/Induction.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "HockeyStickIdentity_doubleCounting"
+      file: "DifferentProofs/CombinatorialIdentities/HockeyStick/DoubleCounting.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+
+# how it was produced. Extra per-entry fields are allowed.
+automation:                    # [required]
+  methods:                     # [required] one entry per distinct phase/run/tool
+    - method: "manual"
+      models: []
+      framework: ""
+      tool_setup: "Lean 4 v4.32.0 with mathlib v4.32.0; VS Code with the Lean 4 extension."
+      cost:
+        wall_time: "2026-05-03 to present (~3.5 months, ongoing)"
+        spend_usd: ""
+        hardware: "laptop"
+      prompting_notes: >-
+        Human authorship of the statements, the choice of which proof to formalize
+        next, the mathematical reading of the sources, and line-by-line review of
+        every AI-assisted contribution before merge.
+
+    - method: "agent"
+      models: ["claude-opus-5", "claude-opus-4-8", "claude-opus-4-7", "claude-fable-5"]
+      framework: "Claude Code"
+      tool_setup: >-
+        Claude Code with the lean-lsp MCP server (goal inspection, mathlib search via
+        loogle/leansearch/LeanFinder, diagnostics) and the `lean4` and `mathlib-quality`
+        skill plugins (drafting, proof repair, golfing, mathlib-style cleanup,
+        duplication checks against mathlib).
+      cost:
+        wall_time: ""
+        spend_usd: ""
+        hardware: "API-only (laptop)"
+      prompting_notes: >-
+        Human-in-the-loop and supervised throughout: one proof per session and per
+        pull request, working from the informal source (for the Wagon proofs, the
+        scanned paper read page by page), with the human author reviewing each
+        statement and proof before merge.
+
+    - method: "agent"
+      models: []
+      framework: "OpenAI Codex"
+      tool_setup: "Codex CLI on the same repository."
+      cost:
+        wall_time: ""
+        spend_usd: ""
+        hardware: "API-only (laptop)"
+      prompting_notes: "Same one-proof-per-PR, human-reviewed workflow as above."
+
+    - method: "agent"
+      models: []
+      framework: "GitHub Copilot coding agent"
+      tool_setup: "GitHub Copilot coding agent, assigned to a repository issue."
+      cost:
+        wall_time: ""
+        spend_usd: ""
+        hardware: "API-only (hosted)"
+      prompting_notes: "Single contribution, reviewed and merged through the usual pull-request flow."
+
+    - method: "agent"
+      models: []
+      framework: "Aristotle (Harmonic)"
+      tool_setup: "Harmonic's Aristotle, used to produce initial proofs for a small number of results."
+      cost:
+        wall_time: ""
+        spend_usd: ""
+        hardware: "API-only (hosted)"
+      prompting_notes: "Initial proof drafts, then human-reviewed and cleaned up to project style before merge."
+
+  spend_usd: "subscription-based usage"
+  notes: >-
+    The repository's CONTRIBUTING.md requires that AI-assisted contributions be
+    disclosed in the pull request and checked line by line before submission, and
+    that every theorem statement be verified to say exactly what is intended.
+    AI tool usage is recorded per commit via `Co-authored-by:` trailers, so the
+    per-proof provenance can be read off the git history. CI (`lake build`) checks
+    the whole project on every pull request.
+
+# fidelity
+fidelity:
+  divergences: >-
+    - Each theorem family fixes a single `Prop`-valued statement in its `Defs.lean`
+      file and every proof in the family proves that same `Prop`; this is a
+      deliberate deviation from the sources, which state their results informally,
+      and it is what makes the proofs comparable.
+    - Wagon's paper is followed proof by proof, but the setup is not his: rectangles
+      are encoded by their corner coordinates (`IntegerRectangle.Rectangle`) and a
+      tiling is recorded as `IsTiling` (finite cover with pairwise-disjoint
+      interiors). Where Wagon says "place the rectangle in standard position", the
+      formalization instead bases the integrand, lattice, or grid at the tiled
+      rectangle's own corner, which avoids translating the tiling; and several of
+      his per-proof local arguments are factored into shared lemmas
+      (`IsTiling.sum_fgArea`, `CornerCount`, `Cells`, `Walks`) reused across proofs.
+    - Wagon's proofs 11 (minimal cut-set, Seymour) and 14 (Sperner's lemma, Schmerl)
+      are not formalized. Both need machinery mathlib does not have: planar duality
+      and a planar min-cut theorem for proof 11, and geometric Sperner for an
+      arbitrary triangulation with T-vertices for proof 14 (mathlib's `Sperner` is
+      the antichain theorem).
+    - Wunderlich's argument is adapted: the formalization uses F_37 = 73 * 149 * 2221
+      as its concrete Fibonacci number with three distinct prime factors.
+    - The Dirichlet-style file covers only the residue classes 1 and 3 mod 4, not
+      Dirichlet's theorem in general.
+    - Reusable supporting results are stated in mathlib-friendly generality under
+      `DifferentProofsForMathlib/`, mirroring mathlib's directory layout, rather
+      than in the narrow form each proof needs.
+
+# review status
+review:
+  status: "self-assessed"      # [required]
+  reviewers:
+    - "Seewoo Lee"
+  notes: >-
+    Reviewed by the project author rather than by an independent reviewer. Per
+    CONTRIBUTING.md, AI-assisted work is checked line by line before merge, with
+    particular attention to whether each theorem statement says exactly what is
+    intended and whether each proof step proves the intended intermediate claim.
+    Contributions land through pull requests with CI running `lake build` over the
+    whole project. Axiom hygiene was checked with `#print axioms` on every main
+    result listed above.
+
+# alignment - how source statements map to formal declarations. The table below
+# covers the one source with an enumerated internal structure (Wagon's fourteen
+# proofs) together with the top-level statement of each theorem family; the
+# remaining proofs are aligned one-to-one with the sources listed above, and the
+# blueprint under `DifferentProofsBlueprint/` records the full correspondence.
+alignment:
+  namespace: ""                # declarations live in the root namespace and in per-proof namespaces
+  statements:
+    # Theorem-family statements.
+    - source: "Fermat's little theorem"
+      lean: "FermatLittleTheorem"
+      module: "DifferentProofs.FermatLittleTheorem.Defs"
+      status: "proved"
+      note: "Proved four ways; see `main_results`."
+    - source: "Infinitude of primes"
+      lean: "InfinitudeOfPrimes"
+      module: "DifferentProofs.InfinitudeOfPrimes.Defs"
+      status: "proved"
+      note: "Proved nine ways, including Dirichlet-style variants for the classes 1 and 3 mod 4."
+    - source: "Irrationality of sqrt 2"
+      lean: "IrrationalSqrtTwo"
+      module: "DifferentProofs.IrrationalSqrtTwo.Defs"
+      status: "proved"
+      note: "Proved three ways."
+    - source: "Fermat's theorem on sums of two squares"
+      lean: "FermatSumOfTwoSquares"
+      module: "DifferentProofs.SumOfTwoSquares.Defs"
+      status: "proved"
+      note: "Proved four ways."
+    - source: "Basel problem"
+      lean: "BaselProblem"
+      module: "DifferentProofs.BaselProblem.Defs"
+      status: "proved"
+      note: "Proved two ways."
+    - source: "Wagon, statement: a rectangle tiled by rectangles each having an integer side has an integer side"
+      lean: "IntegerRectangle.IntegerRectangleTheorem"
+      module: "DifferentProofs.IntegerRectangle.Defs"
+      status: "proved"
+      note: "Proved twelve ways, following Wagon's numbering."
+    - source: "Pascal's rule"
+      lean: "PascalIdentity"
+      module: "DifferentProofs.CombinatorialIdentities.Defs"
+      status: "proved"
+      note: "Proved two ways: double counting, and the binomial theorem."
+    - source: "Hockey-stick identity"
+      lean: "HockeyStickIdentity"
+      module: "DifferentProofs.CombinatorialIdentities.Defs"
+      status: "proved"
+      note: "Proved two ways: induction on `n`, and double counting."
+
+    # Wagon's fourteen proofs, in the paper's order.
+    - source: "Wagon, Proof 1 (complex double integral, de Bruijn)"
+      lean: "IntegerRectangle.ComplexIntegral.IntegerRectangleTheorem_ComplexIntegral"
+      module: "DifferentProofs.IntegerRectangle.ComplexIntegral"
+      status: "proved"
+      note: ""
+    - source: "Wagon, Proof 2 (real double integral)"
+      lean: "IntegerRectangle.RealIntegral.IntegerRectangleTheorem_RealIntegral"
+      module: "DifferentProofs.IntegerRectangle.RealIntegral"
+      status: "proved"
+      note: ""
+    - source: "Wagon, Proof 3 (checkerboard colouring, Rochberg-Stein)"
+      lean: "IntegerRectangle.Checkerboard.IntegerRectangleTheorem_Checkerboard"
+      module: "DifferentProofs.IntegerRectangle.Checkerboard"
+      status: "proved"
+      note: ""
+    - source: "Wagon, Proof 4 (counting squares, Ruzsa-Gilbert)"
+      lean: "IntegerRectangle.CountingSquares.IntegerRectangleTheorem_CountingSquares"
+      module: "DifferentProofs.IntegerRectangle.CountingSquares"
+      status: "proved"
+      note: ""
+    - source: "Wagon, Proof 5 (polynomials, Douady)"
+      lean: "IntegerRectangle.Polynomials.IntegerRectangleTheorem_Polynomials"
+      module: "DifferentProofs.IntegerRectangle.Polynomials"
+      status: "proved"
+      note: ""
+    - source: "Wagon, Proof 6 (prime numbers, Robinson)"
+      lean: "IntegerRectangle.Primes.IntegerRectangleTheorem_Primes"
+      module: "DifferentProofs.IntegerRectangle.Primes"
+      status: "proved"
+      note: ""
+    - source: "Wagon, Proof 7 (Eulerian path, Paterson)"
+      lean: "IntegerRectangle.EulerianPath.IntegerRectangleTheorem_EulerianPath"
+      module: "DifferentProofs.IntegerRectangle.EulerianPath"
+      status: "proved"
+      note: ""
+    - source: "Wagon, Proof 8 (bipartite graph)"
+      lean: "IntegerRectangle.BipartiteGraph.IntegerRectangleTheorem_BipartiteGraph"
+      module: "DifferentProofs.IntegerRectangle.BipartiteGraph"
+      status: "proved"
+      note: ""
+    - source: "Wagon, Proof 9 (induction on the number of H-tiles, Robinson)"
+      lean: "IntegerRectangle.Staircase.IntegerRectangleTheorem_Staircase"
+      module: "DifferentProofs.IntegerRectangle.Staircase"
+      status: "proved"
+      note: ""
+    - source: "Wagon, Proof 10 (induction on reducible links, Bishop-Wagon)"
+      lean: "IntegerRectangle.ReducibleLink.IntegerRectangleTheorem_ReducibleLink"
+      module: "DifferentProofs.IntegerRectangle.ReducibleLink"
+      status: "proved"
+      note: ""
+    - source: "Wagon, Proof 11 (minimal cut-set, Seymour)"
+      lean: ""
+      module: ""
+      status: "not-formalized"
+      note: >-
+        Needs planar duality and a min-cut theorem for planar graphs (the existence
+        direction of Hex duality), which mathlib does not have.
+    - source: "Wagon, Proof 12 (sweep line, Bachman-Yannakakis)"
+      lean: "IntegerRectangle.SweepLine.IntegerRectangleTheorem_SweepLine"
+      module: "DifferentProofs.IntegerRectangle.SweepLine"
+      status: "proved"
+      note: ""
+    - source: "Wagon, Proof 13 (step functions, Hochster-Mate)"
+      lean: "IntegerRectangle.StepFunction.IntegerRectangleTheorem_StepFunction"
+      module: "DifferentProofs.IntegerRectangle.StepFunction"
+      status: "proved"
+      note: ""
+    - source: "Wagon, Proof 14 (Sperner's lemma, Schmerl)"
+      lean: ""
+      module: ""
+      status: "not-formalized"
+      note: >-
+        Needs geometric Sperner for an arbitrary triangulation with T-vertices;
+        mathlib's `Sperner` is the antichain theorem, and mathlib has neither the
+        Jordan curve theorem nor Brouwer to substitute.
+
+# acknowledgements - optional credits for libraries, tools, discussions, etc.
+acknowledgements: >-
+  Built on mathlib4 and the Lean 4 toolchain. The blueprint is written with Verso
+  and VersoBlueprint; declaration links are checked with Patrick Massot's
+  checkdecls. Thanks to Stan Wagon, whose survey of fourteen proofs of the
+  integer-rectangle tiling theorem is the backbone of this project, and to the
+  authors of the individual proofs listed under `sources`.

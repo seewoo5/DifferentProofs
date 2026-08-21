@@ -14,6 +14,8 @@ import DifferentProofs.IntegerRectangle.GridRefinement
 import DifferentProofs.IntegerRectangle.Polynomials
 import DifferentProofs.IntegerRectangle.Primes
 import DifferentProofs.IntegerRectangle.RealIntegral
+import DifferentProofs.IntegerRectangle.ReducibleLink
+import DifferentProofs.IntegerRectangle.Staircase
 import DifferentProofs.IntegerRectangle.StepFunction
 import DifferentProofs.IntegerRectangle.SweepLine
 
@@ -110,7 +112,7 @@ that lies off the lattice through the corner of $`R` onto the nearest half-integ
 lattice lines fixed; the tiling becomes a tiling of a translated rectangle all of whose
 coordinates sit on the half-unit grid, so every rectangle in it is a union of
 $`\tfrac12 \times \tfrac12` squares — the checkerboard cells of the third proof — and the argument
-is a parity count of those squares. As with the polynomial proof below, the f-area supplies the
+is a parity count of those squares. As with the polynomial proof below, the fg-area supplies the
 count without the auxiliary tiling having to be built.
 
 :::lemma_ "lem:int-rect-cell-parity" (parent := "grp:int-rect") (lean := "IntegerRectangle.CountingSquares.even_cellIndex_iff")
@@ -130,8 +132,8 @@ increments of the two grid coordinates across it — is additive over a tiling.
 :::
 
 :::proof "lem:int-rect-cellcount"
-That number is by definition the f-area of the pair of grid coordinate functions, so this is
-f-area additivity {uses "lem:int-rect-fgarea"}[], read back in the integers. It is what Wagon gets
+That number is by definition the fg-area of the pair of grid coordinate functions, so this is
+fg-area additivity {uses "lem:int-rect-fgarea"}[], read back in the integers. It is what Wagon gets
 from the auxiliary tiling, here without having to check that the translated tiles tile the
 translated rectangle.
 :::
@@ -155,7 +157,7 @@ Fifth proof: polynomials (Douady). Through the lower-left corner of $`R`, fix th
 lattices and introduce a parameter $`t`. Move a vertical grid line by $`t` when its x-coordinate is
 off the x-lattice, and move a horizontal grid line by $`t` when its y-coordinate is off the
 y-lattice; leave lattice lines fixed. The perturbed areas become honest polynomials in $`t`; the
-f-area formalizes them without separately constructing the auxiliary tiling.
+fg-area formalizes them without separately constructing the auxiliary tiling.
 
 :::theorem "thm:int-rect-polynomials" (parent := "grp:int-rect") (lean := "IntegerRectangle.Polynomials.IntegerRectangleTheorem_Polynomials") (proofColor := "#fbcfe8")
 A rectangle tiled by rectangles each with an integer side has an integer side.
@@ -167,10 +169,10 @@ define $`\varepsilon_y`; perturb the coordinates by $`\varphi_t(u) = u + t\varep
 $`\psi_t(v) = v + t\varepsilon_y(v)`. The perturbed area of a rectangle $`S` is then the value at
 $`t` of the polynomial $`P_S = (\Delta\varepsilon_x X + w)(\Delta\varepsilon_y X + h)`, with
 $`w, h` the sides of $`S` and $`\Delta\varepsilon` the indicator increments across them; its
-quadratic coefficient is the f-area of the indicator pair. If a tile has an integer side, the two
+quadratic coefficient is the fg-area of the indicator pair. If a tile has an integer side, the two
 endpoints of that side have the same indicator, the corresponding factor is constant, and the
 quadratic coefficient vanishes: the tile's perturbed area is linear or constant in $`t`, as in
-Wagon's text. Additivity of the f-area {uses "lem:int-rect-fgarea"}[] equates $`\sum_i P_{T_i}`
+Wagon's text. Additivity of the fg-area {uses "lem:int-rect-fgarea"}[] equates $`\sum_i P_{T_i}`
 with $`P_R` at every real $`t` — Wagon needs $`t` small so that the moved segments still bound a
 tiling, the algebraic identity does not — hence $`\sum_i P_{T_i} = P_R` as polynomials. If neither
 side of $`R` is an integer, each lower endpoint has indicator $`0` and each upper endpoint $`1`,
@@ -252,7 +254,7 @@ entries, and that is an integer side of $`R`.
 
 Of the degrees only the parity is ever used. Wagon reads it off the local picture — a point other
 than a corner of $`R` is a corner of $`2` or $`4` tiles — which is a statement about how tiles fit
-together around a point. It follows instead from the f-area additivity of the thirteenth proof
+together around a point. It follows instead from the fg-area additivity of the thirteenth proof
 below, with no local analysis at all, in the form of the corner parity lemma; that lemma and the
 double count following it are shared with the eighth proof. Corners are counted with multiplicity,
 so degenerate tiles need no separate treatment.
@@ -265,9 +267,9 @@ counted with multiplicity.)
 
 :::proof "lem:int-rect-corner-parity"
 Fix a point $`(u, v)` and take for $`f` and $`g` the indicator functions of $`\{u\}` and
-$`\{v\}`. The f-area of a rectangle is then
+$`\{v\}`. The fg-area of a rectangle is then
 $`(\mathbb{1}[x_1 = u] - \mathbb{1}[x_0 = u])(\mathbb{1}[y_1 = v] - \mathbb{1}[y_0 = v])`, the
-number of corners at $`(u, v)` with the left and bottom edges counted negatively. Being an f-area
+number of corners at $`(u, v)` with the left and bottom edges counted negatively. Being an fg-area
 it is additive over the tiling {uses "lem:int-rect-fgarea"}[], and modulo $`2` subtraction and
 addition agree, so each signed count may be replaced by the corner count.
 :::
@@ -345,6 +347,159 @@ edge would miss $`X` and its top edge would miss $`Y`, leaving that corner as th
 odd number.
 :::
 
+Ninth proof: induction (Raphael Robinson). Call a tile an *H-tile* if it is designated by its
+integer width and a *V-tile* if it is designated by its integer height. Cutting every tile into
+unit pieces along its designated side normalizes the tiling: every H-tile is then exactly one unit
+wide and every V-tile exactly one unit tall. The induction runs on the number of H-tiles. Robinson
+grows a vertical strip of width $`1` from an H-tile, expanding it one unit at a time through the
+V-tiles above it until an H-tile blocks the way, then stepping onto that H-tile and carrying on;
+and likewise downwards. The resulting staircase runs from the bottom edge of $`R` to its top edge,
+and deleting it and sliding everything on its right one unit leftwards tiles a rectangle one unit
+narrower with fewer H-tiles.
+
+:::lemma_ "lem:int-rect-normalize" (parent := "grp:int-rect") (lean := "IntegerRectangle.IsTiling.normalized")
+Every tiling by tiles with an integer side refines to a normalized one, in which every tile is one
+unit wide or one unit tall.
+:::
+
+:::proof "lem:int-rect-normalize"
+Discard the degenerate tiles and cut each remaining tile into unit pieces along a side of integer
+length, of which it has at least one, and which is at least one unit long since the tile is
+nondegenerate. The half-open cells of the pieces of a tile partition its own, so the cells of all
+the pieces still partition those of $`R`.
+:::
+
+:::lemma_ "lem:int-rect-column" (parent := "grp:int-rect") (lean := "IntegerRectangle.Staircase.exists_column")
+In a normalized tiling the strip of width $`1` carried by an H-tile runs upwards through whole
+V-tiles until it reaches the top of $`R` or an H-tile starts across it.
+:::
+
+:::proof "lem:int-rect-column"
+Induct on the number of unit levels the strip has risen. Nothing crosses the top edge of the
+H-tile inside the strip, since the only tile below that edge there is the H-tile itself. If
+nothing crosses the height reached so far and no H-tile starts there, then the tile above each
+point of that height starts exactly there, hence is a V-tile and is one unit tall; it therefore
+spans the whole level, nothing crosses the next height, and the strip is still inside $`R`. Each
+level raises the strip by a unit, so it cannot rise forever.
+:::
+
+:::lemma_ "lem:int-rect-staircase" (parent := "grp:int-rect") (lean := "IntegerRectangle.Staircase.exists_strip")
+A normalized tiling with an H-tile has a staircase strip of width $`1` running from the bottom
+edge of $`R` to its top edge and containing an H-tile. Every tile lies to the left of the strip at
+each of its heights, or to its right, or inside it, and none lies to the left at one height and to
+the right at another.
+:::
+
+:::proof "lem:int-rect-staircase"
+Walk down from the given H-tile: while the column below the current H-tile is blocked, step onto
+the H-tile blocking it, which lies strictly lower, so the walk stops at an H-tile whose column
+reaches the bottom of $`R`. From there build the staircase upwards {uses "lem:int-rect-column"}[]
+column by column, each step raising the top edge to a strictly higher one of the finitely many
+heights carrying a horizontal edge of the tiling. A tile meeting a column lies inside it, so it
+meets no other column, and the strip has a single abscissa along it; and consecutive columns
+overlap horizontally, since the H-tile carrying the upper column crosses the lower one. A tile to
+the left of the staircase at one height and to its right at another would have to fit in the gap
+between two consecutive columns, and there is no gap.
+:::
+
+:::lemma_ "lem:int-rect-cut" (parent := "grp:int-rect") (lean := "IntegerRectangle.Staircase.isTiling_cut")
+Cutting a normalized tiling along its staircase strip and sliding everything on the right of the
+strip one unit leftwards tiles the rectangle one unit narrower.
+:::
+
+:::proof "lem:int-rect-cut"
+Each tile is cut at a single abscissa: its right edge if it lies left of the strip, its left edge
+less one if it lies right of the strip, and the left edge of the strip if it lies inside it — and
+since the staircase is a wall {uses "lem:int-rect-staircase"}[] the same alternative holds at all
+of that tile's heights. A point of the shrunken rectangle left of the strip comes from the point
+itself and one to its right from its translate one unit rightwards, so the half-open cells of the
+pieces partition those of the shrunken rectangle.
+:::
+
+:::theorem "thm:int-rect-induction" (parent := "grp:int-rect") (lean := "IntegerRectangle.Staircase.IntegerRectangleTheorem_Staircase") (proofColor := "#fbcfe8")
+A rectangle tiled by rectangles each with an integer side has an integer side.
+:::
+
+:::proof "thm:int-rect-induction"
+Normalize the tiling {uses "lem:int-rect-normalize"}[] and induct on the number of its H-tiles.
+With no H-tile every tile has integer height, hence so does $`R`. Otherwise grow the staircase
+from an H-tile {uses "lem:int-rect-staircase"}[]. If $`R` is narrower than two units then the
+H-tile leaves no room beside it and $`R` is exactly one unit wide. Otherwise cut the staircase out
+{uses "lem:int-rect-cut"}[]: heights never change, so V-tiles stay V-tiles, and an H-tile is
+carried over whole or swallowed by the strip, so the new tiling is normalized and has fewer
+H-tiles — the one the staircase was grown from is gone. Its rectangle is one unit narrower and
+just as tall, so an integer side of it is an integer side of $`R`.
+:::
+
+Tenth proof: induction on reducible links (Richard Bishop and Wagon), Wagon's variation on
+Robinson's induction. Call a tile an *H-tile* if it is designated by its integer width and a
+*V-tile* if it is designated by its integer height. A *V-link* is a maximal stretch of a vertical
+line of the tiling that no tile crosses and that no horizontal segment cuts, and an *H-link* is
+its horizontal counterpart — so the H-links are the V-links of the transposed tiling. A link is
+*reducible* if it is a V-link with only H-tiles along one of its sides, or an H-link with only
+V-tiles along one of its sides. The proof is an induction on the number of tiles: a reducible link
+always exists, and reducing it loses a tile.
+
+:::lemma_ "lem:int-rect-link-side" (parent := "grp:int-rect") (lean := "IntegerRectangle.ReducibleLink.Link.exists_left")
+At every height of a V-link there is a tile whose right edge lies on the link, and it sticks out
+past neither end of the link.
+:::
+
+:::proof "lem:int-rect-link-side"
+Approach the point of the link at that height from below left; the tile whose half-open cell
+contains it has the line on or to the right of its own right edge. It cannot reach past the line,
+for a tile crossing the line would block a height interior to the link, and it cannot reach past
+either end of the link, because whatever blocks that end — a tile crossing the line, or a
+horizontal edge arriving at the line from both sides — would share a point with it.
+:::
+
+:::lemma_ "lem:int-rect-link-push" (parent := "grp:int-rect") (lean := "IntegerRectangle.ReducibleLink.isTiling_push")
+Let $`T` tile $`R`, let a V-link of the tiling be given, and let $`w > 0` be at most the width of
+every tile abutting the link on its right. Pushing every tile on the left of the link $`w` units
+rightwards, and paring every tile on its right back by $`w`, again tiles $`R`.
+:::
+
+:::proof "lem:int-rect-link-push"
+The tiles on either side of the link cut it into consecutive pieces
+{uses "lem:int-rect-link-side"}[], so the strip of width $`w` that the tiles on the left sweep out
+is exactly the strip that the tiles on the right vacate; no other tile can reach into it, and the
+half-open cells of the new family therefore still partition those of $`R`.
+:::
+
+:::lemma_ "lem:int-rect-link-exists" (parent := "grp:int-rect") (lean := "IntegerRectangle.ReducibleLink.exists_reducible")
+In a tiling with at least one H-tile and at least one V-tile, some link is reducible.
+:::
+
+:::proof "lem:int-rect-link-exists"
+Suppose not. Then from any H-tile one can step to an H-tile directly above or below across an
+H-link, so the H-tiles reach every height of $`R`; and from any V-tile one can step to a V-tile
+across a V-link on either side, so the V-tiles reach from the left edge of $`R` to its right edge.
+Follow the V-tiles rightwards, carrying the assertion that every H-tile overlapping the current
+V-tile in height lies to the right of it. It holds at the left edge, where there is no room on the
+left. It survives a step: an H-tile lying on the left of the V-link just crossed can be walked up
+and down along H-links to the height of the previous V-tile, staying on the left throughout, since
+a V-link blocks every H-link it meets and the H-tiles bordering an H-link do not reach past its
+ends — contradicting the assertion for the previous V-tile. But at the right edge of $`R` the
+assertion is absurd, since the H-tiles reach that height too.
+:::
+
+:::theorem "thm:int-rect-links" (parent := "grp:int-rect") (lean := "IntegerRectangle.ReducibleLink.IntegerRectangleTheorem_ReducibleLink") (proofColor := "#fbcfe8")
+A rectangle tiled by rectangles each with an integer side has an integer side.
+:::
+
+:::proof "thm:int-rect-links"
+Induct on the number of tiles. Degenerate tiles have empty half-open cells and may be discarded.
+If every tile has integer width the fg-area for the fractional part horizontally and the identity
+vertically vanishes on every tile, hence on $`R`, so $`R` has integer width; likewise if every
+tile has integer height. Otherwise some link is reducible {uses "lem:int-rect-link-exists"}[], say
+a V-link with only H-tiles on its right; take for $`w` the width of the narrowest of them and push
+{uses "lem:int-rect-link-push"}[]. Heights never change, so V-tiles stay V-tiles, and widths change
+by the integer $`w`, so H-tiles stay H-tiles; but the narrowest tile on the right is squeezed to
+nothing, so the new tiling of $`R` has fewer tiles and the induction hypothesis applies. The three
+other ways a link can be reducible are this one read in the mirror image of the tiling, in its
+transpose, and in the mirror image of its transpose.
+:::
+
 Twelfth proof: a sweep line (Bachman–Yannakakis). This one does not use the analytic engine above.
 Instead of an integral it propagates a conserved quantity upward through the tiling, and the only
 geometry it needs is what a horizontal cut of a tiling looks like — the slice lemma below.
@@ -420,12 +575,12 @@ being the theorem — so $`f` is frozen at the top before taking fractional part
 Thirteenth proof: step functions (Hochster–Maté). Like the first three this attaches a number to
 each rectangle and rides on additivity over the tiling, but the number comes from a *step function*
 instead of an integral, and the additivity is combinatorial rather than measure-theoretic: it holds
-for the f-area built from an arbitrary function, with no regularity at all.
+for the fg-area built from an arbitrary function, with no regularity at all.
 
 :::lemma_ "lem:int-rect-fgarea" (parent := "grp:int-rect") (lean := "IntegerRectangle.IsTiling.sum_fgArea")
-For functions $`f, g : \mathbb{R} \to \mathbb{R}` define the *f-area* of a rectangle
+For functions $`f, g : \mathbb{R} \to \mathbb{R}` define the *fg-area* of a rectangle
 $`[x_0, x_1] \times [y_0, y_1]` as $`(f(x_1) - f(x_0)) \cdot (g(y_1) - g(y_0))`. If $`T` tiles $`R`
-then the f-areas of the tiles sum to the f-area of $`R`, for arbitrary $`f` and $`g`.
+then the fg-areas of the tiles sum to the fg-area of $`R`, for arbitrary $`f` and $`g`.
 :::
 
 :::proof "lem:int-rect-fgarea"
@@ -434,10 +589,10 @@ lines carry the finitely many x-coordinates of vertical tile edges and whose hor
 the y-coordinates of horizontal ones. No grid coordinate lies strictly inside an open grid cell, so
 a tile covering the centre of a cell has all four edges clear of it and contains the whole cell; by
 disjointness of interiors this tile is unique. Conversely the cells assigned to a tile fill out a
-full product subdivision of it, because the tile's own edges are grid lines. Summing f-areas of
+full product subdivision of it, because the tile's own edges are grid lines. Summing fg-areas of
 cells therefore counts every cell exactly once, tile by tile; over a product subdivision the sum
-telescopes in both coordinates to the tile's f-area, and over the whole grid it telescopes to the
-f-area of $`R`.
+telescopes in both coordinates to the tile's fg-area, and over the whole grid it telescopes to the
+fg-area of $`R`.
 :::
 
 :::lemma_ "lem:int-rect-step-engine" (parent := "grp:int-rect") (lean := "IntegerRectangle.StepFunction.dichotomy")
@@ -447,8 +602,8 @@ holds for $`R`.
 :::
 
 :::proof "lem:int-rect-step-engine"
-The f-area of every tile is a product with a vanishing factor, so by additivity of the f-area
-{uses "lem:int-rect-fgarea"}[] the f-area of $`R` vanishes, and a product of reals vanishes only if
+The fg-area of every tile is a product with a vanishing factor, so by additivity of the fg-area
+{uses "lem:int-rect-fgarea"}[] the fg-area of $`R` vanishes, and a product of reals vanishes only if
 a factor does.
 :::
 

@@ -21,6 +21,7 @@ This project contains formalizations of different proofs of the same mathematica
 - [Saidak's proof](DifferentProofs/InfinitudeOfPrimes/Saidak.lean)
 - [Wunderlich's proof](DifferentProofs/InfinitudeOfPrimes/Wunderlich.lean)
 - [Infinitely many primes in certain congruence classes](DifferentProofs/InfinitudeOfPrimes/Dirichlet.lean)
+- [Using the irrationality of π² and the Euler product for ζ(2)](DifferentProofs/InfinitudeOfPrimes/Zeta.lean)
 
 ### Irrationality of √2
 
@@ -40,6 +41,18 @@ This project contains formalizations of different proofs of the same mathematica
 - [Using Parseval's identity](DifferentProofs/BaselProblem/Parseval.lean)
 - [Using Cauchy's cotangent squeeze](DifferentProofs/BaselProblem/Cauchy.lean)
 
+### Combinatorial identities
+
+Pascal's rule, $\binom{n}{k} + \binom{n}{k+1} = \binom{n+1}{k+1}$:
+
+- [Using double counting](DifferentProofs/CombinatorialIdentities/Pascal/Counting.lean)
+- [Using the binomial theorem](DifferentProofs/CombinatorialIdentities/Pascal/Binomial.lean)
+
+The hockey-stick identity, $\sum_{i=0}^{n} \binom{i+k}{k} = \binom{n+k+1}{k+1}$:
+
+- [Using induction on n](DifferentProofs/CombinatorialIdentities/HockeyStick/Induction.lean)
+- [Using double counting](DifferentProofs/CombinatorialIdentities/HockeyStick/DoubleCounting.lean)
+
 ### Tiling a rectangle
 
 A rectangle tiled by rectangles each having an integer side has an integer side
@@ -56,6 +69,8 @@ fourteen proofs are still to come.
 - Proof 6: [Prime numbers (Robinson)](DifferentProofs/IntegerRectangle/Primes.lean)
 - Proof 7: [Eulerian path (Paterson)](DifferentProofs/IntegerRectangle/EulerianPath.lean)
 - Proof 8: [Bipartite graph](DifferentProofs/IntegerRectangle/BipartiteGraph.lean)
+- Proof 9: [Induction on the number of H-tiles (Robinson)](DifferentProofs/IntegerRectangle/Staircase.lean)
+- Proof 10: [Induction on reducible links (Bishop–Wagon)](DifferentProofs/IntegerRectangle/ReducibleLink.lean)
 - Proof 12: [Sweep line (Bachman–Yannakakis)](DifferentProofs/IntegerRectangle/SweepLine.lean)
 - Proof 13: [Step functions (Hochster–Maté)](DifferentProofs/IntegerRectangle/StepFunction.lean)
 
