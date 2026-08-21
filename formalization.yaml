@@ -232,16 +232,12 @@ status:
     proved two ways). A Verso blueprint under `DifferentProofsBlueprint/` records the
     informal statements, proof sketches, and dependency graph; reusable supporting
     lemmas that could be upstreamed live in `DifferentProofsForMathlib/`.
-  # Every declaration in the project is sorry-free.
   sorry_count: 0
   sorry_in_definitions: 0
   axioms: &standard_axioms
     - propext
     - Classical.choice
     - Quot.sound
-  # `sorryAx` occurs in no declaration. Verified with `#print axioms` against a
-  # `lake env lean` file importing `DifferentProofs`.
-  #
   # No result in this project has literature dependencies: every proof is complete
   # down to mathlib and the three standard axioms. The project does not use
   # leanprover/comparator, so `comparator_config` is omitted throughout.
