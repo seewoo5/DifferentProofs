@@ -13,7 +13,8 @@
     "IntegerRectangleTheorem_Staircase",
     "IntegerRectangleTheorem_ReducibleLink",
     "IntegerRectangleTheorem_SweepLine",
-    "IntegerRectangleTheorem_StepFunction"
+    "IntegerRectangleTheorem_StepFunction",
+    "IntegerRectangleTheorem_Sperner"
   ],
   "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"],
   "enable_nanoda": false
