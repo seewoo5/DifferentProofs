@@ -390,6 +390,10 @@ status:
       file: "DifferentProofs/IntegerRectangle/StepFunction.lean"
       sorry_count: 0
       axioms: *standard_axioms
+    - declaration: "IntegerRectangleTheorem_Sperner"
+      file: "DifferentProofs/IntegerRectangle/Sperner.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
 
     # --- Combinatorial identities ---
     - declaration: "PascalIdentity_counting"
