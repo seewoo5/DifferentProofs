@@ -390,6 +390,10 @@ status:
       file: "DifferentProofs/IntegerRectangle/StepFunction.lean"
       sorry_count: 0
       axioms: *standard_axioms
+    - declaration: "IntegerRectangleTheorem_Sperner"
+      file: "DifferentProofs/IntegerRectangle/Sperner.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
 
     # --- Combinatorial identities ---
     - declaration: "PascalIdentity_counting"
@@ -496,12 +500,21 @@ fidelity:
       formalization instead bases the integrand, lattice, or grid at the tiled
       rectangle's own corner, which avoids translating the tiling; and several of
       his per-proof local arguments are factored into shared lemmas
-      (`IsTiling.sum_fgArea`, `CornerCount`, `Cells`, `Walks`) reused across proofs.
-    - Wagon's proofs 11 (minimal cut-set, Seymour) and 14 (Sperner's lemma, Schmerl)
-      are not formalized. Both need machinery mathlib does not have: planar duality
-      and a planar min-cut theorem for proof 11, and geometric Sperner for an
-      arbitrary triangulation with T-vertices for proof 14 (mathlib's `Sperner` is
-      the antichain theorem).
+      (`IsTiling.sum_fgArea`, `Grid`, `CornerCount`, `Cells`, `Walks`) reused across
+      proofs.
+    - Wagon's proof 11 (minimal cut-set, Seymour) is not formalized; it needs planar
+      duality and a planar min-cut theorem, which mathlib does not have.
+    - Proof 14 (Sperner's lemma, Schmerl) does not prove geometric Sperner in
+      general; mathlib has no such lemma either (leanprover-community/mathlib4#25231
+      tracks it, and mathlib's `Sperner` is the antichain theorem). Drawing one
+      diagonal per tile leaves T-vertices, so a side of a triangle is subdivided by
+      its neighbours' corners; instead of a Sperner lemma for such figures, the
+      formalization counts doors modulo 2 and shows the count along a subdivided
+      side is fixed by its endpoints, which holds because the labelling is geometric
+      (`IntegerRectangle.Sperner.sum_segDoor`). The parts that are Sperner's lemma
+      rather than the tiling application — the one-dimensional count and the local
+      count for a triangle — are stated on their own in
+      `DifferentProofsForMathlib/Combinatorics/Sperner/Basic.lean`.
     - Wunderlich's argument is adapted: the formalization uses F_37 = 73 * 149 * 2221
       as its concrete Fibonacci number with three distinct prime factors.
     - The Dirichlet-style file covers only the residue classes 1 and 3 mod 4, not
@@ -643,13 +656,14 @@ alignment:
       status: "proved"
       note: ""
     - source: "Wagon, Proof 14 (Sperner's lemma, Schmerl)"
-      lean: ""
-      module: ""
-      status: "not-formalized"
+      lean: "IntegerRectangleTheorem_Sperner"
+      module: "DifferentProofs.IntegerRectangle.Sperner"
+      status: "proved"
       note: >-
-        Needs geometric Sperner for an arbitrary triangulation with T-vertices;
-        mathlib's `Sperner` is the antichain theorem, and mathlib has neither the
-        Jordan curve theorem nor Brouwer to substitute.
+        Sperner's lemma is proved here in the door-counting form the argument needs,
+        modulo 2, rather than imported: mathlib's `Sperner` is the antichain theorem
+        and mathlib has no geometric Sperner lemma. Its reusable part is factored
+        into `DifferentProofsForMathlib.Combinatorics.Sperner.Basic`.
 
 # acknowledgements - optional credits for libraries, tools, discussions, etc.
 acknowledgements: >-
