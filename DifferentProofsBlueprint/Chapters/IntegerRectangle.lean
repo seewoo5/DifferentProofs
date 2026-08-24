@@ -15,7 +15,6 @@ import DifferentProofs.IntegerRectangle.Polynomials
 import DifferentProofs.IntegerRectangle.Primes
 import DifferentProofs.IntegerRectangle.RealIntegral
 import DifferentProofs.IntegerRectangle.Sperner
-import DifferentProofsForMathlib.Combinatorics.Sperner.Basic
 import DifferentProofs.IntegerRectangle.ReducibleLink
 import DifferentProofs.IntegerRectangle.Staircase
 import DifferentProofs.IntegerRectangle.StepFunction
@@ -631,7 +630,7 @@ lemma then forces a triangle carrying all three labels, and no tile with an inte
 The labelling is based at the corner of $`R` rather than at the origin, so the tiling is never
 translated.
 
-:::lemma_ "lem:int-rect-sperner-local" (parent := "grp:int-rect") (lean := "Sperner.door_add_door_add_door_eq_one_iff")
+:::lemma_ "lem:int-rect-sperner-local" (parent := "grp:int-rect") (lean := "IntegerRectangle.Sperner.door_add_door_add_door_eq_one_iff")
 Label points $`A`, $`B` or $`C`, and call a segment a *door* when its endpoints are labelled $`A`
 and $`B`. Counting modulo $`2`, the three sides of a triangle carry an odd number of doors exactly
 when its three vertices carry three different labels.
@@ -641,7 +640,7 @@ when its three vertices carry three different labels.
 A finite check of the $`27` labellings of an ordered triple.
 :::
 
-:::lemma_ "lem:sperner-1d" (parent := "grp:int-rect") (lean := "Sperner.odd_card_colorChanges_iff")
+:::lemma_ "lem:sperner-1d" (parent := "grp:int-rect") (lean := "IntegerRectangle.Sperner.odd_card_colorChanges_iff")
 Sperner's lemma in dimension one: a two-colouring of the points subdividing a segment has an odd
 number of bichromatic edges exactly when the two ends of the segment are coloured differently.
 :::

@@ -1,7 +1,11 @@
 module
 
 public import DifferentProofs.IntegerRectangle.Grid
-public import DifferentProofsForMathlib.Combinatorics.Sperner.Basic
+public import Mathlib.Algebra.BigOperators.Intervals
+public import Mathlib.Algebra.BigOperators.Ring.Finset
+public import Mathlib.Algebra.CharP.Two
+public import Mathlib.Data.ZMod.Basic
+public import Mathlib.Tactic.DeriveFintype
 
 /-!
 # The integer-rectangle tiling theorem, via Sperner's lemma
@@ -35,18 +39,171 @@ So the door count of a side may be replaced by a function of its two endpoints, 
 all, and the classical local count survives: a triangle carries an odd number of doors exactly
 when its three vertices carry all three labels.
 
-The two parts of that which are Sperner's lemma rather than this application — the count along a
-subdivided segment and the local count for a triangle — are stated on their own in
-`DifferentProofsForMathlib.Combinatorics.Sperner.Basic`, whose `Sperner.Color` and `Sperner.door`
-this file uses. What is left here is Schmerl's labelling, the reading of it that kills the two
-kinds of side, and the double count over the grid of the tiling.
+What the rest of the file adds to that is Schmerl's labelling, the reading of it that kills the
+two kinds of side, and the double count over the grid of the tiling.
+
+## The counting core
+
+The two ingredients that are Sperner's lemma rather than this application are proved first, and
+have no geometry in them:
+
+* `odd_card_colorChanges_iff`: **Sperner's lemma in dimension one.** A two-colouring of the
+  points subdividing a segment has an odd number of bichromatic edges exactly when the two ends
+  of the segment are coloured differently. `sum_Ico_add_succ` is the same fact in the telescoped
+  form the rest of the file uses.
+* `door_add_door_add_door_eq_one_iff`: **the local count in dimension two.** A triangle carries
+  an odd number of doors on its three sides exactly when its three vertices carry three different
+  labels. This is the step that turns "the door count is odd" into "some triangle is rainbow".
+
+Both are stated over `ZMod 2`, since the whole argument is a parity count and nothing is gained
+by carrying a cardinality that is only ever used modulo `2`.
+
+## Provenance
+
+Those two are the low-dimensional cases of D. G. Mead, *Dissection of the hypercube into
+simplexes*, Proc. Amer. Math. Soc. **76** (1979) 302–304, whose Lemma 1 is Sperner's lemma for a
+*simplicial* decomposition of an `n`-polytope — one meeting face to face — in the parity form
+used here: the number of simplices carrying all `n + 1` labels is odd exactly when the number of
+boundary faces carrying all `n` of the first labels is odd. Its proof is the double count above,
+together with the observation that a fully labelled simplex has exactly one fully labelled facet
+while any other has none or two; for `n = 2` that observation is
+`door_add_door_add_door_eq_one_iff`, and for `n = 1` the lemma itself is
+`odd_card_colorChanges_iff`.
+
+Mead's Lemma 2 drops the face-to-face hypothesis, allowing a vertex of one simplex to lie in the
+interior of a face of its neighbour, at the cost of a condition on the labelling: a
+`k`-dimensional affine subspace carrying the first `k + 1` labels carries none of the later ones.
+It is proved by induction on the dimension — the two subdivisions an interior hyperplane inherits
+from the simplices above and below it need not agree, but they share a boundary, so the lemma one
+dimension down gives them the same parity and they cancel regardless. The labelling condition is
+what puts that hyperplane in the scope of the lower-dimensional lemma.
+
+That is the version Wagon cites here, and the one geometric applications generally need, since a
+subdivision assembled from independently chosen pieces is rarely face to face. This file does not
+prove it; `sum_segDoor` below supplies what it would have given, for Schmerl's labelling only.
+Mead's own application is to Monsky's theorem on equidissections, where the labelling comes from
+a `p`-adic valuation — the same device, and the reason this lemma grew up in the dissection
+literature rather than in the Sperner literature.
+
+## Relation to mathlib
+
+Mathlib has Sperner's *theorem* on antichains (`IsAntichain.sperner`) but not Sperner's *lemma*;
+leanprover-community/mathlib4#25231 tracks the general statement, which needs a notion of
+triangulation that mathlib also lacks. So the counting core cannot be cited and is proved here.
+
+## Why not the general lemma
+
+The obvious alternative is to formalize Mead's Lemma 2 in general dimension and recover both
+counting statements by specializing to `n = 1` and `n = 2`. That was considered and rejected; the
+reasons are worth recording, since the alternative looks strictly better until one prices it.
+
+There is nothing to build on. Mathlib has no polytopes, and its `SimplicialComplex` is face to
+face by construction — down-closed, and the intersection of two faces is a face — which is the
+hypothesis Lemma 2 exists to drop. There is no pseudomanifold notion either, so the observation
+that an interior facet lies in exactly two `n`-simplices, which Mead disposes of in a line, is
+itself a theorem about triangulated polytopes that would have to be proved first.
+
+It would not subsume the two statements in any case. `door_add_door_add_door_eq_one_iff` is not
+Lemma 1 at `n = 2`; it is an ingredient inside Lemma 1's proof, and would survive unchanged. And
+`odd_card_colorChanges_iff` is indexed by `ℕ` because that is the form its applications produce,
+so deriving it from a statement about segments in a real affine space would cost more glue than
+the proof it replaced.
+
+The specialization to `n = 2` would moreover be blocked. Mead's labelling condition, read
+literally, fails for the labelling used here: the points `(0, 0)`, `(1/4, 1/2)` and `(1/2, 1)`
+are collinear and carry the three labels in the order `A`, `C`, `B`, and nothing in the
+hypothesis that every tile has an integer side stops a tiling from having corners there. Mead's
+*proof* only ever applies the condition to the affine hulls of interior faces, where it does
+hold — so a faithfully stated general lemma could not be applied here without first weakening its
+hypothesis to the form the proof actually uses.
+
+What would pay, if the counting core is ever generalized, is to keep the parity and drop the
+geometry: cells, facets, each interior facet lying in exactly two cells and each boundary facet
+in one, concluding that the facet values summed over the cells agree modulo `2` with their sum
+over the boundary. That is dimension-free, needs nothing mathlib lacks, and is the content the
+two statements share. It is also the direction taken by
+leanprover-community/mathlib4#42788, which builds a facet-ridge incidence interface and
+explicitly declines to claim the geometric lemma.
+
+The same reasoning is why the counting core sits here rather than under
+`DifferentProofsForMathlib`: what mathlib would want is the general lemma, and what this proof
+needs is two special cases of it, so the special cases are not upstream material and are kept
+beside their use.
 -/
 
 @[expose] public section
 
-open Finset Set Sperner
+open Finset Set
 
 namespace IntegerRectangle.Sperner
+
+/-! ### The counting core in dimension one -/
+
+section Dim1
+
+variable {p q : ℕ}
+
+/-- Two elements of `ZMod 2` are different exactly when they sum to `1`. -/
+theorem add_eq_one_iff_ne (a b : ZMod 2) : a + b = 1 ↔ a ≠ b := by decide +revert
+
+/-- The bichromatic edges of a two-colouring `c` of the points subdividing the segment
+`[p, q]`: those `j` in `[p, q)` whose edge to `j + 1` changes colour. -/
+def colorChanges (c : ℕ → ZMod 2) (p q : ℕ) : Finset ℕ :=
+  (Finset.Ico p q).filter fun j ↦ c j ≠ c (j + 1)
+
+/-- **The one-dimensional door count**, telescoped: the increments of a two-colouring along a
+subdivided segment sum to the sum of its two ends, because consecutive terms cancel modulo `2`.
+This is the form in which an application meets `odd_card_colorChanges_iff`, and the reason a
+labelling that is constant in one direction can have its door count read off the endpoints of a
+side however many vertices subdivide it. -/
+theorem sum_Ico_add_succ (h : p ≤ q) (c : ℕ → ZMod 2) :
+    ∑ j ∈ Finset.Ico p q, (c j + c (j + 1)) = c p + c q := by
+  simpa only [CharTwo.sub_eq_add, add_comm] using Finset.sum_Ico_sub c h
+
+/-- **Sperner's lemma in dimension one.** A two-colouring of the points subdividing a segment has
+an odd number of bichromatic edges exactly when its two ends are coloured differently — however
+many points subdivide it. -/
+theorem odd_card_colorChanges_iff (h : p ≤ q) (c : ℕ → ZMod 2) :
+    Odd (colorChanges c p q).card ↔ c p ≠ c q := by
+  have hite : ∀ a b : ZMod 2, (if a ≠ b then (1 : ZMod 2) else 0) = a + b := by decide +revert
+  have hcard : ((colorChanges c p q).card : ZMod 2) = c p + c q := by
+    simpa only [colorChanges, ← Finset.sum_boole, hite] using sum_Ico_add_succ h c
+  rw [← ZMod.natCast_eq_one_iff_odd, hcard, add_eq_one_iff_ne]
+
+end Dim1
+
+/-! ### The counting core in dimension two -/
+
+/-- The three labels of Sperner's lemma in dimension two. The doors are the edges labelled
+`A`–`B`; `C` is the label that closes off a side. -/
+inductive Color
+  /-- The first of the two labels an edge needs to be a door. -/
+  | A
+  /-- The second of the two labels an edge needs to be a door. -/
+  | B
+  /-- The third label. -/
+  | C
+  deriving DecidableEq, Fintype
+
+/-- The *door indicator* of an edge, read off the labels of its two endpoints: `1` when they are
+`A` and `B` in some order, and `0` otherwise. -/
+def door : Color → Color → ZMod 2
+  | .A, .B => 1
+  | .B, .A => 1
+  | _, _ => 0
+
+/-- A door is a door in either direction. -/
+theorem door_comm (x y : Color) : door x y = door y x := by cases x <;> cases y <;> rfl
+
+/-- **The local count of Sperner's lemma in dimension two.** A triangle carries an odd number of
+doors on its three sides exactly when its three vertices carry three different labels. -/
+theorem door_add_door_add_door_eq_one_iff (x y z : Color) :
+    door x y + door y z + door z x = 1 ↔ x ≠ y ∧ y ≠ z ∧ x ≠ z := by decide +revert
+
+/-- A triangle two of whose vertices share a label carries an even number of doors: over `ZMod 2`
+there is no room between "not odd" and "even". -/
+theorem door_add_door_add_door_eq_zero {x y z : Color} (h : ¬(x ≠ y ∧ y ≠ z ∧ x ≠ z)) :
+    door x y + door y z + door z x = 0 := by decide +revert
 
 /-! ### The labelling -/
 
