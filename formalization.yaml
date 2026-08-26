@@ -509,9 +509,11 @@ fidelity:
       tracks it, and mathlib's `Sperner` is the antichain theorem). Drawing one
       diagonal per tile leaves T-vertices, so a side of a triangle is subdivided by
       its neighbours' corners; instead of a Sperner lemma for such figures, the
-      formalization counts doors modulo 2 and shows the count along a subdivided
-      side is fixed by its endpoints, which holds because the labelling is geometric
-      (`IntegerRectangle.Sperner.sum_segDoor`). The parts that are Sperner's lemma
+      formalization counts complete edges modulo 2 and shows the count along a
+      subdivided side is fixed by its endpoints, which holds because the labelling is
+      geometric (`IntegerRectangle.Sperner.sum_segComplete`). Following Mead, an edge
+      is complete when its endpoints carry the first two labels and a triangle when
+      its vertices carry all three. The parts that are Sperner's lemma
       rather than the tiling application — the one-dimensional count and the local
       count for a triangle — are proved first in the same file, and its module
       docstring records why they are not upstream material in that form.
@@ -660,8 +662,8 @@ alignment:
       module: "DifferentProofs.IntegerRectangle.Sperner"
       status: "proved"
       note: >-
-        Sperner's lemma is proved here in the door-counting form the argument needs,
-        modulo 2, rather than imported: mathlib's `Sperner` is the antichain theorem
+        Sperner's lemma is proved here by counting complete edges modulo 2, the form
+        the argument needs, rather than imported: mathlib's `Sperner` is the antichain theorem
         and mathlib has no geometric Sperner lemma. What is proved is the
         one-dimensional count and the local count for a triangle, the cases of
         Mead's Lemma 1 that the argument uses.

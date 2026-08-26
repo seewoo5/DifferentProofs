@@ -201,43 +201,28 @@ def completeEdge : Color → Color → ZMod 2
   | .B, .A => 1
   | _, _ => 0
 
-/-- An edge is complete in either direction. -/
-theorem completeEdge_comm (x y : Color) : completeEdge x y = completeEdge y x := by
-  cases x <;> cases y <;> rfl
-
 /-- A triple of labels is *complete* when its three entries are all different. -/
-def IsCompleteTriple (x y z : Color) : Prop := x ≠ y ∧ y ≠ z ∧ x ≠ z
-
-instance (x y z : Color) : Decidable (IsCompleteTriple x y z) := by
-  unfold IsCompleteTriple
-  infer_instance
+abbrev IsCompleteTriple (x y z : Color) : Prop := x ≠ y ∧ y ≠ z ∧ x ≠ z
 
 /-- **The local count of Sperner's lemma in dimension two.** The three sides of a triangle carry
 an odd number of complete edges exactly when the triangle itself is complete. This is the step
 that turns a parity count of edges into a count of completely labelled triangles. -/
 theorem completeEdge_sum_eq_one_iff (x y z : Color) :
     completeEdge x y + completeEdge y z + completeEdge z x = 1 ↔ IsCompleteTriple x y z := by
-  unfold IsCompleteTriple
   decide +revert
 
 /-- Over `ZMod 2` there is no room between "not one" and "zero". -/
 private lemma eq_ite_of_eq_one_iff {w : ZMod 2} {P : Prop} [Decidable P] (h : w = 1 ↔ P) :
     w = if P then 1 else 0 := by
-  by_cases hP : P
-  · rw [if_pos hP, h.mpr hP]
-  · rw [if_neg hP]
-    have hw : w ≠ 1 := fun hw ↦ hP (h.mp hw)
-    revert hw
-    generalize w = v
-    revert v
-    decide
+  have hz : ∀ v : ZMod 2, v ≠ 1 → v = 0 := by decide
+  split_ifs with hP
+  exacts [h.mpr hP, hz w fun hw ↦ hP (h.mp hw)]
 
 /-- The parity count of a triangle's three sides, as the indicator of its being complete. -/
 theorem completeEdge_sum_eq_ite (x y z : Color) :
     completeEdge x y + completeEdge y z + completeEdge z x
       = if IsCompleteTriple x y z then 1 else 0 :=
   eq_ite_of_eq_one_iff (completeEdge_sum_eq_one_iff x y z)
-
 
 /-! ### The labelling -/
 
@@ -269,12 +254,10 @@ theorem completeEdge_label_vertical (o : ℝ × ℝ) (x y y' : ℝ) :
   split_ifs <;> rfl
 
 /-- `1` when `x` differs from the abscissa of `o` by an integer, `0` otherwise. -/
-noncomputable def onX (o : ℝ × ℝ) (x : ℝ) : ZMod 2 :=
-  if Int.fract x = Int.fract o.1 then 1 else 0
+noncomputable def onX (o : ℝ × ℝ) (x : ℝ) : ZMod 2 := if Int.fract x = Int.fract o.1 then 1 else 0
 
 /-- `1` when `y` differs from the ordinate of `o` by an integer, `0` otherwise. -/
-noncomputable def onY (o : ℝ × ℝ) (y : ℝ) : ZMod 2 :=
-  if Int.fract y = Int.fract o.2 then 1 else 0
+noncomputable def onY (o : ℝ × ℝ) (y : ℝ) : ZMod 2 := if Int.fract y = Int.fract o.2 then 1 else 0
 
 /-- **A horizontal segment is a complete edge exactly when it lies at an integer height and the
 integrality of the abscissa changes across it.** This is the formula that makes the count along a
@@ -331,14 +314,9 @@ def triangle (S : Rectangle) : Bool → (ℝ × ℝ) × (ℝ × ℝ) × (ℝ × 
 
 /-- A triangle of `S` is *complete* when its three vertices carry three different labels. This is
 Wagon's triangle labelled `ABC`, and the object his variation of Sperner's lemma counts. -/
-def IsCompleteTriangle (o : ℝ × ℝ) (S : Rectangle) (b : Bool) : Prop :=
+abbrev IsCompleteTriangle (o : ℝ × ℝ) (S : Rectangle) (b : Bool) : Prop :=
   IsCompleteTriple (label o (triangle S b).1) (label o (triangle S b).2.1)
     (label o (triangle S b).2.2)
-
-noncomputable instance (o : ℝ × ℝ) (S : Rectangle) (b : Bool) :
-    Decidable (IsCompleteTriangle o S b) := by
-  unfold IsCompleteTriangle
-  infer_instance
 
 /-- The number of complete edges on the three sides of a triangle of `S`, modulo `2`. -/
 noncomputable def sideCount (o : ℝ × ℝ) (S : Rectangle) (b : Bool) : ZMod 2 :=
@@ -359,16 +337,12 @@ tile have two vertices carrying the same label. -/
 theorem not_isCompleteTriangle (o : ℝ × ℝ) {S : Rectangle} (hS : S.HasIntegerSide) (b : Bool) :
     ¬ IsCompleteTriangle o S b := by
   rcases hS with ⟨n, hn⟩ | ⟨n, hn⟩
-  · have h : Int.fract S.x₀ = Int.fract S.x₁ :=
-      (Int.fract_eq_fract.mpr ⟨n, by simpa only [Rectangle.width] using hn⟩).symm
+  · have h : Int.fract S.x₀ = Int.fract S.x₁ := (Int.fract_eq_fract.mpr ⟨n, hn⟩).symm
     cases b
-    · exact fun hd ↦ hd.1 (label_congr_fst h)
-    · exact fun hd ↦ hd.2.1 (label_congr_fst h)
-  · have h : Int.fract S.y₀ = Int.fract S.y₁ :=
-      (Int.fract_eq_fract.mpr ⟨n, by simpa only [Rectangle.height] using hn⟩).symm
+    exacts [fun hd ↦ hd.1 (label_congr_fst h), fun hd ↦ hd.2.1 (label_congr_fst h)]
+  · have h : Int.fract S.y₀ = Int.fract S.y₁ := (Int.fract_eq_fract.mpr ⟨n, hn⟩).symm
     cases b
-    · exact fun hd ↦ hd.2.1 (label_congr_snd h)
-    · exact fun hd ↦ hd.1 (label_congr_snd h)
+    exacts [fun hd ↦ hd.2.1 (label_congr_snd h), fun hd ↦ hd.1 (label_congr_snd h)]
 
 /-- **The complete edges of a tile's two triangles are those on its bottom and top edges.** The
 diagonal is a side of both triangles, so it is counted twice and cancels; the vertical sides
@@ -384,14 +358,12 @@ theorem sum_sideCount (i : ι) :
   simp only [sideCount, triangle, completeEdge_label_vertical, add_zero, zero_add]
   rw [add_add_add_comm, CharTwo.add_self_eq_zero, add_zero, add_comm]
 
-
 /-! ### The double count -/
 
 /-- **The column double count.** Summing over the tiles met by the `j`-th column of grid cells
 the complete edges on their bottom and top edges leaves only the two ends of the column: an
-interior
-horizontal grid segment is either interior to a tile, and counted by neither of its triangles, or
-the top edge of one tile and the bottom edge of another, and counted twice. -/
+interior horizontal grid segment is either interior to a tile, and counted by neither of its
+triangles, or the top edge of one tile and the bottom edge of another, and counted twice. -/
 theorem sum_column (hT : IsTiling R T) {j N : ℕ} (hj : j + 1 < (gridX R T).sort.length)
     (hN : (gridY R T).sort.length = N + 2) :
     ∑ i, (if idxL R T i ≤ j ∧ j < idxR R T i then
@@ -438,7 +410,6 @@ theorem sum_tile_edges (hT : IsTiling R T) {N : ℕ} (hN : (gridY R T).sort.leng
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun j hj ↦ sum_column hT (by have := Finset.mem_range.mp hj; lia) hN
 
-open scoped Classical in
 /-- **The number of completely labelled triangles is odd**, when neither side of `R` is an
 integer. This is the conclusion Wagon draws from his variation of Sperner's lemma, and the whole
 weight of the proof: each triangle contributes its parity of complete edges
@@ -451,10 +422,8 @@ theorem odd_card_completeTriangles (hT : IsTiling R T) (hw : ¬∃ n : ℤ, R.wi
     (hh : ¬∃ n : ℤ, R.height = n) :
     Odd (Finset.univ.filter fun t : ι × Bool ↦
       IsCompleteTriangle (corner R) (T t.1) t.2).card := by
-  have hxne : Int.fract R.x₁ ≠ Int.fract R.x₀ := fun h ↦ hw <|
-    (Int.fract_eq_fract.mp h).imp fun n hn ↦ by simpa only [Rectangle.width] using hn
-  have hyne : Int.fract R.y₁ ≠ Int.fract R.y₀ := fun h ↦ hh <|
-    (Int.fract_eq_fract.mp h).imp fun n hn ↦ by simpa only [Rectangle.height] using hn
+  have hxne : Int.fract R.x₁ ≠ Int.fract R.x₀ := fun h ↦ hw (Int.fract_eq_fract.mp h)
+  have hyne : Int.fract R.y₁ ≠ Int.fract R.y₀ := fun h ↦ hh (Int.fract_eq_fract.mp h)
   have hcard : 1 < (gridY R T).card := Finset.one_lt_card.mpr
     ⟨R.y₀, bot_mem_gridY, R.y₁, top_mem_gridY, fun h ↦ hyne (congrArg Int.fract h.symm)⟩
   obtain ⟨N, hNc⟩ : ∃ N, (gridY R T).card = N + 2 := ⟨(gridY R T).card - 2, by lia⟩
@@ -463,22 +432,13 @@ theorem odd_card_completeTriangles (hT : IsTiling R T) (hw : ¬∃ n : ℤ, R.wi
   have hA : label (corner R) (R.x₀, R.y₀) = Color.A := by simp only [label, corner_fst, ↓reduceIte]
   have hB : label (corner R) (R.x₁, R.y₀) = Color.B := by
     simp only [label, corner_fst, hxne, ↓reduceIte, corner_snd]
-  have hTop : completeEdge (label (corner R) (R.x₀, R.y₁))
-      (label (corner R) (R.x₁, R.y₁)) = 0 := by
+  have hTop : completeEdge (label (corner R) (R.x₀, R.y₁)) (label (corner R) (R.x₁, R.y₁)) = 0 := by
     rw [completeEdge_label_horizontal, onY, corner_snd, if_neg hyne, zero_mul]
-  have key := sum_tile_edges hT hN
-  rw [Finset.sum_add_distrib, Finset.range_eq_Ico, sum_segComplete R T (Nat.zero_le _),
-    sum_segComplete R T (Nat.zero_le _), nth_gridX_zero hT, nth_gridX_last hT,
-    nth_gridY_zero hT, hlast, hA, hB, hTop, add_zero] at key
-  rw [← ZMod.natCast_eq_one_iff_odd, ← Finset.sum_boole]
-  calc ∑ t : ι × Bool, (if IsCompleteTriangle (corner R) (T t.1) t.2 then (1 : ZMod 2) else 0)
-      = ∑ t : ι × Bool, sideCount (corner R) (T t.1) t.2 :=
-        Finset.sum_congr rfl fun t _ ↦ (sideCount_eq_ite _ _ _).symm
-    _ = ∑ i, ∑ b, sideCount (corner R) (T i) b := Fintype.sum_prod_type _
-    _ = ∑ i, ∑ j ∈ Ico (idxL R T i) (idxR R T i),
-          (segComplete R T j (idxB R T i) + segComplete R T j (idxT R T i)) :=
-        Finset.sum_congr rfl fun i _ ↦ sum_sideCount i
-    _ = 1 := key
+  rw [← ZMod.natCast_eq_one_iff_odd, ← Finset.sum_boole, Fintype.sum_prod_type]
+  simp only [← sideCount_eq_ite, sum_sideCount]
+  rw [sum_tile_edges hT hN, Finset.sum_add_distrib, Finset.range_eq_Ico,
+    sum_segComplete R T (Nat.zero_le _), sum_segComplete R T (Nat.zero_le _), nth_gridX_zero hT,
+    nth_gridX_last hT, nth_gridY_zero hT, hlast, hA, hB, hTop, add_zero, completeEdge]
 
 end IntegerRectangle.Sperner
 
@@ -488,11 +448,9 @@ Wagon states it: if neither side of `R` were an integer, the number of triangles
 would be odd (`odd_card_completeTriangles`), and in particular there would be one; but every tile
 has an integer side, so no triangle is so labelled (`not_isCompleteTriangle`). -/
 theorem IntegerRectangleTheorem_Sperner : IntegerRectangleTheorem := by
-  classical
   intro ι _ R T hT hsides
   by_contra hR
-  rw [Rectangle.HasIntegerSide, not_or] at hR
-  obtain ⟨hw, hh⟩ := hR
+  obtain ⟨hw, hh⟩ := not_or.mp hR
   have hodd := odd_card_completeTriangles hT hw hh
   rw [Finset.filter_false_of_mem fun t _ ↦
     not_isCompleteTriangle (corner R) (hsides t.1) t.2, Finset.card_empty] at hodd
