@@ -14,6 +14,7 @@ import DifferentProofs.IntegerRectangle.GridRefinement
 import DifferentProofs.IntegerRectangle.Polynomials
 import DifferentProofs.IntegerRectangle.Primes
 import DifferentProofs.IntegerRectangle.RealIntegral
+import DifferentProofs.IntegerRectangle.Sperner
 import DifferentProofs.IntegerRectangle.ReducibleLink
 import DifferentProofs.IntegerRectangle.Staircase
 import DifferentProofs.IntegerRectangle.StepFunction
@@ -621,4 +622,108 @@ so unlike the checkerboard proof, whose triangle wave is symmetric about the hal
 argument needs no standard-position hypothesis. (The sawtooth increment is also the signed mass of
 $`(a, b]` under Lebesgue measure minus the counting measure of the integers, giving an alternative
 measure-theoretic route to the additivity.)
+:::
+
+Fourteenth proof: Sperner's lemma (Schmerl). Cut every tile in two along a diagonal and label each
+vertex of the resulting figure by which of its coordinates are integers; a variation of Sperner's
+lemma then makes the number of triangles carrying all three labels odd, and no tile with an
+integer side has such a triangle. Following Mead, whose lemma this is, an edge is called
+*complete* when its endpoints carry the first two labels, and a triangle is complete when its
+vertices carry all three. The labelling is based at the corner of $`R` rather than at the origin,
+so the tiling is never translated.
+
+:::lemma_ "lem:int-rect-sperner-local" (parent := "grp:int-rect") (lean := "IntegerRectangle.Sperner.completeEdge_sum_eq_one_iff")
+Label points $`A`, $`B` or $`C`, and call an edge *complete* when its endpoints are labelled $`A`
+and $`B`. Counting modulo $`2`, the three sides of a triangle carry an odd number of complete
+edges exactly when its three vertices carry three different labels.
+:::
+
+:::proof "lem:int-rect-sperner-local"
+A finite check of the $`27` labellings of an ordered triple.
+:::
+
+:::lemma_ "lem:sperner-1d" (parent := "grp:int-rect") (lean := "IntegerRectangle.Sperner.odd_card_completeEdges_iff")
+Sperner's lemma in dimension one: a two-colouring of the points subdividing a segment has an odd
+number of complete edges exactly when the two ends of the segment are coloured differently.
+:::
+
+:::proof "lem:sperner-1d"
+Modulo $`2` the colour increments along the segment telescope, so their sum is the sum of the two
+ends; and an increment is $`1` exactly on a complete edge, so that sum counts the complete edges.
+The telescoped identity is the form the application below uses.
+:::
+
+:::lemma_ "lem:int-rect-sperner-side" (parent := "grp:int-rect") (lean := "IntegerRectangle.Sperner.sum_segComplete")
+Label $`(x, y)` by $`A` if $`x` differs from the abscissa of the corner of $`R` by an integer, by
+$`B` if it does not but $`y` differs from the ordinate by an integer, and by $`C` otherwise. Then
+the complete edges among the grid segments composing a horizontal side sum, modulo $`2`, to the
+indicator of the side's own two endpoints.
+:::
+
+:::proof "lem:int-rect-sperner-side"
+This is the point of the geometric labelling, and what lets the argument run on a figure that is
+not a triangulation in the usual sense: a corner of one tile may lie inside an edge of another, so
+a side of a triangle carries however many vertices its neighbours put there, and its number of
+complete edges is not determined by its endpoints. Its parity is. Along a horizontal segment the
+ordinate is constant, so at an integer height the labels are $`A` and $`B` according to the
+integrality of the abscissa, and at any other height they are $`A` and $`C` and no edge is
+complete; in the first case a complete edge records a change in the integrality of the abscissa,
+and a sequence has an odd number of changes exactly when its two ends differ
+{uses "lem:sperner-1d"}[]. Along a vertical segment the abscissa is constant, so either every
+point is labelled $`A` or none is, and no edge is ever complete.
+:::
+
+:::lemma_ "lem:int-rect-sperner-tile" (parent := "grp:int-rect") (lean := "IntegerRectangle.Sperner.not_isCompleteTriangle")
+Neither of the two triangles of a tile with an integer side is complete.
+:::
+
+:::proof "lem:int-rect-sperner-tile"
+If the width of the tile is an integer, its left and right edges have abscissae differing by an
+integer, so the two ends of each of its horizontal sides carry the same label; if the height is an
+integer, the two ends of each of its vertical sides do. Either way each of the two triangles has
+two vertices with a common label, hence not three different ones.
+:::
+
+:::lemma_ "lem:int-rect-sperner-count" (parent := "grp:int-rect") (lean := "IntegerRectangle.Sperner.sum_tile_edges")
+Summed over all the triangles, the number of complete edges on their sides equals, modulo $`2`,
+the number along the bottom and top edges of $`R`.
+:::
+
+:::proof "lem:int-rect-sperner-count"
+The diagonal of a tile is a side of both of its triangles, so it is counted twice and cancels, and
+its vertical sides carry no complete edge {uses "lem:int-rect-sperner-side"}[]; what is left of a
+tile is the complete edges on its bottom and top edges. Refine the tiling to its grid: every open
+grid cell lies in a unique tile {uses "lem:int-rect-fgarea"}[], so along a fixed column of cells a
+horizontal grid segment strictly inside $`R` either has the same tile above and below it, and is
+interior to that tile and counted by neither of its triangles, or has different tiles, and is then
+the top edge of the lower and the bottom edge of the upper and counted exactly twice. Everything
+in the interior of the column therefore cancels, leaving the segment at the bottom of the column
+and the one at the top; summing over the columns leaves the bottom and top edges of $`R`.
+:::
+
+:::lemma_ "lem:int-rect-sperner-odd" (parent := "grp:int-rect") (lean := "IntegerRectangle.Sperner.odd_card_completeTriangles")
+**The variation of Sperner's lemma, as Wagon uses it.** If neither side of $`R` is an integer,
+the number of complete triangles is odd.
+:::
+
+:::proof "lem:int-rect-sperner-odd"
+Each triangle carries an odd number of complete edges exactly when it is itself complete
+{uses "lem:int-rect-sperner-local"}[], so modulo $`2` the number of complete triangles is the
+total number of complete edges over all the triangles, which is the number along the bottom and
+top edges of $`R` {uses "lem:int-rect-sperner-count"}[]. The top edge is at a height differing
+from the bottom by the height of $`R`, not an integer, so it carries none. The bottom edge runs
+at an integer height from the corner of $`R`, labelled $`A`, to its lower-right corner, labelled
+$`B` because the width of $`R` is not an integer — so it carries a single one
+{uses "lem:int-rect-sperner-side"}[]. The total is therefore odd.
+:::
+
+:::theorem "thm:int-rect-sperner" (parent := "grp:int-rect") (lean := "IntegerRectangleTheorem_Sperner") (proofColor := "#fbcfe8")
+A rectangle tiled by rectangles each with an integer side has an integer side.
+:::
+
+:::proof "thm:int-rect-sperner"
+Suppose neither side of $`R` is an integer. Then the number of complete triangles is odd
+{uses "lem:int-rect-sperner-odd"}[], and in particular there is one. But every tile has an integer
+side, so neither of its triangles is complete {uses "lem:int-rect-sperner-tile"}[] — a
+contradiction.
 :::

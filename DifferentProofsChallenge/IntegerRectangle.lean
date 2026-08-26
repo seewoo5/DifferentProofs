@@ -50,3 +50,6 @@ theorem IntegerRectangleTheorem_SweepLine : IntegerRectangleTheorem := sorry
 
 /-- Proof 13. -/
 theorem IntegerRectangleTheorem_StepFunction : IntegerRectangleTheorem := sorry
+
+/-- Proof 14. -/
+theorem IntegerRectangleTheorem_Sperner : IntegerRectangleTheorem := sorry

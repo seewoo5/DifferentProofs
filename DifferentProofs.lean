@@ -32,11 +32,13 @@ public import DifferentProofs.IntegerRectangle.CornerCount
 public import DifferentProofs.IntegerRectangle.CountingSquares
 public import DifferentProofs.IntegerRectangle.Defs
 public import DifferentProofs.IntegerRectangle.EulerianPath
+public import DifferentProofs.IntegerRectangle.Grid
 public import DifferentProofs.IntegerRectangle.GridRefinement
 public import DifferentProofs.IntegerRectangle.Polynomials
 public import DifferentProofs.IntegerRectangle.Primes
 public import DifferentProofs.IntegerRectangle.RealIntegral
 public import DifferentProofs.IntegerRectangle.ReducibleLink
+public import DifferentProofs.IntegerRectangle.Sperner
 public import DifferentProofs.IntegerRectangle.Staircase
 public import DifferentProofs.IntegerRectangle.StepFunction
 public import DifferentProofs.IntegerRectangle.SweepLine
