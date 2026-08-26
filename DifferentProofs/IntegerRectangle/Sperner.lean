@@ -20,43 +20,50 @@ Following the rest of this development the lattice is based at the corner of `R`
 the origin, so that "integer" means "differing from the corner of `R` by an integer"
 (`Sperner.label`) and the tiling never has to be translated.
 
+Following Mead, whose lemma the argument rests on, an edge is *complete* when its endpoints carry
+the first two labels `A` and `B`, and a triangle is complete when its vertices carry all three —
+Wagon's triangle labelled `ABC`.
+
 ## The variation of Sperner's lemma
 
 Drawing one diagonal per tile does *not* give a triangulation in the usual sense: a corner of one
 tile may sit in the interior of an edge of another, so a side of a triangle is subdivided by the
-vertices lying on it, and the count of doors along a side is not determined by its endpoints. It
-is determined *modulo 2*, which is all the argument needs, and this is what makes the labelling
+vertices lying on it, and its number of complete edges is not determined by its endpoints. It is
+determined *modulo 2*, which is all the argument needs, and this is what makes the labelling
 geometric rather than arbitrary:
 
-* a *door* is a segment whose endpoints are labelled `A` and `B`;
 * along a vertical segment the abscissa is constant, so either every point is labelled `A` or
-  none is, and a vertical side carries no doors at all (`door_label_vertical`);
+  none is, and a vertical side carries no complete edge at all
+  (`completeEdge_label_vertical`);
 * along a horizontal segment the labels are `A`/`B` at an integer height and `A`/`C` otherwise,
-  so a door records a change in the integrality of the abscissa (`door_label_horizontal`), and
-  the number of changes along a subdivided side has the parity of its endpoints'.
+  so a complete edge records a change in the integrality of the abscissa
+  (`completeEdge_label_horizontal`), and the number of changes along a subdivided side has the
+  parity of its endpoints'.
 
-So the door count of a side may be replaced by a function of its two endpoints, T-vertices and
-all, and the classical local count survives: a triangle carries an odd number of doors exactly
-when its three vertices carry all three labels.
-
-What the rest of the file adds to that is Schmerl's labelling, the reading of it that kills the
-two kinds of side, and the double count over the grid of the tiling.
+So the count on a side may be replaced by a function of its two endpoints, T-vertices and all,
+and the classical local count survives: a triangle carries an odd number of complete edges
+exactly when it is itself complete.
 
 ## The counting core
 
 The two ingredients that are Sperner's lemma rather than this application are proved first, and
 have no geometry in them:
 
-* `odd_card_colorChanges_iff`: **Sperner's lemma in dimension one.** A two-colouring of the
-  points subdividing a segment has an odd number of bichromatic edges exactly when the two ends
-  of the segment are coloured differently. `sum_Ico_add_succ` is the same fact in the telescoped
+* `odd_card_completeEdges_iff`: **Sperner's lemma in dimension one.** A two-colouring of the
+  points subdividing a segment has an odd number of complete edges exactly when the two ends of
+  the segment are coloured differently. `sum_Ico_add_succ` is the same fact in the telescoped
   form the rest of the file uses.
-* `door_add_door_add_door_eq_one_iff`: **the local count in dimension two.** A triangle carries
-  an odd number of doors on its three sides exactly when its three vertices carry three different
-  labels. This is the step that turns "the door count is odd" into "some triangle is rainbow".
+* `completeEdge_sum_eq_one_iff`: **the local count in dimension two.** The three sides of a
+  triangle carry an odd number of complete edges exactly when the triangle is complete. This is
+  the step that turns a parity count of edges into a count of triangles.
 
 Both are stated over `ZMod 2`, since the whole argument is a parity count and nothing is gained
 by carrying a cardinality that is only ever used modulo `2`.
+
+What the rest of the file adds is Schmerl's labelling, the reading of it that kills the two kinds
+of side, the double count over the grid of the tiling, and finally
+`odd_card_completeTriangles`: the number of complete triangles is odd. Wagon's proof then ends in
+one line, since no tile with an integer side has one.
 
 ## Provenance
 
@@ -67,8 +74,8 @@ used here: the number of simplices carrying all `n + 1` labels is odd exactly wh
 boundary faces carrying all `n` of the first labels is odd. Its proof is the double count above,
 together with the observation that a fully labelled simplex has exactly one fully labelled facet
 while any other has none or two; for `n = 2` that observation is
-`door_add_door_add_door_eq_one_iff`, and for `n = 1` the lemma itself is
-`odd_card_colorChanges_iff`.
+`completeEdge_sum_eq_one_iff`, and for `n = 1` the lemma itself is
+`odd_card_completeEdges_iff`.
 
 Mead's Lemma 2 drops the face-to-face hypothesis, allowing a vertex of one simplex to lie in the
 interior of a face of its neighbour, at the cost of a condition on the labelling: a
@@ -80,7 +87,7 @@ what puts that hyperplane in the scope of the lower-dimensional lemma.
 
 That is the version Wagon cites here, and the one geometric applications generally need, since a
 subdivision assembled from independently chosen pieces is rarely face to face. This file does not
-prove it; `sum_segDoor` below supplies what it would have given, for Schmerl's labelling only.
+prove it; `sum_segComplete` below supplies what it would have given, for Schmerl's labelling only.
 Mead's own application is to Monsky's theorem on equidissections, where the labelling comes from
 a `p`-adic valuation — the same device, and the reason this lemma grew up in the dissection
 literature rather than in the Sperner literature.
@@ -103,9 +110,9 @@ hypothesis Lemma 2 exists to drop. There is no pseudomanifold notion either, so 
 that an interior facet lies in exactly two `n`-simplices, which Mead disposes of in a line, is
 itself a theorem about triangulated polytopes that would have to be proved first.
 
-It would not subsume the two statements in any case. `door_add_door_add_door_eq_one_iff` is not
+It would not subsume the two statements in any case. `completeEdge_sum_eq_one_iff` is not
 Lemma 1 at `n = 2`; it is an ingredient inside Lemma 1's proof, and would survive unchanged. And
-`odd_card_colorChanges_iff` is indexed by `ℕ` because that is the form its applications produce,
+`odd_card_completeEdges_iff` is indexed by `ℕ` because that is the form its applications produce,
 so deriving it from a statement about segments in a real affine space would cost more glue than
 the proof it replaced.
 
@@ -146,64 +153,91 @@ variable {p q : ℕ}
 /-- Two elements of `ZMod 2` are different exactly when they sum to `1`. -/
 theorem add_eq_one_iff_ne (a b : ZMod 2) : a + b = 1 ↔ a ≠ b := by decide +revert
 
-/-- The bichromatic edges of a two-colouring `c` of the points subdividing the segment
-`[p, q]`: those `j` in `[p, q)` whose edge to `j + 1` changes colour. -/
-def colorChanges (c : ℕ → ZMod 2) (p q : ℕ) : Finset ℕ :=
+/-- The complete edges of a two-colouring `c` of the points subdividing the segment `[p, q]`:
+those `j` in `[p, q)` whose edge to `j + 1` changes colour. With only two labels in play, an edge
+is complete exactly when it is bichromatic. -/
+def completeEdges (c : ℕ → ZMod 2) (p q : ℕ) : Finset ℕ :=
   (Finset.Ico p q).filter fun j ↦ c j ≠ c (j + 1)
 
-/-- **The one-dimensional door count**, telescoped: the increments of a two-colouring along a
+/-- **The one-dimensional count**, telescoped: the increments of a two-colouring along a
 subdivided segment sum to the sum of its two ends, because consecutive terms cancel modulo `2`.
-This is the form in which an application meets `odd_card_colorChanges_iff`, and the reason a
-labelling that is constant in one direction can have its door count read off the endpoints of a
-side however many vertices subdivide it. -/
+This is the form in which an application meets `odd_card_completeEdges_iff`, and the reason a
+labelling constant in one direction has its count read off the endpoints of a side, however many
+vertices subdivide it. -/
 theorem sum_Ico_add_succ (h : p ≤ q) (c : ℕ → ZMod 2) :
     ∑ j ∈ Finset.Ico p q, (c j + c (j + 1)) = c p + c q := by
   simpa only [CharTwo.sub_eq_add, add_comm] using Finset.sum_Ico_sub c h
 
 /-- **Sperner's lemma in dimension one.** A two-colouring of the points subdividing a segment has
-an odd number of bichromatic edges exactly when its two ends are coloured differently — however
+an odd number of complete edges exactly when its two ends are coloured differently — however
 many points subdivide it. -/
-theorem odd_card_colorChanges_iff (h : p ≤ q) (c : ℕ → ZMod 2) :
-    Odd (colorChanges c p q).card ↔ c p ≠ c q := by
+theorem odd_card_completeEdges_iff (h : p ≤ q) (c : ℕ → ZMod 2) :
+    Odd (completeEdges c p q).card ↔ c p ≠ c q := by
   have hite : ∀ a b : ZMod 2, (if a ≠ b then (1 : ZMod 2) else 0) = a + b := by decide +revert
-  have hcard : ((colorChanges c p q).card : ZMod 2) = c p + c q := by
-    simpa only [colorChanges, ← Finset.sum_boole, hite] using sum_Ico_add_succ h c
+  have hcard : ((completeEdges c p q).card : ZMod 2) = c p + c q := by
+    simpa only [completeEdges, ← Finset.sum_boole, hite] using sum_Ico_add_succ h c
   rw [← ZMod.natCast_eq_one_iff_odd, hcard, add_eq_one_iff_ne]
 
 end Dim1
 
 /-! ### The counting core in dimension two -/
 
-/-- The three labels of Sperner's lemma in dimension two. The doors are the edges labelled
-`A`–`B`; `C` is the label that closes off a side. -/
+/-- The three labels of Sperner's lemma in dimension two. Following Mead, an edge is *complete*
+when its endpoints carry the first two labels, and a triangle is complete when its vertices carry
+all three — Wagon's triangle labelled `ABC`. -/
 inductive Color
-  /-- The first of the two labels an edge needs to be a door. -/
+  /-- The first label. -/
   | A
-  /-- The second of the two labels an edge needs to be a door. -/
+  /-- The second label. -/
   | B
   /-- The third label. -/
   | C
   deriving DecidableEq, Fintype
 
-/-- The *door indicator* of an edge, read off the labels of its two endpoints: `1` when they are
-`A` and `B` in some order, and `0` otherwise. -/
-def door : Color → Color → ZMod 2
+/-- The indicator of a *complete edge*, read off the labels of its two endpoints: `1` when they
+are `A` and `B` in some order, and `0` otherwise. -/
+def completeEdge : Color → Color → ZMod 2
   | .A, .B => 1
   | .B, .A => 1
   | _, _ => 0
 
-/-- A door is a door in either direction. -/
-theorem door_comm (x y : Color) : door x y = door y x := by cases x <;> cases y <;> rfl
+/-- An edge is complete in either direction. -/
+theorem completeEdge_comm (x y : Color) : completeEdge x y = completeEdge y x := by
+  cases x <;> cases y <;> rfl
 
-/-- **The local count of Sperner's lemma in dimension two.** A triangle carries an odd number of
-doors on its three sides exactly when its three vertices carry three different labels. -/
-theorem door_add_door_add_door_eq_one_iff (x y z : Color) :
-    door x y + door y z + door z x = 1 ↔ x ≠ y ∧ y ≠ z ∧ x ≠ z := by decide +revert
+/-- A triple of labels is *complete* when its three entries are all different. -/
+def IsCompleteTriple (x y z : Color) : Prop := x ≠ y ∧ y ≠ z ∧ x ≠ z
 
-/-- A triangle two of whose vertices share a label carries an even number of doors: over `ZMod 2`
-there is no room between "not odd" and "even". -/
-theorem door_add_door_add_door_eq_zero {x y z : Color} (h : ¬(x ≠ y ∧ y ≠ z ∧ x ≠ z)) :
-    door x y + door y z + door z x = 0 := by decide +revert
+instance (x y z : Color) : Decidable (IsCompleteTriple x y z) := by
+  unfold IsCompleteTriple
+  infer_instance
+
+/-- **The local count of Sperner's lemma in dimension two.** The three sides of a triangle carry
+an odd number of complete edges exactly when the triangle itself is complete. This is the step
+that turns a parity count of edges into a count of completely labelled triangles. -/
+theorem completeEdge_sum_eq_one_iff (x y z : Color) :
+    completeEdge x y + completeEdge y z + completeEdge z x = 1 ↔ IsCompleteTriple x y z := by
+  unfold IsCompleteTriple
+  decide +revert
+
+/-- Over `ZMod 2` there is no room between "not one" and "zero". -/
+private lemma eq_ite_of_eq_one_iff {w : ZMod 2} {P : Prop} [Decidable P] (h : w = 1 ↔ P) :
+    w = if P then 1 else 0 := by
+  by_cases hP : P
+  · rw [if_pos hP, h.mpr hP]
+  · rw [if_neg hP]
+    have hw : w ≠ 1 := fun hw ↦ hP (h.mp hw)
+    revert hw
+    generalize w = v
+    revert v
+    decide
+
+/-- The parity count of a triangle's three sides, as the indicator of its being complete. -/
+theorem completeEdge_sum_eq_ite (x y z : Color) :
+    completeEdge x y + completeEdge y z + completeEdge z x
+      = if IsCompleteTriple x y z then 1 else 0 :=
+  eq_ite_of_eq_one_iff (completeEdge_sum_eq_one_iff x y z)
+
 
 /-! ### The labelling -/
 
@@ -227,10 +261,10 @@ label. -/
 theorem label_congr_snd (h : Int.fract y = Int.fract y') : label o (x, y) = label o (x, y') := by
   simp only [label, h]
 
-/-- **A vertical segment is never a door.** Its two endpoints share an abscissa, so they are both
-labelled `A` or neither is, and a door needs exactly one `A`. -/
-theorem door_label_vertical (o : ℝ × ℝ) (x y y' : ℝ) :
-    door (label o (x, y)) (label o (x, y')) = 0 := by
+/-- **A vertical segment is never a complete edge.** Its two endpoints share an abscissa, so
+they are both labelled `A` or neither is, and a complete edge needs exactly one `A`. -/
+theorem completeEdge_label_vertical (o : ℝ × ℝ) (x y y' : ℝ) :
+    completeEdge (label o (x, y)) (label o (x, y')) = 0 := by
   simp only [label]
   split_ifs <;> rfl
 
@@ -242,15 +276,15 @@ noncomputable def onX (o : ℝ × ℝ) (x : ℝ) : ZMod 2 :=
 noncomputable def onY (o : ℝ × ℝ) (y : ℝ) : ZMod 2 :=
   if Int.fract y = Int.fract o.2 then 1 else 0
 
-/-- **A horizontal segment is a door exactly when it lies at an integer height and the
-integrality of the abscissa changes across it.** This is the formula that makes the door count
-along a subdivided side telescope. -/
-theorem door_label_horizontal (o : ℝ × ℝ) (x x' y : ℝ) :
-    door (label o (x, y)) (label o (x', y)) = onY o y * (onX o x + onX o x') := by
+/-- **A horizontal segment is a complete edge exactly when it lies at an integer height and the
+integrality of the abscissa changes across it.** This is the formula that makes the count along a
+subdivided side telescope. -/
+theorem completeEdge_label_horizontal (o : ℝ × ℝ) (x x' y : ℝ) :
+    completeEdge (label o (x, y)) (label o (x', y)) = onY o y * (onX o x + onX o x') := by
   simp only [label, onX, onY]
   split_ifs <;> rfl
 
-/-! ### Doors along the grid -/
+/-! ### Complete edges along the grid -/
 
 open Grid
 
@@ -265,112 +299,134 @@ def corner (R : Rectangle) : ℝ × ℝ := (R.x₀, R.y₀)
 
 @[simp] lemma corner_snd (R : Rectangle) : (corner R).2 = R.y₀ := rfl
 
-/-- The door indicator of the `j`-th segment of the `k`-th horizontal grid line: the segment from
-`(x j, y k)` to `(x (j + 1), y k)`, where `x` and `y` enumerate the grid lines of the tiling. -/
-noncomputable def segDoor (R : Rectangle) (T : ι → Rectangle) (j k : ℕ) : ZMod 2 :=
-  door (label (corner R) (nth (gridX R T) j, nth (gridY R T) k))
+/-- The complete-edge indicator of the `j`-th segment of the `k`-th horizontal grid line: the
+segment from `(x j, y k)` to `(x (j + 1), y k)`, where `x` and `y` enumerate the grid lines. -/
+noncomputable def segComplete (R : Rectangle) (T : ι → Rectangle) (j k : ℕ) : ZMod 2 :=
+  completeEdge (label (corner R) (nth (gridX R T) j, nth (gridY R T) k))
     (label (corner R) (nth (gridX R T) (j + 1), nth (gridY R T) k))
 
-/-- **The doors along a subdivided horizontal side are counted, modulo `2`, by its endpoints.**
+/-- **The complete edges along a subdivided horizontal side are counted, modulo `2`, by its
+endpoints.**
 This is the variation of Sperner's lemma that Schmerl's proof needs: one diagonal per tile is not
 a triangulation in the usual sense, since a corner of one tile may lie inside an edge of another,
 so a side of a triangle carries however many vertices its neighbours put there. Along a
-horizontal line the labels record the integrality of the abscissa, so the doors on the side count
-the changes of that integrality — and the parity of the number of changes is fixed by the two
-ends. -/
-theorem sum_segDoor (R : Rectangle) (T : ι → Rectangle) {p q : ℕ} (h : p ≤ q) (k : ℕ) :
-    ∑ j ∈ Ico p q, segDoor R T j k =
-      door (label (corner R) (nth (gridX R T) p, nth (gridY R T) k))
+horizontal line the labels record the integrality of the abscissa, so the complete edges on the
+side count the changes of that integrality — and the parity of the number of changes is fixed by
+the two ends. -/
+theorem sum_segComplete (R : Rectangle) (T : ι → Rectangle) {p q : ℕ} (h : p ≤ q) (k : ℕ) :
+    ∑ j ∈ Ico p q, segComplete R T j k =
+      completeEdge (label (corner R) (nth (gridX R T) p, nth (gridY R T) k))
         (label (corner R) (nth (gridX R T) q, nth (gridY R T) k)) := by
-  simp only [segDoor, door_label_horizontal, ← Finset.mul_sum]
+  simp only [segComplete, completeEdge_label_horizontal, ← Finset.mul_sum]
   rw [sum_Ico_add_succ h fun j ↦ onX (corner R) (nth (gridX R T) j)]
 
 /-! ### The two triangles of a tile -/
 
-/-- The doors on the three sides of the *lower* triangle of `S`, the one below the diagonal from
-its lower-left to its upper-right corner. -/
-noncomputable def lowerDoors (o : ℝ × ℝ) (S : Rectangle) : ZMod 2 :=
-  door (label o (S.x₀, S.y₀)) (label o (S.x₁, S.y₀))
-    + door (label o (S.x₁, S.y₀)) (label o (S.x₁, S.y₁))
-    + door (label o (S.x₁, S.y₁)) (label o (S.x₀, S.y₀))
+/-- The three vertices, in cyclic order, of one of the two triangles into which the diagonal from
+`S`'s lower-left to its upper-right corner cuts it: `false` is the triangle below the diagonal,
+`true` the one above. -/
+def triangle (S : Rectangle) : Bool → (ℝ × ℝ) × (ℝ × ℝ) × (ℝ × ℝ)
+  | false => ((S.x₀, S.y₀), (S.x₁, S.y₀), (S.x₁, S.y₁))
+  | true => ((S.x₀, S.y₀), (S.x₀, S.y₁), (S.x₁, S.y₁))
 
-/-- The doors on the three sides of the *upper* triangle of `S`. -/
-noncomputable def upperDoors (o : ℝ × ℝ) (S : Rectangle) : ZMod 2 :=
-  door (label o (S.x₀, S.y₀)) (label o (S.x₀, S.y₁))
-    + door (label o (S.x₀, S.y₁)) (label o (S.x₁, S.y₁))
-    + door (label o (S.x₁, S.y₁)) (label o (S.x₀, S.y₀))
+/-- A triangle of `S` is *complete* when its three vertices carry three different labels. This is
+Wagon's triangle labelled `ABC`, and the object his variation of Sperner's lemma counts. -/
+def IsCompleteTriangle (o : ℝ × ℝ) (S : Rectangle) (b : Bool) : Prop :=
+  IsCompleteTriple (label o (triangle S b).1) (label o (triangle S b).2.1)
+    (label o (triangle S b).2.2)
 
-/-- **A tile with an integer side has no rainbow triangle.** If the width is an integer the two
+noncomputable instance (o : ℝ × ℝ) (S : Rectangle) (b : Bool) :
+    Decidable (IsCompleteTriangle o S b) := by
+  unfold IsCompleteTriangle
+  infer_instance
+
+/-- The number of complete edges on the three sides of a triangle of `S`, modulo `2`. -/
+noncomputable def sideCount (o : ℝ × ℝ) (S : Rectangle) (b : Bool) : ZMod 2 :=
+  completeEdge (label o (triangle S b).1) (label o (triangle S b).2.1)
+    + completeEdge (label o (triangle S b).2.1) (label o (triangle S b).2.2)
+    + completeEdge (label o (triangle S b).2.2) (label o (triangle S b).1)
+
+/-- **A triangle carries an odd number of complete edges exactly when it is complete**, the local
+count of Sperner's lemma read on the triangles of a tile. -/
+theorem sideCount_eq_ite (o : ℝ × ℝ) (S : Rectangle) (b : Bool) :
+    sideCount o S b = if IsCompleteTriangle o S b then 1 else 0 :=
+  completeEdge_sum_eq_ite _ _ _
+
+/-- **A tile with an integer side has no complete triangle.** If the width is an integer the two
 ends of each horizontal side agree in the integrality of their abscissa, hence in their label; if
-the height is an integer the two ends of each vertical side do. Either way each of the tile's two
-triangles has two vertices with the same label, so it carries an even number of doors. -/
-theorem doors_eq_zero (o : ℝ × ℝ) {S : Rectangle} (hS : S.HasIntegerSide) :
-    lowerDoors o S = 0 ∧ upperDoors o S = 0 := by
+the height is an integer the two ends of each vertical side do. Either way both triangles of the
+tile have two vertices carrying the same label. -/
+theorem not_isCompleteTriangle (o : ℝ × ℝ) {S : Rectangle} (hS : S.HasIntegerSide) (b : Bool) :
+    ¬ IsCompleteTriangle o S b := by
   rcases hS with ⟨n, hn⟩ | ⟨n, hn⟩
   · have h : Int.fract S.x₀ = Int.fract S.x₁ :=
       (Int.fract_eq_fract.mpr ⟨n, by simpa only [Rectangle.width] using hn⟩).symm
-    exact ⟨door_add_door_add_door_eq_zero fun hd ↦ hd.1 (label_congr_fst h),
-      door_add_door_add_door_eq_zero fun hd ↦ hd.2.1 (label_congr_fst h)⟩
+    cases b
+    · exact fun hd ↦ hd.1 (label_congr_fst h)
+    · exact fun hd ↦ hd.2.1 (label_congr_fst h)
   · have h : Int.fract S.y₀ = Int.fract S.y₁ :=
       (Int.fract_eq_fract.mpr ⟨n, by simpa only [Rectangle.height] using hn⟩).symm
-    exact ⟨door_add_door_add_door_eq_zero fun hd ↦ hd.2.1 (label_congr_snd h),
-      door_add_door_add_door_eq_zero fun hd ↦ hd.1 (label_congr_snd h)⟩
+    cases b
+    · exact fun hd ↦ hd.2.1 (label_congr_snd h)
+    · exact fun hd ↦ hd.1 (label_congr_snd h)
 
-/-- **The doors of a tile's two triangles are the doors on its bottom and top edges.** The
+/-- **The complete edges of a tile's two triangles are those on its bottom and top edges.** The
 diagonal is a side of both triangles, so it is counted twice and cancels; the vertical sides
-carry no doors at all. -/
-theorem lowerDoors_add_upperDoors (i : ι) :
-    lowerDoors (corner R) (T i) + upperDoors (corner R) (T i) =
+carry no complete edges at all. -/
+theorem sum_sideCount (i : ι) :
+    ∑ b, sideCount (corner R) (T i) b =
       ∑ j ∈ Ico (idxL R T i) (idxR R T i),
-        (segDoor R T j (idxB R T i) + segDoor R T j (idxT R T i)) := by
+        (segComplete R T j (idxB R T i) + segComplete R T j (idxT R T i)) := by
   have hle : idxL R T i ≤ idxR R T i :=
     le_of_nth_le_nth (idxL_lt i) (((nth_idxL i).le.trans (T i).hx).trans (nth_idxR i).ge)
-  rw [Finset.sum_add_distrib, sum_segDoor R T hle, sum_segDoor R T hle, nth_idxL, nth_idxR,
-    nth_idxB, nth_idxT]
-  simp only [lowerDoors, upperDoors, door_label_vertical, add_zero, zero_add]
-  rw [add_add_add_comm, CharTwo.add_self_eq_zero, add_zero]
+  rw [Finset.sum_add_distrib, sum_segComplete R T hle, sum_segComplete R T hle, nth_idxL,
+    nth_idxR, nth_idxB, nth_idxT, Fintype.sum_bool]
+  simp only [sideCount, triangle, completeEdge_label_vertical, add_zero, zero_add]
+  rw [add_add_add_comm, CharTwo.add_self_eq_zero, add_zero, add_comm]
+
 
 /-! ### The double count -/
 
 /-- **The column double count.** Summing over the tiles met by the `j`-th column of grid cells
-the doors on their bottom and top edges there leaves only the two ends of the column: an interior
+the complete edges on their bottom and top edges leaves only the two ends of the column: an
+interior
 horizontal grid segment is either interior to a tile, and counted by neither of its triangles, or
 the top edge of one tile and the bottom edge of another, and counted twice. -/
 theorem sum_column (hT : IsTiling R T) {j N : ℕ} (hj : j + 1 < (gridX R T).sort.length)
     (hN : (gridY R T).sort.length = N + 2) :
     ∑ i, (if idxL R T i ≤ j ∧ j < idxR R T i then
-        segDoor R T j (idxB R T i) + segDoor R T j (idxT R T i) else 0) =
-      segDoor R T j 0 + segDoor R T j (N + 1) := by
+        segComplete R T j (idxB R T i) + segComplete R T j (idxT R T i) else 0) =
+      segComplete R T j 0 + segComplete R T j (N + 1) := by
   have hcell : ∀ i, ∀ k < N + 1, (cellTile hT (j, k) = i ↔
       (idxL R T i ≤ j ∧ j < idxR R T i) ∧ idxB R T i ≤ k ∧ k < idxT R T i) :=
     fun i k hk ↦ cellTile_eq_iff hT (p := (j, k)) hj (by lia)
   have key : ∀ i, (if idxL R T i ≤ j ∧ j < idxR R T i then
-        segDoor R T j (idxB R T i) + segDoor R T j (idxT R T i) else 0)
+        segComplete R T j (idxB R T i) + segComplete R T j (idxT R T i) else 0)
       = ∑ k ∈ range (N + 1), if (idxL R T i ≤ j ∧ j < idxR R T i) ∧ idxB R T i ≤ k ∧
-        k < idxT R T i then segDoor R T j k + segDoor R T j (k + 1) else 0 := fun i ↦ by
+        k < idxT R T i then segComplete R T j k + segComplete R T j (k + 1) else 0 := fun i ↦ by
     rw [← Finset.sum_filter]
     by_cases hP : idxL R T i ≤ j ∧ j < idxR R T i
     · have := idxT_lt (R := R) (T := T) i
       rw [if_pos hP, ← sum_Ico_add_succ (le_of_nth_le_nth (idxB_lt i)
-        (((nth_idxB i).le.trans (T i).hy).trans (nth_idxT i).ge)) fun k ↦ segDoor R T j k]
+        (((nth_idxB i).le.trans (T i).hy).trans (nth_idxT i).ge)) fun k ↦ segComplete R T j k]
       refine Finset.sum_congr (Finset.ext fun k ↦ ?_) fun _ _ ↦ rfl
       simp only [Finset.mem_Ico, Finset.mem_filter, Finset.mem_range, hP, true_and]
       lia
     · rw [if_neg hP, Finset.filter_false_of_mem fun k _ hk ↦ hP hk.1, Finset.sum_empty]
   rw [Finset.sum_congr rfl fun i _ ↦ key i, Finset.sum_comm, Finset.range_eq_Ico,
-    ← sum_Ico_add_succ (Nat.zero_le (N + 1)) fun k ↦ segDoor R T j k]
+    ← sum_Ico_add_succ (Nat.zero_le (N + 1)) fun k ↦ segComplete R T j k]
   refine Finset.sum_congr rfl fun k hk ↦ ?_
   have hk' : k < N + 1 := (Finset.mem_Ico.mp hk).2
   rw [Finset.sum_eq_single_of_mem _ (Finset.mem_univ (cellTile hT (j, k)))
     fun i _ hi ↦ if_neg fun hc ↦ hi ((hcell i k hk').mpr hc).symm, if_pos ((hcell _ k hk').mp rfl)]
 
-/-- **The doors of all the triangles are the doors on the bottom and top edges of `R`.** The
+/-- **The complete edges of all the triangles are those on the bottom and top edges of `R`.** The
 column count, summed over the columns of the grid. -/
 theorem sum_tile_edges (hT : IsTiling R T) {N : ℕ} (hN : (gridY R T).sort.length = N + 2) :
     ∑ i, ∑ j ∈ Finset.Ico (idxL R T i) (idxR R T i),
-        (segDoor R T j (idxB R T i) + segDoor R T j (idxT R T i))
+        (segComplete R T j (idxB R T i) + segComplete R T j (idxT R T i))
       = ∑ j ∈ range ((gridX R T).sort.length - 1),
-          (segDoor R T j 0 + segDoor R T j (N + 1)) := by
+          (segComplete R T j 0 + segComplete R T j (N + 1)) := by
   have hIco : ∀ i, Finset.Ico (idxL R T i) (idxR R T i)
       = (range ((gridX R T).sort.length - 1)).filter
         (fun j ↦ idxL R T i ≤ j ∧ j < idxR R T i) := fun i ↦ by
@@ -382,23 +438,19 @@ theorem sum_tile_edges (hT : IsTiling R T) {N : ℕ} (hN : (gridY R T).sort.leng
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun j hj ↦ sum_column hT (by have := Finset.mem_range.mp hj; lia) hN
 
-end IntegerRectangle.Sperner
-
-open IntegerRectangle IntegerRectangle.Sperner Grid in
-/-- **Sperner's lemma proof** (Schmerl) of the integer-rectangle tiling theorem. Suppose neither
-side of `R` is an integer. Cut each tile in two along a diagonal and label every vertex by
-Schmerl's rule; a tile with an integer side then has two vertices of the same label in each of
-its triangles, so each carries an even number of doors (`doors_eq_zero`) and the total over all
-triangles is even. On the other hand the doors of a tile's two triangles are those on its bottom
-and top edges (`lowerDoors_add_upperDoors`), the interior horizontal segments pair off
-(`sum_tile_edges`), and what survives is the bottom edge of `R` — one door, since the corner of
-`R` is labelled `A` and its lower-right corner `B` — together with its top edge, which carries
-none because the height of `R` is not an integer. So the total is odd. -/
-theorem IntegerRectangleTheorem_Sperner : IntegerRectangleTheorem := by
-  intro ι _ R T hT hsides
-  by_contra hR
-  rw [Rectangle.HasIntegerSide, not_or] at hR
-  obtain ⟨hw, hh⟩ := hR
+open scoped Classical in
+/-- **The number of completely labelled triangles is odd**, when neither side of `R` is an
+integer. This is the conclusion Wagon draws from his variation of Sperner's lemma, and the whole
+weight of the proof: each triangle contributes its parity of complete edges
+(`sideCount_eq_ite`), the tiles' contributions are the complete edges on their bottom and top
+edges (`sum_sideCount`), the interior horizontal segments pair off (`sum_tile_edges`), and what
+survives is the bottom edge of `R` — a single complete edge, since the corner of `R` is labelled
+`A` and its lower-right corner `B` — together with its top edge, which carries none because the
+height of `R` is not an integer. -/
+theorem odd_card_completeTriangles (hT : IsTiling R T) (hw : ¬∃ n : ℤ, R.width = n)
+    (hh : ¬∃ n : ℤ, R.height = n) :
+    Odd (Finset.univ.filter fun t : ι × Bool ↦
+      IsCompleteTriangle (corner R) (T t.1) t.2).card := by
   have hxne : Int.fract R.x₁ ≠ Int.fract R.x₀ := fun h ↦ hw <|
     (Int.fract_eq_fract.mp h).imp fun n hn ↦ by simpa only [Rectangle.width] using hn
   have hyne : Int.fract R.y₁ ≠ Int.fract R.y₀ := fun h ↦ hh <|
@@ -411,15 +463,37 @@ theorem IntegerRectangleTheorem_Sperner : IntegerRectangleTheorem := by
   have hA : label (corner R) (R.x₀, R.y₀) = Color.A := by simp only [label, corner_fst, ↓reduceIte]
   have hB : label (corner R) (R.x₁, R.y₀) = Color.B := by
     simp only [label, corner_fst, hxne, ↓reduceIte, corner_snd]
-  have hTop : door (label (corner R) (R.x₀, R.y₁)) (label (corner R) (R.x₁, R.y₁)) = 0 := by
-    rw [door_label_horizontal, onY, corner_snd, if_neg hyne, zero_mul]
-  have hzero : ∑ i, ∑ j ∈ Finset.Ico (idxL R T i) (idxR R T i),
-      (segDoor R T j (idxB R T i) + segDoor R T j (idxT R T i)) = 0 :=
-    Finset.sum_eq_zero fun i _ ↦ by
-      obtain ⟨h1, h2⟩ := doors_eq_zero (corner R) (hsides i)
-      rw [← lowerDoors_add_upperDoors i, h1, h2, add_zero]
+  have hTop : completeEdge (label (corner R) (R.x₀, R.y₁))
+      (label (corner R) (R.x₁, R.y₁)) = 0 := by
+    rw [completeEdge_label_horizontal, onY, corner_snd, if_neg hyne, zero_mul]
   have key := sum_tile_edges hT hN
-  rw [hzero, Finset.sum_add_distrib, Finset.range_eq_Ico,
-    sum_segDoor R T (Nat.zero_le _), sum_segDoor R T (Nat.zero_le _), nth_gridX_zero hT,
-    nth_gridX_last hT, nth_gridY_zero hT, hlast, hA, hB, hTop, add_zero] at key
-  exact absurd key (by decide)
+  rw [Finset.sum_add_distrib, Finset.range_eq_Ico, sum_segComplete R T (Nat.zero_le _),
+    sum_segComplete R T (Nat.zero_le _), nth_gridX_zero hT, nth_gridX_last hT,
+    nth_gridY_zero hT, hlast, hA, hB, hTop, add_zero] at key
+  rw [← ZMod.natCast_eq_one_iff_odd, ← Finset.sum_boole]
+  calc ∑ t : ι × Bool, (if IsCompleteTriangle (corner R) (T t.1) t.2 then (1 : ZMod 2) else 0)
+      = ∑ t : ι × Bool, sideCount (corner R) (T t.1) t.2 :=
+        Finset.sum_congr rfl fun t _ ↦ (sideCount_eq_ite _ _ _).symm
+    _ = ∑ i, ∑ b, sideCount (corner R) (T i) b := Fintype.sum_prod_type _
+    _ = ∑ i, ∑ j ∈ Ico (idxL R T i) (idxR R T i),
+          (segComplete R T j (idxB R T i) + segComplete R T j (idxT R T i)) :=
+        Finset.sum_congr rfl fun i _ ↦ sum_sideCount i
+    _ = 1 := key
+
+end IntegerRectangle.Sperner
+
+open IntegerRectangle IntegerRectangle.Sperner in
+/-- **Sperner's lemma proof** (Schmerl) of the integer-rectangle tiling theorem, in the two steps
+Wagon states it: if neither side of `R` were an integer, the number of triangles labelled `ABC`
+would be odd (`odd_card_completeTriangles`), and in particular there would be one; but every tile
+has an integer side, so no triangle is so labelled (`not_isCompleteTriangle`). -/
+theorem IntegerRectangleTheorem_Sperner : IntegerRectangleTheorem := by
+  classical
+  intro ι _ R T hT hsides
+  by_contra hR
+  rw [Rectangle.HasIntegerSide, not_or] at hR
+  obtain ⟨hw, hh⟩ := hR
+  have hodd := odd_card_completeTriangles hT hw hh
+  rw [Finset.filter_false_of_mem fun t _ ↦
+    not_isCompleteTriangle (corner R) (hsides t.1) t.2, Finset.card_empty] at hodd
+  exact absurd hodd (by decide)
