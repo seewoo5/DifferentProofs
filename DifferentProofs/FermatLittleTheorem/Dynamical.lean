@@ -81,7 +81,6 @@ lemma T_num_fp_eq (n : ℕ) (hn : 2 ≤ n) : Nat.card {x : I | T n x = x} = n :=
         have hh : ((toI j : I) : ℝ) = 1 := by rw [h]; rfl
         linarith
       apply Subtype.ext
-      change (T n (toI j) : ℝ) = ((toI j : I) : ℝ)
       rw [T_val_of_ne htoI_ne]
       change Int.fract ((n : ℝ) * ((j : ℝ) / ((n : ℝ) - 1))) = (j : ℝ) / ((n : ℝ) - 1)
       have key : (n : ℝ) * ((j : ℝ) / ((n : ℝ) - 1)) =
@@ -182,7 +181,7 @@ private lemma T_fixed_set_finite {n : ℕ} (hn : 2 ≤ n) :
 private lemma fixedDiff_finite {a p : ℕ} (hp : p.Prime) (ha : 2 ≤ a) :
     (fixedDiff a p).Finite := by
   rw [fixedDiff]
-  exact T_fixed_set_finite (ha.trans <| le_self_pow (by lia : 1 ≤ a) hp.ne_zero) |>.diff
+  exact T_fixed_set_finite (ha.trans <| le_self_pow (by lia : 1 ≤ a) hp.ne_zero) |>.sdiff
 
 private lemma fixedDiff_card {a p : ℕ} (hp : p.Prime) (ha : 2 ≤ a) :
     Nat.card (fixedDiff a p) = a ^ p - a := by
@@ -190,7 +189,7 @@ private lemma fixedDiff_card {a p : ℕ} (hp : p.Prime) (ha : 2 ≤ a) :
     intro x hx
     have hiter : (T a)^[p] x = x := Function.iterate_fixed hx p
     rwa [T_iterate a hp.pos] at hiter
-  rw [Nat.card_coe_set_eq, fixedDiff, Set.ncard_diff hBA (T_fixed_set_finite ha),
+  rw [Nat.card_coe_set_eq, fixedDiff, Set.ncard_sdiff hBA (T_fixed_set_finite ha),
       ← Nat.card_coe_set_eq {x : I | T (a ^ p) x = x},
       ← Nat.card_coe_set_eq {x : I | T a x = x},
       T_num_fp_eq (a ^ p) (ha.trans <| le_self_pow (by lia : 1 ≤ a) hp.ne_zero),

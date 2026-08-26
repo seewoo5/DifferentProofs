@@ -702,7 +702,7 @@ and the one at the top; summing over the columns leaves the bottom and top edges
 :::
 
 :::lemma_ "lem:int-rect-sperner-odd" (parent := "grp:int-rect") (lean := "IntegerRectangle.Sperner.odd_card_completeTriangles")
-**The variation of Sperner's lemma, as Wagon uses it.** If neither side of $`R` is an integer,
+*The variation of Sperner's lemma, as Wagon uses it.* If neither side of $`R` is an integer,
 the number of complete triangles is odd.
 :::
 
