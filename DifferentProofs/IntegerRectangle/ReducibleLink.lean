@@ -78,6 +78,38 @@ structure Link (R : Rectangle) (T : ι → Rectangle) where
   /-- The link is maximal upwards. -/
   top : hi = R.y₁ ∨ Blocked T c hi
 
+omit [Fintype ι] in
+/-- Two links coincide when their line and their two ends coincide. -/
+lemma Link.ext {l l' : Link R T} (hc : l.c = l'.c) (hlo : l.lo = l'.lo) (hhi : l.hi = l'.hi) :
+    l = l' := by
+  cases l
+  cases l'
+  subst hc hlo hhi
+  rfl
+
+omit [Fintype ι] in
+/-- **Two V-links sharing a stretch of positive length coincide.** By maximality: were an end of
+one of them interior to the other, that end would be blocked and unblocked at once. -/
+lemma Link.eq_of_overlap {l l' : Link R T} {y y' : ℝ} (hc : l.c = l'.c) (hyy' : y < y')
+    (hlo : l.lo ≤ y) (hhi : y' ≤ l.hi) (hlo' : l'.lo ≤ y) (hhi' : y' ≤ l'.hi) : l = l' := by
+  have hi_le : ∀ l₁ l₂ : Link R T, l₁.c = l₂.c → l₁.lo ≤ y → y' ≤ l₂.hi → l₁.hi ≤ l₂.hi := by
+    intro l₁ l₂ hc h₁ h₂
+    by_contra hcon
+    push Not at hcon
+    rcases l₂.top with heq | hbl
+    · linarith [l₁.le_y₁]
+    · exact l₁.free l₂.hi (by linarith) hcon (by rwa [hc])
+  have lo_le : ∀ l₁ l₂ : Link R T, l₁.c = l₂.c → l₂.lo ≤ y → y' ≤ l₁.hi → l₂.lo ≤ l₁.lo := by
+    intro l₁ l₂ hc h₁ h₂
+    by_contra hcon
+    push Not at hcon
+    rcases l₂.bot with heq | hbl
+    · linarith [l₁.y₀_le]
+    · exact l₁.free l₂.lo hcon (by linarith) (by rwa [hc])
+  exact Link.ext hc
+    (le_antisymm (lo_le l' l hc.symm hlo hhi') (lo_le l l' hc hlo' hhi))
+    (le_antisymm (hi_le l l' hc hlo hhi') (hi_le l' l hc.symm hlo' hhi))
+
 /-- Two tiles whose lower-left cells contain a common point are equal — the form in which
 uniqueness of the tile in a quadrant is used below. -/
 private lemma eq_of_cell (hT : IsTiling R T) {c t : ℝ} {i j : ι}

@@ -502,49 +502,82 @@ other ways a link can be reducible are this one read in the mirror image of the 
 transpose, and in the mirror image of its transpose.
 :::
 
-Eleventh proof: a minimal cut-set (Paul Seymour, Bell Communications Research). Seymour forms a
-graph $`\Gamma` whose vertices are the horizontal segments of the tiling and whose edges are the
-tiles, each joining the segment carrying its bottom edge to the segment carrying its top edge,
-together with one extra edge running around the outside of $`R` from its base to its top. Let
-$`S` collect the edges coming from H-tiles, together with that outer edge. If $`S` does not
-separate the base of $`R` from its top, a path avoiding $`S` runs from base to top across V-tiles
-alone, whose integer heights telescope to the height of $`R`. Otherwise take a *minimal* cut
-$`S' \subseteq S`. The dual of a minimal cut in a planar graph is a cycle; that cycle has to use
-the dual of the outer edge, so deleting it leaves a path across the dual graph from the left edge
-of $`R` to its right edge, whose steps are widths of H-tiles and telescope to the width of $`R`.
+Eleventh proof: a minimal cut-set (Paul Seymour, Bell Communications Research). Form a graph
+$`\Gamma`: its vertices are the horizontal segments of the tiling, and its edges are the tiles —
+each tile joins the segment carrying its bottom edge to the segment carrying its top edge — plus
+one exterior edge running around the outside of $`R` from its bottom edge to its top edge. Call a
+tile a V-tile when its height is an integer, an H-tile (of integer width) otherwise, and let $`S`
+collect the H-tile edges together with the exterior edge. If deleting $`S` leaves the bottom of
+$`R` connected to its top, a path of V-tiles climbs from bottom to top and the height of $`R` is
+an integer. Otherwise Seymour passes to a minimal cut $`S' \subseteq S` and invokes planar
+duality: the tiling embeds $`\Gamma` in the plane, the faces of the embedding are the V-links of
+the tenth proof together with the two outer faces on either side of the exterior edge, and the
+duals of a minimal cut's edges form a cycle in the dual graph. The cycle must use the dual of the
+exterior edge — that edge alone joins bottom to top — and deleting it leaves a dual path from the
+left outer face to the right one whose steps cross H-tiles, so the width of $`R` is an integer.
 
-Mathlib has no planar duality, so the formalization keeps the cut and drops the duality. A vertex
-is recorded by its height alone, which merges horizontal segments sitting at a common height and
-so can only make the base and the top easier to connect: the dichotomy below is weaker than
-Seymour's, and still enough. What replaces the theorem on planar duality is the fg-area of the
-thirteenth proof, which does the same bookkeeping.
+Mathlib has no planarity, so the formalization proves the duality directly for this graph, in the
+concrete geometric form Wagon reads off the embedding, and in its parity form: instead of
+minimalizing the cut and extracting a cycle, it takes the cut around the region reachable from
+the bottom and shows that this cut crosses every inner face evenly and the two outer faces oddly,
+which yields the dual path by a handshake. Vertices are handled as the points of the plane lying
+on horizontal tile edges, two points representing the same vertex when the whole stretch between
+them lies on horizontal edges, and a path is a `Relation.ReflTransGen` chain of such moves and
+tile crossings.
 
-:::lemma_ "lem:int-rect-cut-steps" (parent := "grp:int-rect") (lean := "IntegerRectangle.CutSet.int_sub_y₀_of_mem_VReach")
-Call a height *reachable* when it can be reached from the base of $`R` by repeatedly crossing a
-tile of integer height from one of its horizontal edges to the other, in either direction. A
-reachable height lies an integer distance above the base of $`R`.
+:::lemma_ "lem:int-rect-cut-steps" (parent := "grp:int-rect") (lean := "IntegerRectangle.CutSet.int_sub_y₀_of_mem_reach")
+Reachability climbs by integer steps: every vertex reachable from the bottom of $`R` across tiles
+of integer height sits an integer distance above the bottom of $`R`.
 :::
 
 :::proof "lem:int-rect-cut-steps"
-Induction along the chain of crossings: the base lies $`0` above itself, and each crossing changes
-the height by plus or minus the integer height of the tile crossed.
+Induction along the chain: a move within a horizontal segment keeps the height, and a crossing
+changes it by plus or minus the integer height of the tile crossed. In particular, if some vertex
+at the height of the top edge of $`R` is reachable, the height of $`R` is an integer — the first
+alternative of Seymour's dichotomy.
 :::
 
-:::lemma_ "lem:int-rect-cut-dichotomy" (parent := "grp:int-rect") (lean := "IntegerRectangle.CutSet.y₁_mem_VReach_or_x₁_mem_HReach")
-Either the top of $`R` is reachable from its base across tiles of integer height, or the right
-edge of $`R` is reachable from its left edge across tiles of integer width — the same notion read
-in the transpose of the tiling.
+:::lemma_ "lem:int-rect-cut-even" (parent := "grp:int-rect") (lean := "IntegerRectangle.CutSet.cutDeg_link")
+Suppose instead that no vertex at the top of $`R` is reachable, and call a tile *cut* when
+exactly one of its two horizontal edges is reachable — all such tiles are H-tiles, because
+reachability crosses V-tiles freely. Around every V-link face of the embedding, the cut crosses
+an even number of tiles.
 :::
 
-:::proof "lem:int-rect-cut-dichotomy"
-Suppose neither. Give the horizontal axis the indicator of the reachable abscissae and the
-vertical axis the indicator of the reachable heights. A tile of integer width has both of its
-vertical edges reachable or neither, so its horizontal increment vanishes; a tile of integer
-height has both of its horizontal edges reachable or neither, so its vertical increment vanishes;
-every tile is one or the other, so every tile has fg-area $`0`, and by additivity
-{uses "lem:int-rect-fgarea"}[] so has $`R`. But the base of $`R` is reachable and its top is not,
-and its left edge is reachable and its right edge is not, which makes the fg-area of $`R` equal to
-$`(0 - 1)(0 - 1) = 1`.
+:::proof "lem:int-rect-cut-even"
+The tiles abutting the link on its left partition it {uses "lem:int-rect-link-side"}[], so in
+$`\mathbb{Z}/2` the reachability indicators of their horizontal edges telescope — consecutive
+tiles share an edge point on the link — to the indicators of the two ends of the link; the tiles
+abutting it on the right telescope to the same two ends, and the two sides cancel. This parity
+statement carries what Wagon takes from the cited planar-duality theorem, that the duals of a
+minimal cut's edges form a cycle.
+:::
+
+:::lemma_ "lem:int-rect-cut-odd" (parent := "grp:int-rect") (lean := "IntegerRectangle.CutSet.cutDeg_left")
+Around each of the two outer faces, the cut crosses an odd number of tiles.
+:::
+
+:::proof "lem:int-rect-cut-odd"
+The tiles reaching the left edge of $`R` partition it, and the same telescope now runs between
+the two left corners of $`R`: the bottom corner is reachable, since the bottom edge of $`R` is a
+single segment covered by the bottom row of tiles, and the top corner is not, so the count is
+odd. The odd crossing belongs to the exterior edge — the one boundary edge of the outer face
+that the tile count does not see. The right outer face is its mirror image.
+:::
+
+:::lemma_ "lem:int-rect-cut-path" (parent := "grp:int-rect") (lean := "IntegerRectangle.CutSet.reflTransGen_dualStep")
+The dual path exists: the right outer face is joined to the left outer face by a chain of cut
+tiles, each step passing from the face along a tile's left edge to the face along its right edge.
+:::
+
+:::proof "lem:int-rect-cut-path"
+A handshake in $`\mathbb{Z}/2`. The set of faces joined to the left outer face is closed under
+crossing cut tiles, so summing the cut degrees of its members counts every cut tile zero or two
+times: the sum is even. But V-link faces have even degree {uses "lem:int-rect-cut-even"}[] and
+the two outer faces odd degree {uses "lem:int-rect-cut-odd"}[], so the sum is odd unless the set
+contains both odd faces — it contains the left outer face, so it contains the right one. This is
+the path Wagon extracts from the dual cycle of his minimal cut by deleting the dual of the
+exterior edge.
 :::
 
 :::theorem "thm:int-rect-cut" (parent := "grp:int-rect") (lean := "IntegerRectangleTheorem_CutSet") (proofColor := "#fbcfe8")
@@ -552,10 +585,12 @@ A rectangle tiled by rectangles each with an integer side has an integer side.
 :::
 
 :::proof "thm:int-rect-cut"
-By the dichotomy {uses "lem:int-rect-cut-dichotomy"}[], either the top of $`R` is reachable from
-its base or its right edge is reachable from its left edge; reachability proceeds by integer steps
-{uses "lem:int-rect-cut-steps"}[], so in the first case $`R` has integer height and in the second
-it has integer width.
+Prune the tiling to its nondegenerate tiles and delete the cut-set. If some vertex at the top of
+$`R` is reachable, the height of $`R` is an integer {uses "lem:int-rect-cut-steps"}[]. Otherwise
+the dual path runs from the left outer face to the right one {uses "lem:int-rect-cut-path"}[];
+each of its steps crosses a cut tile, moving the abscissa by that H-tile's integer width, and its
+two end faces lie at the abscissae of the left and right edges of $`R` — so the width of $`R` is
+an integer.
 :::
 
 Twelfth proof: a sweep line (Bachman–Yannakakis). This one does not use the analytic engine above.
