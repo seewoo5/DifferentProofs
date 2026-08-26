@@ -33,7 +33,7 @@ sources:                       # [required] list of sources or an original proof
     authors: ["Stan Wagon"]
     id: "Amer. Math. Monthly 94 (1987), no. 7, 601-617; https://www.jstor.org/stable/2322213"
     type: "article"
-    location: "Proofs 1-10, 12, 13 of the fourteen (11 and 14 not yet formalized)"
+    location: "All fourteen proofs"
     relationship: "formalizes"
     license: ""
     author_endorsement: "not-contacted"
@@ -382,6 +382,10 @@ status:
       file: "DifferentProofs/IntegerRectangle/ReducibleLink.lean"
       sorry_count: 0
       axioms: *standard_axioms
+    - declaration: "IntegerRectangleTheorem_CutSet"
+      file: "DifferentProofs/IntegerRectangle/CutSet.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
     - declaration: "IntegerRectangleTheorem_SweepLine"
       file: "DifferentProofs/IntegerRectangle/SweepLine.lean"
       sorry_count: 0
@@ -502,8 +506,16 @@ fidelity:
       his per-proof local arguments are factored into shared lemmas
       (`IsTiling.sum_fgArea`, `Grid`, `CornerCount`, `Cells`, `Walks`) reused across
       proofs.
-    - Wagon's proof 11 (minimal cut-set, Seymour) is not formalized; it needs planar
-      duality and a planar min-cut theorem, which mathlib does not have.
+    - Proof 11 (minimal cut-set, Seymour) does not build the planar duality it is
+      stated with; mathlib has neither planarity nor a min-cut theorem. Seymour's
+      graph has the horizontal segments of the tiling as its vertices, and the
+      formalization records a vertex by its height alone, which merges segments at a
+      common height and can only make the base and the top of the rectangle easier to
+      connect; the dichotomy proved
+      (`IntegerRectangle.CutSet.y₁_mem_VReach_or_x₁_mem_HReach`) is therefore weaker
+      than Seymour's, and still enough. In place of "the dual of a minimal cut in a
+      planar graph is a cycle" it feeds the indicators of the two reachable sets to
+      the fg-area identity `IsTiling.sum_fgArea`, which does the same bookkeeping.
     - Proof 14 (Sperner's lemma, Schmerl) does not prove geometric Sperner in
       general; mathlib has no such lemma either (leanprover-community/mathlib4#25231
       tracks it, and mathlib's `Sperner` is the antichain theorem). Drawing one
@@ -577,7 +589,7 @@ alignment:
       lean: "IntegerRectangleTheorem"
       module: "DifferentProofs.IntegerRectangle.Defs"
       status: "proved"
-      note: "Proved twelve ways, following Wagon's numbering."
+      note: "Proved fourteen ways, following Wagon's numbering."
     - source: "Pascal's rule"
       lean: "PascalIdentity"
       module: "DifferentProofs.CombinatorialIdentities.Defs"
@@ -641,12 +653,12 @@ alignment:
       status: "proved"
       note: ""
     - source: "Wagon, Proof 11 (minimal cut-set, Seymour)"
-      lean: ""
-      module: ""
-      status: "not-formalized"
+      lean: "IntegerRectangleTheorem_CutSet"
+      module: "DifferentProofs.IntegerRectangle.CutSet"
+      status: "proved"
       note: >-
-        Needs planar duality and a min-cut theorem for planar graphs (the existence
-        direction of Hex duality), which mathlib does not have.
+        The cut is formalized, the planar duality it is dualized with is not; see
+        `fidelity.divergences`.
     - source: "Wagon, Proof 12 (sweep line, Bachman-Yannakakis)"
       lean: "IntegerRectangleTheorem_SweepLine"
       module: "DifferentProofs.IntegerRectangle.SweepLine"

@@ -8,6 +8,7 @@ import DifferentProofs.IntegerRectangle.Checkerboard
 import DifferentProofs.IntegerRectangle.ComplexIntegral
 import DifferentProofs.IntegerRectangle.CornerCount
 import DifferentProofs.IntegerRectangle.CountingSquares
+import DifferentProofs.IntegerRectangle.CutSet
 import DifferentProofs.IntegerRectangle.Defs
 import DifferentProofs.IntegerRectangle.EulerianPath
 import DifferentProofs.IntegerRectangle.GridRefinement
@@ -499,6 +500,62 @@ by the integer $`w`, so H-tiles stay H-tiles; but the narrowest tile on the righ
 nothing, so the new tiling of $`R` has fewer tiles and the induction hypothesis applies. The three
 other ways a link can be reducible are this one read in the mirror image of the tiling, in its
 transpose, and in the mirror image of its transpose.
+:::
+
+Eleventh proof: a minimal cut-set (Paul Seymour, Bell Communications Research). Seymour forms a
+graph $`\Gamma` whose vertices are the horizontal segments of the tiling and whose edges are the
+tiles, each joining the segment carrying its bottom edge to the segment carrying its top edge,
+together with one extra edge running around the outside of $`R` from its base to its top. Let
+$`S` collect the edges coming from H-tiles, together with that outer edge. If $`S` does not
+separate the base of $`R` from its top, a path avoiding $`S` runs from base to top across V-tiles
+alone, whose integer heights telescope to the height of $`R`. Otherwise take a *minimal* cut
+$`S' \subseteq S`. The dual of a minimal cut in a planar graph is a cycle; that cycle has to use
+the dual of the outer edge, so deleting it leaves a path across the dual graph from the left edge
+of $`R` to its right edge, whose steps are widths of H-tiles and telescope to the width of $`R`.
+
+Mathlib has no planar duality, so the formalization keeps the cut and drops the duality. A vertex
+is recorded by its height alone, which merges horizontal segments sitting at a common height and
+so can only make the base and the top easier to connect: the dichotomy below is weaker than
+Seymour's, and still enough. What replaces the theorem on planar duality is the fg-area of the
+thirteenth proof, which does the same bookkeeping.
+
+:::lemma_ "lem:int-rect-cut-steps" (parent := "grp:int-rect") (lean := "IntegerRectangle.CutSet.int_sub_y₀_of_mem_VReach")
+Call a height *reachable* when it can be reached from the base of $`R` by repeatedly crossing a
+tile of integer height from one of its horizontal edges to the other, in either direction. A
+reachable height lies an integer distance above the base of $`R`.
+:::
+
+:::proof "lem:int-rect-cut-steps"
+Induction along the chain of crossings: the base lies $`0` above itself, and each crossing changes
+the height by plus or minus the integer height of the tile crossed.
+:::
+
+:::lemma_ "lem:int-rect-cut-dichotomy" (parent := "grp:int-rect") (lean := "IntegerRectangle.CutSet.y₁_mem_VReach_or_x₁_mem_HReach")
+Either the top of $`R` is reachable from its base across tiles of integer height, or the right
+edge of $`R` is reachable from its left edge across tiles of integer width — the same notion read
+in the transpose of the tiling.
+:::
+
+:::proof "lem:int-rect-cut-dichotomy"
+Suppose neither. Give the horizontal axis the indicator of the reachable abscissae and the
+vertical axis the indicator of the reachable heights. A tile of integer width has both of its
+vertical edges reachable or neither, so its horizontal increment vanishes; a tile of integer
+height has both of its horizontal edges reachable or neither, so its vertical increment vanishes;
+every tile is one or the other, so every tile has fg-area $`0`, and by additivity
+{uses "lem:int-rect-fgarea"}[] so has $`R`. But the base of $`R` is reachable and its top is not,
+and its left edge is reachable and its right edge is not, which makes the fg-area of $`R` equal to
+$`(0 - 1)(0 - 1) = 1`.
+:::
+
+:::theorem "thm:int-rect-cut" (parent := "grp:int-rect") (lean := "IntegerRectangleTheorem_CutSet") (proofColor := "#fbcfe8")
+A rectangle tiled by rectangles each with an integer side has an integer side.
+:::
+
+:::proof "thm:int-rect-cut"
+By the dichotomy {uses "lem:int-rect-cut-dichotomy"}[], either the top of $`R` is reachable from
+its base or its right edge is reachable from its left edge; reachability proceeds by integer steps
+{uses "lem:int-rect-cut-steps"}[], so in the first case $`R` has integer height and in the second
+it has integer width.
 :::
 
 Twelfth proof: a sweep line (Bachman–Yannakakis). This one does not use the analytic engine above.

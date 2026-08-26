@@ -10,7 +10,7 @@ Each theorem below records the statement that the correspondingly named declarat
 check guarantees and how to run it.
 
 Listed in the order of Stan Wagon's *Fourteen Proofs of a Result About Tiling a Rectangle*,
-keeping its numbering, so the gaps show which of the fourteen are still to come.
+keeping its numbering. All fourteen are formalized.
 -/
 
 @[expose] public section
@@ -44,6 +44,9 @@ theorem IntegerRectangleTheorem_Staircase : IntegerRectangleTheorem := sorry
 
 /-- Proof 10. -/
 theorem IntegerRectangleTheorem_ReducibleLink : IntegerRectangleTheorem := sorry
+
+/-- Proof 11. -/
+theorem IntegerRectangleTheorem_CutSet : IntegerRectangleTheorem := sorry
 
 /-- Proof 12. -/
 theorem IntegerRectangleTheorem_SweepLine : IntegerRectangleTheorem := sorry

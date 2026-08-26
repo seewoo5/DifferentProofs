@@ -58,8 +58,8 @@ The hockey-stick identity, $\sum_{i=0}^{n} \binom{i+k}{k} = \binom{n+k+1}{k+1}$:
 A rectangle tiled by rectangles each having an integer side has an integer side
 ([Stan Wagon, *Fourteen Proofs of a Result About Tiling a Rectangle*](https://www.jstor.org/stable/2322213)).
 
-Listed in the paper's order, keeping its numbering so the gaps show which of the
-fourteen proofs are still to come.
+Listed in the paper's order, keeping its numbering. All fourteen proofs are
+formalized.
 
 - Proof 1: [Complex double integral (de Bruijn)](DifferentProofs/IntegerRectangle/ComplexIntegral.lean)
 - Proof 2: [Real double integral](DifferentProofs/IntegerRectangle/RealIntegral.lean)
@@ -71,6 +71,7 @@ fourteen proofs are still to come.
 - Proof 8: [Bipartite graph](DifferentProofs/IntegerRectangle/BipartiteGraph.lean)
 - Proof 9: [Induction on the number of H-tiles (Robinson)](DifferentProofs/IntegerRectangle/Staircase.lean)
 - Proof 10: [Induction on reducible links (Bishop–Wagon)](DifferentProofs/IntegerRectangle/ReducibleLink.lean)
+- Proof 11: [Minimal cut-set (Seymour)](DifferentProofs/IntegerRectangle/CutSet.lean)
 - Proof 12: [Sweep line (Bachman–Yannakakis)](DifferentProofs/IntegerRectangle/SweepLine.lean)
 - Proof 13: [Step functions (Hochster–Maté)](DifferentProofs/IntegerRectangle/StepFunction.lean)
 - Proof 14: [Sperner's lemma (Schmerl)](DifferentProofs/IntegerRectangle/Sperner.lean)
