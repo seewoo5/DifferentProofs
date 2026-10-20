@@ -2,8 +2,8 @@ module
 
 public import DifferentProofs.InfinitudeOfPrimes.Defs
 public import Mathlib.Algebra.Order.Ring.Star
-public import Mathlib.Data.Int.Star
-public import Mathlib.Data.Rat.Star
+public import Mathlib.Algebra.Order.Star.Int
+public import Mathlib.Algebra.Order.Star.Rat
 public import Mathlib.NumberTheory.Harmonic.Bounds
 public import Mathlib.Tactic.NormNum.Prime
 
@@ -54,7 +54,7 @@ theorem prod_prime_div_prime_sub_one_ge_harmonic (n : ℕ) :
       omega
   refine le_trans ?_ (h_prod_ge_sum.trans ?_)
   · norm_num [harmonic]
-  · refine prod_le_prod ?_ ?_ <;> norm_num
+  · refine prod_le_prod₀ ?_ ?_ <;> norm_num
     · exact fun _ _ _ ↦ sum_nonneg fun _ _ ↦ by positivity
     · intro i hi hi'
       have := geom_sum_mul (i : ℚ)⁻¹ (Nat.log i n + 1)

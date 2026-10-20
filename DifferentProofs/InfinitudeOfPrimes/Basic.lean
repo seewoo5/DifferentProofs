@@ -1,6 +1,6 @@
 module
 
-public import Mathlib.Data.Finite.Defs
+public import Mathlib.Basic.Finite.Defs
 public import Mathlib.Data.Nat.Prime.Defs
 public import Mathlib.Order.Interval.Finset.Nat
 public import DifferentProofs.InfinitudeOfPrimes.Defs
@@ -9,12 +9,12 @@ public import DifferentProofs.InfinitudeOfPrimes.Defs
 
 theorem InfinitudeOfPrimes_iff_InfinitudeOfPrimes' : InfinitudeOfPrimes ↔ InfinitudeOfPrimes' := by
   simp only [InfinitudeOfPrimes, InfinitudeOfPrimes', Set.infinite_iff_exists_gt,
-    Set.mem_setOf_eq, and_comm]
+    Set.mem_ofPred_eq, and_comm]
 
 theorem InfinitudeOfPrimes_cong_iff_InfinitudeOfPrimes_cong' {a b : ℕ} :
     InfinitudeOfPrimes_cong a b ↔ InfinitudeOfPrimes_cong' a b := by
   simp only [InfinitudeOfPrimes_cong, InfinitudeOfPrimes_cong', Set.infinite_iff_exists_gt,
-    Set.mem_setOf_eq]
+    Set.mem_ofPred_eq]
   constructor
   · intro h n
     obtain ⟨p, ⟨hp, hcong⟩, hpn⟩ := h n

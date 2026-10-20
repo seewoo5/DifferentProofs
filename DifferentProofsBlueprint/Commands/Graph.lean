@@ -74,13 +74,16 @@ private def mkGraphPart (stx : Syntax) (endPos : String.Pos.Raw)
   let titleInlines ← `(inline | "Dependency Graph")
   let expandedTitle ← #[titleInlines].mapM (elabInline ·)
   let metadata : Option (TSyntax `term) := some (← `(term| { number := false }))
-  let graphModel ← Informal.Commands.buildAll
+  -- The project graph, built exactly as `blueprint_render_model%` builds it, but recolored here
+  -- and handed to the block as a custom model.
+  let state := Informal.Environment.informalExt.getState (← getEnv)
+  let graphModel := Informal.Graph.buildModel state (state.data.toArray.map (·.1))
+    (groupTitles := state.groups.toArray)
   let graphModel := applyProofColors (← getEnv) graphModel
   let graphData : Informal.Commands.GraphBlockData := {
-    graphModel, options, previewMode, previewPlacement
+    graphModel := some graphModel, options, previewMode, previewPlacement
   }
-  let block ← ``(Verso.Doc.Block.other
-    (Informal.Commands.Block.graph $(quote graphData)) #[])
+  let block ← Informal.Commands.serializedBlockTerm `Informal.Commands.Block.graph graphData
   pure <| FinishedPart.mk stx stx expandedTitle titlePreview metadata #[block] #[] endPos
 
 open Verso Doc Elab Syntax PartElabM in

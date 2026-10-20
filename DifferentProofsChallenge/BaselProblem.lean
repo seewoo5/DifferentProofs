@@ -15,3 +15,7 @@ guarantees and how to run it.
 theorem BaselProblem_Cauchy : BaselProblem := sorry
 
 theorem BaselProblem_Parseval : BaselProblem := sorry
+
+theorem BaselProblem_Ramanujan : BaselProblem := sorry
+
+theorem BaselProblem_RamanujanUnnormalized : BaselProblem := sorry

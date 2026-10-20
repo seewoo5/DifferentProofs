@@ -40,6 +40,10 @@ This project contains formalizations of different proofs of the same mathematica
 
 - [Using Parseval's identity](DifferentProofs/BaselProblem/Parseval.lean)
 - [Using Cauchy's cotangent squeeze](DifferentProofs/BaselProblem/Cauchy.lean)
+- [Using Ramanujan's identity for E₂, as in mathlib](DifferentProofs/BaselProblem/Ramanujan.lean)
+  (not independent: mathlib proves this identity using ζ(2) = π²/6)
+- [Using Ramanujan's identity for E₂, unnormalized](DifferentProofs/BaselProblem/RamanujanUnnormalized.lean)
+  (independent of ζ(2) = π²/6)
 
 ### Combinatorial identities
 
@@ -90,22 +94,14 @@ Running it locally is optional — CI runs it on every pull request. Check
 Comparator out *outside* this repository, since the directory name `comparator`
 is taken here by the configs. It has to be built against the same Lean version
 as this project, because the two share a Lean installation and `lean4export`
-reads the project's `.olean` files; the commit below is the last one on v4.32.0,
+reads the project's `.olean` files; the commit below is Comparator's v4.35.0 tag,
 and should be bumped together with `lean-toolchain`.
 
 ```sh
 git clone https://github.com/leanprover/comparator ../comparator-tool
-git -C ../comparator-tool checkout 07bc4ea40f2266dcb861820a2ec1fa3244ed307f
-git -C ../comparator-tool cherry-pick --no-commit 9badaf470d8f724346d33738bd273efacd78df76
+git -C ../comparator-tool checkout e3dcf3083fc53d44b27a4431fabf7d43181583f5
 lake -d ../comparator-tool build lean4export comparator
 ```
-
-That cherry-pick is [leanprover/comparator#60](https://github.com/leanprover/comparator/pull/60),
-which makes Comparator pass its own `--` terminator before the sandboxed command. Without it
-landrun's flag parser swallows the `--` that separates `lean4export`'s module argument from its
-declaration names, and every export fails with "unknown module prefix". The fix landed after the
-last v4.32.0 commit, so it has to be applied on top of the pin; drop it when `lean-toolchain`
-moves to v4.33.0 or later.
 
 Then, from the root of this project, run one topic at a time:
 
