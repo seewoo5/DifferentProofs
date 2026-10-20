@@ -40,6 +40,10 @@ This project contains formalizations of different proofs of the same mathematica
 
 - [Using Parseval's identity](DifferentProofs/BaselProblem/Parseval.lean)
 - [Using Cauchy's cotangent squeeze](DifferentProofs/BaselProblem/Cauchy.lean)
+- [Using Ramanujan's identity for E₂, as in mathlib](DifferentProofs/BaselProblem/Ramanujan.lean)
+  (not independent: mathlib proves this identity using ζ(2) = π²/6)
+- [Using Ramanujan's identity for E₂, unnormalized](DifferentProofs/BaselProblem/RamanujanUnnormalized.lean)
+  (independent of ζ(2) = π²/6)
 
 ### Combinatorial identities
 

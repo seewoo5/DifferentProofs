@@ -2,7 +2,11 @@ module  -- shake: keep-all --deprecated_module: ignore
 
 public import DifferentProofs.BaselProblem.Cauchy
 public import DifferentProofs.BaselProblem.Defs
+public import DifferentProofs.BaselProblem.Eisenstein
 public import DifferentProofs.BaselProblem.Parseval
+public import DifferentProofs.BaselProblem.Ramanujan
+public import DifferentProofs.BaselProblem.RamanujanUnnormalized
+public import DifferentProofs.BaselProblem.RamanujanUnnormalized.Eta
 public import DifferentProofs.CombinatorialIdentities.Defs
 public import DifferentProofs.CombinatorialIdentities.HockeyStick.DoubleCounting
 public import DifferentProofs.CombinatorialIdentities.HockeyStick.Induction

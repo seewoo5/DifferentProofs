@@ -3,7 +3,9 @@
   "solution_module": "DifferentProofs",
   "theorem_names": [
     "BaselProblem_Cauchy",
-    "BaselProblem_Parseval"
+    "BaselProblem_Parseval",
+    "BaselProblem_Ramanujan",
+    "BaselProblem_RamanujanUnnormalized"
   ],
   "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"],
   "enable_nanoda": false
