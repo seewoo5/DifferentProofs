@@ -321,18 +321,18 @@ noncomputable def rightFace (hT : IsTiling R T) (hp : Proper T) (i : ι) : Face 
 lemma c_leftFace (hT : IsTiling R T) (hp : Proper T) (i : ι) :
     (leftFace hT hp i).c = (T i).x₀ := by
   by_cases h : (T i).x₀ = R.x₀
-  · simp only [leftFace, dif_pos h]
+  · simp only [leftFace, dite_eq_left h]
     exact h.symm
-  · simp only [leftFace, dif_neg h]
+  · simp only [leftFace, dite_eq_right h]
     exact (exists_link_left hT hp ((hT.le_tile_x₀ i).lt_of_ne fun h' ↦ h h'.symm)).choose_spec.1
 
 /-- The right face of a tile lies at the abscissa of its right edge. -/
 lemma c_rightFace (hT : IsTiling R T) (hp : Proper T) (i : ι) :
     (rightFace hT hp i).c = (T i).x₁ := by
   by_cases h : (T i).x₁ = R.x₁
-  · simp only [rightFace, dif_pos h]
+  · simp only [rightFace, dite_eq_left h]
     exact h.symm
-  · simp only [rightFace, dif_neg h]
+  · simp only [rightFace, dite_eq_right h]
     exact (exists_link_right hT hp ((hT.tile_x₁_le i).lt_of_ne h)).choose_spec.1
 
 /-- The left face of a tile is the left outer face exactly when the tile reaches the left edge
@@ -370,10 +370,10 @@ exactly when the tile abuts it on its right side. Uniqueness is `Link.eq_of_over
 lemma leftFace_eq_link_iff (hT : IsTiling R T) (hp : Proper T) {l : Link R T} :
     leftFace hT hp i = .link l ↔ IsRight l i := by
   by_cases h : (T i).x₀ = R.x₀
-  · simp only [leftFace, dif_pos h]
+  · simp only [leftFace, dite_eq_left h]
     exact iff_of_false nofun fun hcon ↦
       absurd l.x₀_lt (by rw [← hcon.1, h]; exact lt_irrefl _)
-  · simp only [leftFace, dif_neg h]
+  · simp only [leftFace, dite_eq_right h]
     obtain ⟨hc, hlo, hhi⟩ := (exists_link_left hT hp
       ((hT.le_tile_x₀ i).lt_of_ne fun h' ↦ h h'.symm)).choose_spec
     rw [Face.link.injEq]
@@ -388,10 +388,10 @@ link exactly when the tile abuts it on its left side. -/
 lemma rightFace_eq_link_iff (hT : IsTiling R T) (hp : Proper T) {l : Link R T} :
     rightFace hT hp i = .link l ↔ IsLeft l i := by
   by_cases h : (T i).x₁ = R.x₁
-  · simp only [rightFace, dif_pos h]
+  · simp only [rightFace, dite_eq_left h]
     exact iff_of_false nofun fun hcon ↦
       absurd l.lt_x₁ (by rw [← hcon.1, h]; exact lt_irrefl _)
-  · simp only [rightFace, dif_neg h]
+  · simp only [rightFace, dite_eq_right h]
     obtain ⟨hc, hlo, hhi⟩ := (exists_link_right hT hp
       ((hT.tile_x₁_le i).lt_of_ne h)).choose_spec
     rw [Face.link.injEq]
@@ -426,14 +426,17 @@ private lemma reachInd_add_reachInd (hb : MemBot (T i) p) (ht : MemTop (T i) q) 
       ⟨rfl, le_rfl, (T i).hx⟩) rfl rfl,
     if_congr (memTop_mem_reach_iff (q := (((T i).x₀, (T i).y₁) : ℝ × ℝ)) ht
       ⟨rfl, le_rfl, (T i).hx⟩) rfl rfl]
-  simp only [Cut]
   by_cases h₁ : (((T i).x₀, (T i).y₀) : ℝ × ℝ) ∈ Reach R T <;>
     by_cases h₂ : (((T i).x₀, (T i).y₁) : ℝ × ℝ) ∈ Reach R T
-  · rw [if_pos h₁, if_pos h₂, if_neg (not_not_intro (iff_of_true h₁ h₂))]
+  · rw [ite_eq_left h₁, ite_eq_left h₂,
+      ite_eq_right (show ¬Cut R T i from not_not_intro (iff_of_true h₁ h₂))]
     exact CharTwo.add_self_eq_zero 1
-  · rw [if_pos h₁, if_neg h₂, if_pos fun h ↦ h₂ (h.mp h₁), add_zero]
-  · rw [if_neg h₁, if_pos h₂, if_pos fun h ↦ h₁ (h.mpr h₂), zero_add]
-  · rw [if_neg h₁, if_neg h₂, if_neg (not_not_intro (iff_of_false h₁ h₂)), add_zero]
+  · rw [ite_eq_left h₁, ite_eq_right h₂,
+      ite_eq_left (show Cut R T i from fun h ↦ h₂ (h.mp h₁)), add_zero]
+  · rw [ite_eq_right h₁, ite_eq_left h₂,
+      ite_eq_left (show Cut R T i from fun h ↦ h₁ (h.mpr h₂)), zero_add]
+  · rw [ite_eq_right h₁, ite_eq_right h₂,
+      ite_eq_right (show ¬Cut R T i from not_not_intro (iff_of_false h₁ h₂)), add_zero]
 
 open scoped Classical in
 /-- The cut count of a family of tiles carrying the points `(c, y₀ i)` and `(c, y₁ i)` on their
@@ -447,9 +450,9 @@ private lemma sum_cut_eq_sum_reachInd {P : ι → Prop} {c : ℝ}
   rw [Finset.sum_filter, Finset.sum_filter]
   refine Finset.sum_congr rfl fun i _ ↦ ?_
   by_cases hPi : P i
-  · simp only [hPi, if_true]
+  · simp only [hPi, ite_true]
     exact (reachInd_add_reachInd (hbt i hPi).1 (hbt i hPi).2).symm
-  · simp only [hPi, if_false, ite_self]
+  · simp only [hPi, ite_false, ite_self]
 
 /-- **The cut crosses every V-link face evenly** — the planar-duality parity at an inner face.
 The tiles abutting the link on either side partition it, so on each side the cut count
@@ -488,7 +491,7 @@ theorem cutDeg_left (hT : IsTiling R T) (hp : Proper T) (hx : R.x₀ < R.x₁) (
   classical
   have hright : ∑ i ∈ Finset.univ.filter (Cut R T),
       (if rightFace hT hp i = Face.left then (1 : ZMod 2) else 0) = 0 :=
-    Finset.sum_eq_zero fun i _ ↦ if_neg (rightFace_ne_left hT hp i)
+    Finset.sum_eq_zero fun i _ ↦ ite_eq_right (rightFace_ne_left hT hp i)
   have hleft : ∑ i ∈ Finset.univ.filter (Cut R T),
       (if leftFace hT hp i = Face.left then (1 : ZMod 2) else 0) =
       reachInd R T (R.x₀, R.y₀) + reachInd R T (R.x₀, R.y₁) := by
@@ -504,8 +507,8 @@ theorem cutDeg_left (hT : IsTiling R T) (hp : Proper T) (hx : R.x₀ < R.x₁) (
     rcases Rectangle.mem_cell_ft.mp hj with ⟨⟨hx₀, -⟩, hyj⟩
     exact ⟨j, le_antisymm hx₀ (hT.le_tile_x₀ j), hyj⟩
   rw [cutDeg, Finset.sum_add_distrib, hleft, hright, add_zero, reachInd, reachInd,
-    if_pos (show ((R.x₀, R.y₀) : ℝ × ℝ) ∈ Reach R T from Relation.ReflTransGen.refl),
-    if_neg (htop R.x₀), add_zero]
+    ite_eq_left (show ((R.x₀, R.y₀) : ℝ × ℝ) ∈ Reach R T from Relation.ReflTransGen.refl),
+    ite_eq_right (htop R.x₀), add_zero]
 
 /-- **The cut crosses the right outer face oddly**, the mirror image of `cutDeg_left`. -/
 theorem cutDeg_right (hT : IsTiling R T) (hp : Proper T) (hx : R.x₀ < R.x₁) (hy : R.y₀ < R.y₁)
@@ -513,7 +516,7 @@ theorem cutDeg_right (hT : IsTiling R T) (hp : Proper T) (hx : R.x₀ < R.x₁) 
   classical
   have hleft : ∑ i ∈ Finset.univ.filter (Cut R T),
       (if leftFace hT hp i = Face.right then (1 : ZMod 2) else 0) = 0 :=
-    Finset.sum_eq_zero fun i _ ↦ if_neg (leftFace_ne_right hT hp i)
+    Finset.sum_eq_zero fun i _ ↦ ite_eq_right (leftFace_ne_right hT hp i)
   have hright : ∑ i ∈ Finset.univ.filter (Cut R T),
       (if rightFace hT hp i = Face.right then (1 : ZMod 2) else 0) =
       reachInd R T (R.x₁, R.y₀) + reachInd R T (R.x₁, R.y₁) := by
@@ -530,7 +533,7 @@ theorem cutDeg_right (hT : IsTiling R T) (hp : Proper T) (hx : R.x₀ < R.x₁) 
     rcases Rectangle.mem_cell_tt.mp hj with ⟨⟨-, hx₁⟩, hyj⟩
     exact ⟨j, le_antisymm (hT.tile_x₁_le j) hx₁, hyj⟩
   rw [cutDeg, Finset.sum_add_distrib, hleft, hright, zero_add, reachInd, reachInd,
-    if_pos (mem_reach_of_bot hT hx hy hx.le le_rfl), if_neg (htop R.x₁), add_zero]
+    ite_eq_left (mem_reach_of_bot hT hx hy hx.le le_rfl), ite_eq_right (htop R.x₁), add_zero]
 
 /-! ### The dual path -/
 
@@ -591,7 +594,7 @@ theorem reflTransGen_dualStep (hT : IsTiling R T) (hp : Proper T) (hx : R.x₀ <
     rw [Finset.sum_congr rfl fun F _ ↦ by
         rw [mul_add, mul_ite, mul_one, mul_zero, mul_ite, mul_one, mul_zero],
       Finset.sum_add_distrib, Finset.sum_ite_eq s (leftFace hT hp i) _,
-      Finset.sum_ite_eq s (rightFace hT hp i) _, if_pos hmeml, if_pos hmemr]
+      Finset.sum_ite_eq s (rightFace hT hp i) _, ite_eq_left hmeml, ite_eq_left hmemr]
     exact hstep i hcut
   rw [hA] at hB
   exact one_ne_zero hB
