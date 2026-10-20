@@ -176,6 +176,15 @@ sources:                       # [required] list of sources or an original proof
     license: ""
     author_endorsement: "n/a"
 
+  - title: "New(?) proof of Bassel problem"
+    authors: ["Seewoo Lee"]
+    id: "https://seewoo5.github.io/jekyll/update/2023/12/04/zeta-eisenstein.html"
+    type: "blog post"
+    location: "whole post"
+    relationship: "formalizes"
+    license: ""
+    author_endorsement: "participated"
+
   - title: "Pascal's rule and the hockey-stick identity for binomial coefficients"
     authors: []
     id: ""
@@ -191,7 +200,7 @@ sources:                       # [required] list of sources or an original proof
 related_formalizations:
   - name: "mathlib4"
     id: "https://github.com/leanprover-community/mathlib4"
-    revision: "v4.32.0"
+    revision: "v4.35.0"
     relationship: "builds-on"
     # Mathlib declarations with the same mathematical content as statements proved
     # here. None of them is used to prove its counterpart in this project.
@@ -210,7 +219,11 @@ related_formalizations:
       counterpart. Some of those proofs may well coincide mathematically with
       mathlib's; the point is that they are carried out independently, not
       re-exported. Other mathlib results are of course used freely inside the
-      proofs.
+      proofs. The one exception is `BaselProblem_Ramanujan`: it takes Ramanujan's
+      identity for `E₂` from mathlib (`Derivative.normalizedDerivOfComplex_E₂`),
+      whose proof uses `riemannZeta_two`, which mathlib derives from
+      `hasSum_zeta_two`. `BaselProblem_RamanujanUnnormalized` formalizes the same
+      argument without that dependency.
 
 # classification - what area of mathematics the formalized result belongs to.
 classification:
@@ -226,7 +239,7 @@ status:
     family proves exactly that `Prop`. Currently covered: Fermat's little theorem
     (4 proofs), the infinitude of primes (9 proofs, including a Dirichlet-style pair
     for the classes 1 and 3 mod 4), the irrationality of sqrt 2 (3 proofs),
-    Fermat's theorem on sums of two squares (4 proofs), the Basel problem (2 proofs),
+    Fermat's theorem on sums of two squares (4 proofs), the Basel problem (4 proofs),
     the integer-rectangle tiling theorem of Wagon (12 of his 14 proofs), and two
     combinatorial identities (Pascal's rule and the hockey-stick identity, each
     proved two ways). A Verso blueprint under `DifferentProofsBlueprint/` records the
@@ -339,6 +352,14 @@ status:
       file: "DifferentProofs/BaselProblem/Cauchy.lean"
       sorry_count: 0
       axioms: *standard_axioms
+    - declaration: "BaselProblem_Ramanujan"
+      file: "DifferentProofs/BaselProblem/Ramanujan.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "BaselProblem_RamanujanUnnormalized"
+      file: "DifferentProofs/BaselProblem/RamanujanUnnormalized.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
 
     # --- Integer-rectangle tiling theorem (statement: `IntegerRectangleTheorem`);
     #     numbering follows Wagon's paper.
@@ -423,7 +444,7 @@ automation:                    # [required]
     - method: "manual"
       models: []
       framework: ""
-      tool_setup: "Lean 4 v4.32.0 with mathlib v4.32.0; VS Code with the Lean 4 extension."
+      tool_setup: "Lean 4 v4.35.0 with mathlib v4.35.0; VS Code with the Lean 4 extension."
       cost:
         wall_time: "2026-05-03 to present (~3.5 months, ongoing)"
         spend_usd: ""
@@ -434,7 +455,8 @@ automation:                    # [required]
         every AI-assisted contribution before merge.
 
     - method: "agent"
-      models: ["claude-opus-5", "claude-opus-4-8", "claude-opus-4-7", "claude-fable-5"]
+      models: ["claude-opus-5-5", "claude-opus-5", "claude-opus-4-8", "claude-opus-4-7",
+               "claude-fable-5"]
       framework: "Claude Code"
       tool_setup: >-
         Claude Code with the lean-lsp MCP server (goal inspection, mathlib search via
@@ -532,6 +554,21 @@ fidelity:
       rather than the tiling application — the one-dimensional count and the local
       count for a triangle — are proved first in the same file, and its module
       docstring records why they are not upstream material in that form.
+    - Lee's Eisenstein-series proof of the Basel problem is formalized twice. The note
+      compares the coefficients of `q` and `q²` in Ramanujan's identity
+      `D E₂ = (E₂² - E₄) / 12`, where `E₂ = G₂ / ζ(2)` (mathlib: `G₂ / (2ζ(2))`) is
+      normalized by the unknown `ζ(2)`. `BaselProblem_Ramanujan` does exactly this with
+      mathlib's identity, whose proof uses `ζ(2) = π² / 6`; as the identity with the
+      constant `1/12` is itself equivalent to the Basel problem, that proof is not
+      independent of mathlib's `hasSum_zeta_two`.
+      `BaselProblem_RamanujanUnnormalized` proves the identity in the form
+      `D E₂ = κ (E₂² - E₄)` with `κ = ζ(2) / (2π²)`, the form a proof by modularity
+      gives without knowing `ζ(2)`, and runs the note's comparison of the `q` and
+      `q²` coefficients with `1/12` replaced by `κ` and the relation `κ α₂ = -2`.
+      Its dimension input (cusp forms of weight `4` vanish) is reproved because
+      mathlib's dimension formula rests on the transformation of `η`, which mathlib
+      proves from that of `E₂` using `ζ(2) = π² / 6`; the transformation of `η²⁴` is
+      instead proved from Euler's pentagonal number theorem and Poisson summation.
     - Wunderlich's argument is adapted: the formalization uses F_37 = 73 * 149 * 2221
       as its concrete Fibonacci number with three distinct prime factors.
     - The Dirichlet-style file covers only the residue classes 1 and 3 mod 4, not
@@ -587,7 +624,9 @@ alignment:
       lean: "BaselProblem"
       module: "DifferentProofs.BaselProblem.Defs"
       status: "proved"
-      note: "Proved two ways."
+      note: >-
+        Proved four ways. `BaselProblem_Ramanujan` uses mathlib's Ramanujan identity,
+        whose proof depends on mathlib's `ζ(2) = π² / 6`; the other three do not.
     - source: "Wagon, statement: a rectangle tiled by rectangles each having an integer side has an integer side"
       lean: "IntegerRectangleTheorem"
       module: "DifferentProofs.IntegerRectangle.Defs"

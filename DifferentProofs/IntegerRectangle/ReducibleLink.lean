@@ -297,25 +297,25 @@ omit [Fintype ι] in
 
 omit [Fintype ι] in
 lemma push_x₀_of_isLeft {i : ι} (h : IsLeft l i) : (push l w hw hR i).x₀ = (T i).x₀ := by
-  unfold push; rw [dif_pos h]
+  unfold push; rw [dite_eq_left h]
 
 omit [Fintype ι] in
 lemma push_x₁_of_isLeft {i : ι} (h : IsLeft l i) : (push l w hw hR i).x₁ = l.c + w := by
-  unfold push; rw [dif_pos h]
+  unfold push; rw [dite_eq_left h]
 
 omit [Fintype ι] in
 lemma push_x₀_of_isRight (hp : Proper T) {i : ι} (h : IsRight l i) :
     (push l w hw hR i).x₀ = l.c + w := by
-  unfold push; rw [dif_neg fun h' ↦ not_isLeft_isRight hp h' h, dif_pos h]
+  unfold push; rw [dite_eq_right fun h' ↦ not_isLeft_isRight hp h' h, dite_eq_left h]
 
 omit [Fintype ι] in
 lemma push_x₁_of_isRight (hp : Proper T) {i : ι} (h : IsRight l i) :
     (push l w hw hR i).x₁ = (T i).x₁ := by
-  unfold push; rw [dif_neg fun h' ↦ not_isLeft_isRight hp h' h, dif_pos h]
+  unfold push; rw [dite_eq_right fun h' ↦ not_isLeft_isRight hp h' h, dite_eq_left h]
 
 omit [Fintype ι] in
 lemma push_of_not {i : ι} (h : ¬ IsLeft l i) (h' : ¬ IsRight l i) : push l w hw hR i = T i := by
-  unfold push; rw [dif_neg h, dif_neg h']
+  unfold push; rw [dite_eq_right h, dite_eq_right h']
 
 /-- Since some tile on the right of the link is at least `w` wide, the pushed edge stays inside
 `R`. -/

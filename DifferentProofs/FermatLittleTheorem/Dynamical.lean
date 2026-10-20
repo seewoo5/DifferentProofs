@@ -6,7 +6,7 @@ public import Mathlib.Algebra.Order.Floor.Defs
 public import Mathlib.Algebra.Order.Floor.Ring
 public import Mathlib.Data.Set.Card
 public import Mathlib.Data.ZMod.Basic
-public import Mathlib.Data.Real.Basic
+public import Mathlib.Basic.Real.Basic
 public import Mathlib.Algebra.Order.Archimedean.Basic
 public import Mathlib.GroupTheory.PGroup
 public import Mathlib.Topology.UnitInterval
@@ -247,8 +247,8 @@ private lemma prime_dvd_card_of_fixedpointfree_periodic
     change f ^ ((p : ℕ) : ℤ) = 1
     simpa using hpow
   let φ : ZMod p →+ Additive (Equiv.Perm α) := ZMod.lift p ⟨fZ, hfZ_p⟩
-  letI : AddAction (ZMod p) α := AddAction.compHom α φ
-  letI : MulAction (Multiplicative (ZMod p)) α := inferInstance
+  let : AddAction (ZMod p) α := AddAction.compHom α φ
+  let : MulAction (Multiplicative (ZMod p)) α := inferInstance
   have hgen (x : α) : (Multiplicative.ofAdd (1 : ZMod p)) • x = f x := by
     change φ (1 : ZMod p) +ᵥ x = f x
     have hφ_one : φ (1 : ZMod p) = Additive.ofMul f := by

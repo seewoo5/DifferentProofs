@@ -227,7 +227,7 @@ noncomputable def cellTile (hT : IsTiling R T) (p : ℕ × ℕ) : ι :=
 lemma openCell_subset_cellTile (hT : IsTiling R T) {p : ℕ × ℕ}
     (h₁ : p.1 + 1 < (gridX R T).sort.length) (h₂ : p.2 + 1 < (gridY R T).sort.length) :
     openCell R T p.1 p.2 ⊆ interior (T (cellTile hT p)).toSet := by
-  rw [cellTile, dif_pos ⟨h₁, h₂⟩]
+  rw [cellTile, dite_eq_left ⟨h₁, h₂⟩]
   exact (existsUnique_openCell_subset hT h₁ h₂).exists.choose_spec
 
 /-! ### The index intervals of a tile -/
