@@ -75,7 +75,7 @@ private lemma widthSum_split (h : ∀ i, p i ↔ q i ∨ r i) (hd : ∀ i, ¬(q 
 
 /-- A width sum over an empty selection vanishes. -/
 private lemma widthSum_eq_zero (h : ∀ i, ¬ p i) : widthSum T p = 0 :=
-  Finset.sum_eq_zero fun i _ ↦ if_neg (h i)
+  Finset.sum_eq_zero fun i _ ↦ ite_eq_right (h i)
 
 /-- A width sum over tiles that all have integer width is an integer. -/
 private lemma widthSum_isInt (h : ∀ i, p i → ∃ n : ℤ, (T i).width = n) :

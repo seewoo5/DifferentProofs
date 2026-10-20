@@ -84,17 +84,17 @@ lemma cotPoly_eval (n : ℕ) (θ : ℝ) (hθ : Real.sin θ ≠ 0) :
 lemma cotPoly_coeff (n d : ℕ) (hd : d ≤ n) :
     (cotPoly n).coeff d = (-1 : ℝ) ^ (n - d) * Nat.choose (2 * n + 1) (2 * (n - d) + 1) := by
   rw [cotPoly, finsetSum_coeff, Finset.sum_eq_single (n - d)]
-  · rw [coeff_C_mul, coeff_X_pow, if_pos (by lia), mul_one]
+  · rw [coeff_C_mul, coeff_X_pow, ite_eq_left (by lia), mul_one]
   · intro j hj hjd
     rw [mem_range] at hj
-    rw [coeff_C_mul, coeff_X_pow, if_neg (by lia), mul_zero]
+    rw [coeff_C_mul, coeff_X_pow, ite_eq_right (by lia), mul_zero]
   · intro h; exact absurd (mem_range.mpr (by lia)) h
 
 lemma cotPoly_coeff_eq_zero (n d : ℕ) (hd : n < d) : (cotPoly n).coeff d = 0 := by
   rw [cotPoly, finsetSum_coeff, Finset.sum_eq_zero]
   intro j hj
   rw [mem_range] at hj
-  rw [coeff_C_mul, coeff_X_pow, if_neg (by lia), mul_zero]
+  rw [coeff_C_mul, coeff_X_pow, ite_eq_right (by lia), mul_zero]
 
 lemma cotPoly_natDegree (n : ℕ) : (cotPoly n).natDegree = n := by
   refine le_antisymm (natDegree_le_iff_coeff_eq_zero.mpr fun d hd ↦ cotPoly_coeff_eq_zero n d hd)
@@ -188,7 +188,7 @@ lemma cotSq_sum (n : ℕ) (hn : 1 ≤ n) :
   have hvieta := hsplit.nextCoeff_eq_neg_sum_roots_mul_leadingCoeff
   rw [cotPoly_leadingCoeff, ← hroots] at hvieta
   have hnext : (cotPoly n).nextCoeff = -(Nat.choose (2 * n + 1) 3 : ℝ) := by
-    rw [nextCoeff, if_neg (by rw [cotPoly_natDegree]; lia), cotPoly_natDegree,
+    rw [nextCoeff, ite_eq_right (by rw [cotPoly_natDegree]; lia), cotPoly_natDegree,
       cotPoly_coeff n (n - 1) (by lia), show n - (n - 1) = 1 by lia]
     norm_num
   rw [hnext] at hvieta

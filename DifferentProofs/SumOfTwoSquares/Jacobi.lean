@@ -3,6 +3,7 @@ module
 public import DifferentProofs.SumOfTwoSquares.Defs
 public import DifferentProofsForMathlib.RingTheory.RootsOfUnity.Complex
 public import Mathlib.NumberTheory.JacobiSum.Basic
+public import Mathlib.NumberTheory.MulChar.Lemmas
 public import Mathlib.NumberTheory.Zsqrtd.GaussianInt
 
 /-!

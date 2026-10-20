@@ -46,7 +46,7 @@ namespace FermatLittleTheorem.Alkauskas
 /-- The negated formal logarithmic derivative `W g = -(X · g' · g⁻¹)`.
 Defined for every `g`; the lemmas below assume `constantCoeff g = 1`, which makes `invOfUnit g 1`
 the genuine inverse and keeps everything inside `ℤ⟦X⟧`. -/
-private noncomputable def W (g : ℤ⟦X⟧) : ℤ⟦X⟧ := -(X * (d⁄dX ℤ g * invOfUnit g 1))
+private noncomputable def W (g : ℤ⟦X⟧) : ℤ⟦X⟧ := -(X * (d⁄dX g * invOfUnit g 1))
 
 /-- Alkauskas' series `f_d(x) = (1-(d+1)x)/(1-dx)`, written as a product of two units of `ℤ⟦X⟧`. -/
 private noncomputable def f (d : ℤ) : ℤ⟦X⟧ := (1 - C (d + 1) * X) * invOfUnit (1 - C d * X) 1
@@ -78,10 +78,10 @@ private lemma W_mul {g h : ℤ⟦X⟧} (hg : constantCoeff g = 1) (hh : constant
   have invprod : invOfUnit (g * h) 1 = invOfUnit g 1 * invOfUnit h 1 :=
     mul_left_cancel₀ hne <| by
       rw [mul_invOfUnit (g * h) 1 egh, mul_mul_mul_comm, hg1, hh1, one_mul]
-  have key : (g * d⁄dX ℤ h + h * d⁄dX ℤ g) * (invOfUnit g 1 * invOfUnit h 1)
-      = d⁄dX ℤ g * invOfUnit g 1 + d⁄dX ℤ h * invOfUnit h 1 := by
-    linear_combination (d⁄dX ℤ h * invOfUnit h 1) * hg1 + (d⁄dX ℤ g * invOfUnit g 1) * hh1
-  simp only [W, (d⁄dX ℤ).leibniz, smul_eq_mul, invprod, key, mul_add, neg_add]
+  have key : (g * d⁄dX h + h * d⁄dX g) * (invOfUnit g 1 * invOfUnit h 1)
+      = d⁄dX g * invOfUnit g 1 + d⁄dX h * invOfUnit h 1 := by
+    linear_combination (d⁄dX h * invOfUnit h 1) * hg1 + (d⁄dX g * invOfUnit g 1) * hh1
+  simp only [W, (derivative (R := ℤ)).leibniz, smul_eq_mul, invprod, key, mul_add, neg_add]
 
 /-- `W 1 = 0`, since the derivative of `1` vanishes. -/
 private lemma W_one : W (1 : ℤ⟦X⟧) = 0 := by simp [W]
@@ -124,33 +124,34 @@ private lemma invOfUnit_oneSubMonomial (c : ℤ) {n : ℕ} (hn : 0 < n) :
     simp only [hG, coeff_mk]
     by_cases hN0 : N = 0
     · subst hN0; simp [hn.ne']
-    · rw [if_neg hN0]
+    · rw [ite_eq_right hN0]
       by_cases hdvd : n ∣ N
       · obtain ⟨q, rfl⟩ := hdvd
         have hqpos : 0 < q := Nat.pos_of_ne_zero fun h => hN0 (by rw [h, mul_zero])
         have hsub : n * q - n = n * (q - 1) := (Nat.mul_sub_one n q).symm
-        rw [if_pos ⟨q, rfl⟩, if_pos (Nat.le_mul_of_pos_right n hqpos),
-            if_pos (hsub ▸ Dvd.intro _ rfl), Nat.mul_div_cancel_left q hn, hsub,
+        rw [ite_eq_left ⟨q, rfl⟩, ite_eq_left (Nat.le_mul_of_pos_right n hqpos),
+            ite_eq_left (hsub ▸ Dvd.intro _ rfl), Nat.mul_div_cancel_left q hn, hsub,
             Nat.mul_div_cancel_left _ hn, ← pow_succ', Nat.sub_add_cancel hqpos, sub_self]
-      · rw [if_neg hdvd]
+      · rw [ite_eq_right hdvd]
         by_cases hle : n ≤ N
-        · rw [if_pos hle, if_neg fun h => hdvd (Nat.sub_add_cancel hle ▸ dvd_add h dvd_rfl),
-              mul_zero, sub_zero]
-        · rw [if_neg hle, mul_zero, sub_zero]
+        · rw [ite_eq_left hle,
+            ite_eq_right fun h => hdvd (Nat.sub_add_cancel hle ▸ dvd_add h dvd_rfl), mul_zero,
+            sub_zero]
+        · rw [ite_eq_right hle, mul_zero, sub_zero]
   exact mul_left_cancel₀ hune ((mul_invOfUnit u 1 hcu).trans huG.symm)
 
 /-- The coefficient of `Xᴺ` in `W (1 - c·Xⁿ)` is `n·c^{N/n}` exactly when `n ∣ N` and `N > 0`. -/
 private lemma coeff_W_oneSubMonomial (c : ℤ) {n : ℕ} (hn : 0 < n) (N : ℕ) :
     coeff N (W (1 - C c * X ^ n)) =
       if n ∣ N ∧ 0 < N then (n : ℤ) * c ^ (N / n) else 0 := by
-  have hXd : X * d⁄dX ℤ (1 - C c * X ^ n) = -(C (c * (n : ℤ)) * X ^ n) := by
+  have hXd : X * d⁄dX (1 - C c * X ^ n) = -(C (c * (n : ℤ)) * X ^ n) := by
     ext k
     cases k with
     | zero => simp [hn.ne']
     | succ m =>
         rw [coeff_succ_X_mul, coeff_derivative]
         simp only [map_sub, map_neg, coeff_C_mul, coeff_X_pow, coeff_one,
-          Nat.succ_ne_zero, if_false, zero_sub]
+          Nat.succ_ne_zero, ite_false, zero_sub]
         by_cases h : m + 1 = n
         · subst h; simp
         · simp [h]
@@ -163,12 +164,12 @@ private lemma coeff_W_oneSubMonomial (c : ℤ) {n : ℕ} (hn : 0 < n) (N : ℕ) 
   · obtain ⟨⟨q, rfl⟩, hNpos⟩ := hcond
     have hqpos : 0 < q := Nat.pos_of_ne_zero fun h => by simp [h] at hNpos
     have hsub : n * q - n = n * (q - 1) := (Nat.mul_sub_one n q).symm
-    rw [if_pos (Nat.le_mul_of_pos_right n hqpos), if_pos ⟨q - 1, hsub⟩,
-        if_pos ⟨⟨q, rfl⟩, hNpos⟩, Nat.mul_div_cancel_left q hn, hsub,
+    rw [ite_eq_left (Nat.le_mul_of_pos_right n hqpos), ite_eq_left ⟨q - 1, hsub⟩,
+        ite_eq_left ⟨⟨q, rfl⟩, hNpos⟩, Nat.mul_div_cancel_left q hn, hsub,
         Nat.mul_div_cancel_left _ hn,
         show c ^ q = c * c ^ (q - 1) by rw [← pow_succ', Nat.sub_add_cancel hqpos]]
     ring
-  · rw [if_neg hcond]
+  · rw [ite_eq_right hcond]
     have hinner : (if n ≤ N then (if n ∣ (N - n) then c ^ ((N - n) / n) else 0) else 0)
         = (0 : ℤ) := by
       split_ifs with hle hd
@@ -181,7 +182,7 @@ private lemma coeff_W_f (d : ℤ) {N : ℕ} (hN : 0 < N) :
     coeff N (W (f d)) = (d + 1) ^ N - d ^ N := by
   have hlin : ∀ c : ℤ, coeff N (W (1 - C c * X)) = c ^ N := fun c => by
     rw [← pow_one (X : ℤ⟦X⟧), coeff_W_oneSubMonomial c Nat.one_pos N,
-        if_pos ⟨one_dvd N, hN⟩, Nat.cast_one, Nat.div_one, one_mul]
+        ite_eq_left ⟨one_dvd N, hN⟩, Nat.cast_one, Nat.div_one, one_mul]
   rw [f, W_mul (by simp) (by simp [constantCoeff_invOfUnit]),
       W_invOfUnit (by simp), map_add, map_neg, hlin, hlin, ← sub_eq_add_neg]
 
@@ -190,10 +191,11 @@ private lemma coeff_W_partialProduct {p : ℕ} (hp : p.Prime) (a : ℕ → ℤ) 
   rw [W_prod _ _ (fun n hn => constantCoeff_oneSubMonomial (a n) (Finset.mem_Icc.mp hn).1), map_sum,
       Finset.sum_congr rfl (fun n hn => coeff_W_oneSubMonomial (a n) (Finset.mem_Icc.mp hn).1 p),
       ← Finset.sum_subset (s₁ := {1, p}) (by simp [Finset.insert_subset_iff, hp.one_le])
-        (fun x _ hxni => if_neg fun ⟨hxdvd, _⟩ => hxni <| by
+        (fun x _ hxni => ite_eq_right fun ⟨hxdvd, _⟩ => hxni <| by
           rcases hp.eq_one_or_self_of_dvd x hxdvd with rfl | rfl <;> simp),
-      Finset.sum_pair hp.one_lt.ne, if_pos ⟨one_dvd p, hp.pos⟩, if_pos ⟨dvd_refl p, hp.pos⟩,
-      ha1, Nat.div_one, Nat.div_self hp.pos, Nat.cast_one, one_pow, mul_one, pow_one]
+      Finset.sum_pair hp.one_lt.ne, ite_eq_left ⟨one_dvd p, hp.pos⟩,
+      ite_eq_left ⟨dvd_refl p, hp.pos⟩, ha1, Nat.div_one, Nat.div_self hp.pos, Nat.cast_one,
+      one_pow, mul_one, pow_one]
 
 /-- If `g` and `h` agree up to degree `m`, so do their inverses (strong induction on the
 `coeff_invOfUnit` recursion). -/
@@ -266,10 +268,10 @@ lemma exists_intExpansion {g : ℤ⟦X⟧} (hg0 : constantCoeff g = 1)
       rw [hQ, show P * (1 - C c * X ^ (N + 1)) = P - C c * (P * X ^ (N + 1)) by ring,
           map_sub, coeff_C_mul, coeff_mul_X_pow']
       rcases Nat.lt_or_ge k (N + 1) with hlt | hge
-      · rw [if_neg (by omega), mul_zero, sub_zero]
+      · rw [ite_eq_right (by omega), mul_zero, sub_zero]
         exact hmatch k (by omega)
       · obtain rfl : k = N + 1 := by omega
-        rw [if_pos le_rfl, Nat.sub_self, hP0, hc]
+        rw [ite_eq_left le_rfl, Nat.sub_self, hP0, hc]
         ring
 
 /-! ### Assembling the proof -/

@@ -191,7 +191,7 @@ sources:                       # [required] list of sources or an original proof
 related_formalizations:
   - name: "mathlib4"
     id: "https://github.com/leanprover-community/mathlib4"
-    revision: "v4.32.0"
+    revision: "v4.35.0"
     relationship: "builds-on"
     # Mathlib declarations with the same mathematical content as statements proved
     # here. None of them is used to prove its counterpart in this project.
@@ -419,7 +419,7 @@ automation:                    # [required]
     - method: "manual"
       models: []
       framework: ""
-      tool_setup: "Lean 4 v4.32.0 with mathlib v4.32.0; VS Code with the Lean 4 extension."
+      tool_setup: "Lean 4 v4.35.0 with mathlib v4.35.0; VS Code with the Lean 4 extension."
       cost:
         wall_time: "2026-05-03 to present (~3.5 months, ongoing)"
         spend_usd: ""

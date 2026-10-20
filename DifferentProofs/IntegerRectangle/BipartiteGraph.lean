@@ -114,8 +114,8 @@ theorem IntegerRectangleTheorem_BipartiteGraph : IntegerRectangleTheorem := by
         ⟨hT.le_tile_y₀ i, (T i).hy.trans (hT.tile_y₁_le i)⟩
         ⟨(hT.le_tile_y₀ i).trans (T i).hy, hT.tile_y₁_le i⟩ hn
   have key := even_sum_cornerCount hT hlat
-  rw [sum_cornerCount_product, if_pos ((mem_latticeIcc le_rfl R.hx).mpr ⟨0, by simp⟩),
-    if_neg fun hx ↦ hcon.1 ((mem_latticeIcc R.hx le_rfl).mp hx),
-    if_pos ((mem_latticeIcc le_rfl R.hy).mpr ⟨0, by simp⟩),
-    if_neg fun hy ↦ hcon.2 ((mem_latticeIcc R.hy le_rfl).mp hy)] at key
+  rw [sum_cornerCount_product, ite_eq_left ((mem_latticeIcc le_rfl R.hx).mpr ⟨0, by simp⟩),
+    ite_eq_right fun hx ↦ hcon.1 ((mem_latticeIcc R.hx le_rfl).mp hx),
+    ite_eq_left ((mem_latticeIcc le_rfl R.hy).mpr ⟨0, by simp⟩),
+    ite_eq_right fun hy ↦ hcon.2 ((mem_latticeIcc R.hy le_rfl).mp hy)] at key
   simp at key

@@ -133,8 +133,8 @@ theorem exists_reachable_corner (hT : IsTiling R T) (hsides : ∀ i, (T i).HasIn
   have hnot : ∀ {z : ℝ × ℝ}, ¬Reachable T (R.x₀, R.y₀) z → z ∉ component R T :=
     fun hz h ↦ hz (mem_filter.mp h).2
   have key := hT.even_sum_cornerCount (even_sum_cornerCount_tile (R := R) hsides)
-  rw [sum_cornerCount_eq, if_pos hmem, if_neg (hnot hcon.1), if_neg (hnot hcon.2.1),
-    if_neg (hnot hcon.2.2)] at key
+  rw [sum_cornerCount_eq, ite_eq_left hmem, ite_eq_right (hnot hcon.1),
+    ite_eq_right (hnot hcon.2.1), ite_eq_right (hnot hcon.2.2)] at key
   simp at key
 
 end IntegerRectangle.EulerianPath

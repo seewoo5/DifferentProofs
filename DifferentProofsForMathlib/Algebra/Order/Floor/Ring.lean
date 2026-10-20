@@ -39,6 +39,7 @@ namespace Int
 
 variable {R : Type*} [Ring R] [LinearOrder R] [IsOrderedRing R] [FloorRing R] {a b : R}
 
+omit [IsOrderedRing R] in
 lemma ceil_eq_floor_iff_mem (a : R) : ⌈a⌉ = ⌊a⌋ ↔ a ∈ Set.range Int.cast := by
   rw [← not_iff_not, ← ceil_eq_floor_add_one_iff_notMem]
   have := floor_le_ceil a

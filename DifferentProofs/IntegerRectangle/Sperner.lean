@@ -192,7 +192,12 @@ inductive Color
   | B
   /-- The third label. -/
   | C
-  deriving DecidableEq, Fintype
+  deriving DecidableEq
+
+-- Written out by hand: mathlib v4.35.0's `deriving Fintype` handler fails on this enumeration.
+instance : Fintype Color where
+  elems := {.A, .B, .C}
+  complete x := by cases x <;> simp
 
 /-- The indicator of a *complete edge*, read off the labels of its two endpoints: `1` when they
 are `A` and `B` in some order, and `0` otherwise. -/
@@ -379,18 +384,19 @@ theorem sum_column (hT : IsTiling R T) {j N : ℕ} (hj : j + 1 < (gridX R T).sor
     rw [← Finset.sum_filter]
     by_cases hP : idxL R T i ≤ j ∧ j < idxR R T i
     · have := idxT_lt (R := R) (T := T) i
-      rw [if_pos hP, ← sum_Ico_add_succ (le_of_nth_le_nth (idxB_lt i)
+      rw [ite_eq_left hP, ← sum_Ico_add_succ (le_of_nth_le_nth (idxB_lt i)
         (((nth_idxB i).le.trans (T i).hy).trans (nth_idxT i).ge)) fun k ↦ segComplete R T j k]
       refine Finset.sum_congr (Finset.ext fun k ↦ ?_) fun _ _ ↦ rfl
       simp only [Finset.mem_Ico, Finset.mem_filter, Finset.mem_range, hP, true_and]
       lia
-    · rw [if_neg hP, Finset.filter_false_of_mem fun k _ hk ↦ hP hk.1, Finset.sum_empty]
+    · rw [ite_eq_right hP, Finset.filter_false_of_mem fun k _ hk ↦ hP hk.1, Finset.sum_empty]
   rw [Finset.sum_congr rfl fun i _ ↦ key i, Finset.sum_comm, Finset.range_eq_Ico,
     ← sum_Ico_add_succ (Nat.zero_le (N + 1)) fun k ↦ segComplete R T j k]
   refine Finset.sum_congr rfl fun k hk ↦ ?_
   have hk' : k < N + 1 := (Finset.mem_Ico.mp hk).2
   rw [Finset.sum_eq_single_of_mem _ (Finset.mem_univ (cellTile hT (j, k)))
-    fun i _ hi ↦ if_neg fun hc ↦ hi ((hcell i k hk').mpr hc).symm, if_pos ((hcell _ k hk').mp rfl)]
+    fun i _ hi ↦ ite_eq_right fun hc ↦ hi ((hcell i k hk').mpr hc).symm,
+    ite_eq_left ((hcell _ k hk').mp rfl)]
 
 /-- **The complete edges of all the triangles are those on the bottom and top edges of `R`.** The
 column count, summed over the columns of the grid. -/
@@ -433,7 +439,7 @@ theorem odd_card_completeTriangles (hT : IsTiling R T) (hw : ¬∃ n : ℤ, R.wi
   have hB : label (corner R) (R.x₁, R.y₀) = Color.B := by
     simp only [label, corner_fst, hxne, ↓reduceIte, corner_snd]
   have hTop : completeEdge (label (corner R) (R.x₀, R.y₁)) (label (corner R) (R.x₁, R.y₁)) = 0 := by
-    rw [completeEdge_label_horizontal, onY, corner_snd, if_neg hyne, zero_mul]
+    rw [completeEdge_label_horizontal, onY, corner_snd, ite_eq_right hyne, zero_mul]
   rw [← ZMod.natCast_eq_one_iff_odd, ← Finset.sum_boole, Fintype.sum_prod_type]
   simp only [← sideCount_eq_ite, sum_sideCount]
   rw [sum_tile_edges hT hN, Finset.sum_add_distrib, Finset.range_eq_Ico,
