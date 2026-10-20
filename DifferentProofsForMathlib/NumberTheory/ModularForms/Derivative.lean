@@ -6,7 +6,6 @@ Authors: Seewoo Lee
 module
 
 public import DifferentProofsForMathlib.NumberTheory.ModularForms.QExpansion
-public import Mathlib.Analysis.Complex.LocallyUniformLimit
 public import Mathlib.NumberTheory.ModularForms.Derivative
 
 /-!
@@ -37,45 +36,18 @@ theorem hasSum_normalizedDerivOfComplex_of_hasSum (hh : 0 < h)
     (hf : ∀ τ : ℍ, HasSum (fun m ↦ c m • 𝕢 h τ ^ m) (f τ)) (τ : ℍ) :
     HasSum (fun m : ℕ ↦ (m / h * c m) • 𝕢 h τ ^ m) (D f τ) := by
   set p := FormalMultilinearSeries.ofScalars ℂ c
-  have hrad := one_le_radius_of_hasSum_qExpansion hh hf
-  have hw : ‖𝕢 h τ‖ < 1 := Periodic.norm_qParam_lt_one hh τ.im_pos
-  obtain ⟨r, hwr, hr1⟩ := exists_between hw
-  -- Differentiate `∑ cₘ wᵐ` term by term on the disc of radius `r`.
-  have hderiv := hasSum_deriv_of_summable_norm (F := fun m v ↦ c m * v ^ m)
-    (U := Metric.ball 0 r)
-    (summable_norm_mul_pow_of_hasSum_qExpansion hh hf ((norm_nonneg _).trans hwr.le) hr1)
-    (fun m ↦ (by fun_prop : Differentiable ℂ _).differentiableOn) Metric.isOpen_ball
-    (fun m v hv ↦ by
-      rw [norm_mul, norm_pow]
-      gcongr
-      exact (mem_ball_zero_iff.mp hv).le)
-    (mem_ball_zero_iff.mpr hwr)
-  have hsum : (fun v ↦ ∑' m, c m * v ^ m) = p.sum := by
-    ext v
-    exact (FormalMultilinearSeries.ofScalars_sum_eq c v).symm
-  rw [hsum] at hderiv
-  -- The chain rule for `f = p.sum ∘ q` gives `D f τ = (q / h) · p.sum' q`.
-  have hpd : DifferentiableAt ℂ p.sum (𝕢 h τ) := by
-    refine (p.hasFPowerSeriesOnBall (zero_lt_one.trans_le hrad)).differentiableOn.differentiableAt
-      (Metric.isOpen_eball.mem_nhds (Metric.mem_eball.mpr (lt_of_lt_of_le ?_ hrad)))
-    simpa only [edist_zero_right, ← ofReal_norm, ENNReal.ofReal_lt_one] using hw
-  have hD : D f τ = 𝕢 h τ / h * deriv p.sum (𝕢 h τ) := by
-    have hcomp : (f ∘ ofComplex) =ᶠ[𝓝 (τ : ℂ)] p.sum ∘ 𝕢 h := by
-      filter_upwards [isOpen_upperHalfPlaneSet.mem_nhds τ.im_pos] with z hz
-      simpa only [comp_apply, ofComplex_apply_of_im_pos hz] using
-        eq_sum_ofScalars_of_hasSum_qExpansion hf ⟨z, hz⟩
-    rw [normalizedDerivOfComplex, hcomp.deriv_eq,
-      (hpd.hasDerivAt.comp (τ : ℂ) (Periodic.hasDerivAt_qParam h τ)).deriv]
-    have := two_pi_I_ne_zero
-    field_simp
-  rw [hD]
-  convert hderiv.mul_left (𝕢 h τ / h) using 2 with m
-  rw [((hasDerivAt_pow m _).const_mul (c m)).deriv]
-  rcases m with _ | m
-  · simp only [CharP.cast_eq_zero, zero_div, zero_mul, pow_zero, smul_eq_mul, mul_one, zero_tsub,
-      mul_zero]
-  · simp only [smul_eq_mul, add_tsub_cancel_right]
-    push_cast
-    ring
+  have hq : ‖𝕢 h τ‖ₑ < p.radius := (ofReal_norm (𝕢 h τ) ▸ ENNReal.ofReal_lt_one.2
+    (Periodic.norm_qParam_lt_one hh τ.im_pos)).trans_le (one_le_radius_of_hasSum_qExpansion hh hf)
+  rw [← hasSum_nat_add_iff' 1, Finset.sum_range_one, Nat.cast_zero, zero_div, zero_mul, zero_smul,
+    sub_zero, normalizedDerivOfComplex, HasDerivAt.deriv (((p.hasFDerivAt_sum hq).hasDerivAt.comp _
+    (Periodic.hasDerivAt_qParam h τ)).congr_of_eventuallyEq <|
+    eventually_of_mem (isOpen_upperHalfPlaneSet.mem_nhds τ.im_pos) fun z hz ↦
+      (comp_ofComplex_of_im_pos f z hz).trans (eq_sum_ofScalars_of_hasSum_qExpansion hf ⟨z, hz⟩))]
+  refine ((((ContinuousLinearMap.apply ℂ ℂ 1).hasSum (p.derivSeries.hasSum (mem_eball_zero_iff.2
+    (hq.trans_le p.radius_le_radius_derivSeries)))).mul_right _).mul_left _).congr_fun fun n ↦ ?_
+  simp only [p, FormalMultilinearSeries.apply_eq_pow_smul_coeff, smul_apply,
+    ContinuousLinearMap.apply_apply, FormalMultilinearSeries.derivSeries_coeff_one,
+    FormalMultilinearSeries.coeff_ofScalars, nsmul_eq_mul, smul_eq_mul, pow_succ]
+  field_simp
 
 end Derivative

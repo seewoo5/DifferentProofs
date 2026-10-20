@@ -47,10 +47,8 @@ namespace BaselProblem.Ramanujan
 
 /-- Solving the coefficient relations for Ramanujan's identity `D E₂ = (E₂² - E₄) / 12`:
 `α₄ = -10 α₂` and `α₂ (α₂ + 24) = 0`. -/
-theorem α_two_eq : α 2 = -24 := by
-  obtain ⟨h1, h2⟩ := coeff_relations normalizedDerivOfComplex_E₂
-  have h : α 2 * (α 2 + 24) = 0 := by linear_combination 108 * h1 - 12 * h2
-  exact eq_neg_of_add_eq_zero_left ((mul_eq_zero.mp h).resolve_left α_two_ne_zero)
+lemma α_two_eq : α 2 = -24 := by
+  grind [coeff_relations normalizedDerivOfComplex_E₂, α_two_ne_zero]
 
 end BaselProblem.Ramanujan
 

@@ -23,19 +23,17 @@ open scoped Real
 namespace Function.Periodic
 
 /-- The `q`-parameter `exp (2πiz / h)` is `h`-periodic. -/
-theorem qParam_add_self (h : ℝ) (z : ℂ) : qParam h (z + h) = qParam h z := by
+theorem qParam_periodic (h : ℝ) : Periodic (qParam h) h := fun z ↦ by
   rcases eq_or_ne h 0 with rfl | hh
-  · simp only [qParam, ofReal_zero, add_zero, div_zero, exp_zero]
-  · rw [qParam, qParam, mul_add, add_div, exp_add, mul_div_cancel_right₀ _ (ofReal_ne_zero.mpr hh),
-      exp_two_pi_mul_I, mul_one]
+  · simp only [qParam, ofReal_zero, div_zero]
+  · simpa only [qParam, mul_add, add_div, mul_div_cancel_right₀ _ (ofReal_ne_zero.mpr hh)] using
+      exp_periodic (2 * π * I * z / h)
 
 /-- The derivative of the `q`-parameter: `d/dz exp (2πiz / h) = (2πi / h) exp (2πiz / h)`. -/
 theorem hasDerivAt_qParam (h : ℝ) (z : ℂ) :
-    HasDerivAt (qParam h) (2 * π * I / h * qParam h z) z := by
-  have hq : qParam h = fun x ↦ cexp (2 * π * I / h * x) := by
-    ext x
-    rw [qParam, mul_div_right_comm]
-  rw [hq]
-  simpa only [mul_comm, id_eq, one_mul] using ((hasDerivAt_id z).const_mul (2 * π * I / h)).cexp
+    HasDerivAt (qParam h) (2 * π * I / h * qParam h z) z :=
+  (((hasDerivAt_id z).const_mul (2 * π * I)).div_const h).cexp.congr_deriv <| by
+    rw [id, mul_one, mul_comm, mul_div_assoc]
+    rfl
 
 end Function.Periodic

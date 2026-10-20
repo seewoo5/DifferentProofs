@@ -195,9 +195,7 @@ inductive Color
   deriving DecidableEq
 
 -- Written out by hand: mathlib v4.35.0's `deriving Fintype` handler fails on this enumeration.
-instance : Fintype Color where
-  elems := {.A, .B, .C}
-  complete x := by cases x <;> simp
+instance : Fintype Color := ⟨{.A, .B, .C}, fun x ↦ by cases x <;> decide⟩
 
 /-- The indicator of a *complete edge*, read off the labels of its two endpoints: `1` when they
 are `A` and `B` in some order, and `0` otherwise. -/

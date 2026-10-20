@@ -38,44 +38,23 @@ open scoped Real MatrixGroups
 namespace BaselProblem.RamanujanUnnormalized
 
 /-- Splitting a sum over `ℤ` according to the residue of the index modulo `3`. -/
-lemma tsum_int_eq_add_add {g : ℤ → ℂ} (hg : Summable g) :
-    ∑' n, g n = ∑' j, g (3 * j) + ∑' j, g (3 * j + 1) + ∑' j, g (3 * j + 2) := by
-  have hs (r : ℤ) : Summable fun j : ℤ ↦ g (3 * j + r) :=
-    hg.comp_injective fun a b h ↦ by lia
-  have hs0 : Summable fun j : ℤ ↦ g (3 * j) := by simpa only [add_zero] using hs 0
-  calc ∑' n, g n = ∑' p, (g ∘ (Int.divModEquiv 3).symm) p :=
-        ((Int.divModEquiv 3).symm.tsum_eq g).symm
-    _ = ∑' j, ∑' r, (g ∘ (Int.divModEquiv 3).symm) (j, r) :=
-        (hg.comp_injective (Int.divModEquiv 3).symm.injective).tsum_prod
-    _ = ∑' j, (g (3 * j) + g (3 * j + 1) + g (3 * j + 2)) := by
-        congr 1
-        ext j
-        rw [tsum_fintype, Fin.sum_univ_three]
-        simp only [Fin.isValue, comp_apply, Int.divModEquiv_symm_apply, Nat.cast_ofNat,
-          Fin.coe_ofNat_eq_mod, Nat.zero_mod, CharP.cast_eq_zero, add_zero, Nat.one_mod,
-          Nat.cast_one, Nat.mod_succ, mul_comm]
-    _ = _ := by rw [(hs0.add (hs 1)).tsum_add (hs 2), hs0.tsum_add (hs 1)]
+private lemma tsum_int_eq_add_add {g : ℤ → ℂ} (hg : Summable g) :
+    ∑' n, g n = ∑' j, g (3 * j) + ∑' j, g (3 * j + 1) + ∑' j, g (3 * j + 2) :=
+  (((Int.divModEquiv 3).trans (.prodComm _ _)).symm.tsum_eq g).symm.trans <|
+    (hg.comp_injective (Equiv.injective _)).tsum_prod.trans <| by
+      norm_num [Fin.sum_univ_three, mul_comm]
 
 /-- **Euler's pentagonal number theorem** for `η`:
 `η(z) = ∑ₖ (-1)ᵏ exp (πiz (6k - 1)² / 12)`. -/
 lemma hasSum_eta {z : ℂ} (hz : 0 < z.im) :
-    HasSum (fun k : ℤ ↦ (-1) ^ k * cexp (π * I * z * (6 * k - 1) ^ 2 / 12)) (η z) := by
-  have hq : ‖Periodic.qParam 1 z‖ < 1 := Periodic.norm_qParam_lt_one one_pos hz
-  have h := (hasSum_eulerFunction_pentagonal hq).mul_left (Periodic.qParam 24 z)
-  rw [eulerFunction_eq_tprod hq] at h
-  convert h using 1
-  · ext k
-    have hp : (pentagonal k : ℂ) = k * (3 * k - 1) / 2 := by
-      have h2 : ((2 * (pentagonal k : ℤ) : ℤ) : ℂ) = ((k * (3 * k - 1) : ℤ) : ℂ) := by
-        rw [two_mul_natCast_pentagonal]
-      push_cast at h2
-      linear_combination h2 / 2
-    rw [Int.cast_negOnePow, Periodic.qParam, Periodic.qParam, ← exp_nat_mul, hp,
-      mul_left_comm, ← exp_add]
+    HasSum (fun k : ℤ ↦ (-1) ^ k * cexp (π * I * z * (6 * k - 1) ^ 2 / 12)) (η z) :=
+  have hq := Periodic.norm_qParam_lt_one one_pos hz
+  (eulerFunction_eq_tprod hq ▸ (hasSum_eulerFunction_pentagonal hq).mul_left _).congr_fun fun k ↦ by
+    rw [Int.cast_negOnePow, mul_left_comm, Periodic.qParam, Periodic.qParam, ofReal_ofNat,
+      ofReal_one, ← exp_nat_mul, ← exp_add]
     congr 2
-    push_cast
-    ring
-  · rfl
+    linear_combination -π * I * z *
+      (mod_cast two_mul_natCast_pentagonal k : (2 * pentagonal k : ℂ) = k * (3 * k - 1))
 
 /-- **Poisson summation** applied to the pentagonal series: the Gaussian `k ↦ exp (3πizk²)` has
 Fourier transform `ξ ↦ (-3iz)^{-1/2} exp (πi (-1/z) ξ² / 3)`, and the outcome is
@@ -83,24 +62,10 @@ Fourier transform `ξ ↦ (-3iz)^{-1/2} exp (πi (-1/z) ξ² / 3)`, and the outc
 lemma eta_eq_tsum {z : ℂ} (hz : 0 < z.im) :
     η z = 1 / (-3 * I * z) ^ (1 / 2 : ℂ) * ∑' n : ℤ,
       cexp (-π * I * (2 * n - 1) / 6) * cexp (π * I * (-1 / z) * (2 * n - 1) ^ 2 / 12) := by
-  have hz0 : z ≠ 0 := fun h ↦ by simp only [h, zero_im, lt_self_iff_false] at hz
-  have ha : 0 < (-3 * I * z).re := by norm_num [hz]
-  rw [← (hasSum_eta hz).tsum_eq]
-  have key (k : ℤ) : (-1) ^ k * cexp (π * I * z * (6 * k - 1) ^ 2 / 12) =
-      cexp (π * I * z / 12) *
-        cexp (-π * (-3 * I * z) * k ^ 2 + 2 * π * (I * (1 - z) / 2) * k) := by
-    rw [← exp_pi_mul_I, ← exp_int_mul, ← exp_add, ← exp_add]
-    congr 1
-    ring
-  simp_rw [key]
-  rw [tsum_mul_left, tsum_exp_neg_quadratic ha, ← mul_assoc, mul_comm (cexp _), mul_assoc,
-    ← tsum_mul_left]
-  congr 2
-  ext n
-  rw [← exp_add, ← exp_add]
-  congr 1
-  field_simp
-  linear_combination (72 * I ^ 2 * z ^ 2 + 288 * n ^ 2 + 72 * I ^ 2 - 144 * I ^ 2 * z) * I_sq
+  have h := congr(cexp (π * I * z / 12) *
+    $(tsum_exp_neg_quadratic (by norm_num [hz] : 0 < (-3 * I * z).re) (I * (1 - z) / 2)))
+  rw [← tsum_mul_left, mul_left_comm (cexp _), ← tsum_mul_left] at h
+  grind [I_sq, zero_im, =_ exp_add, =_ exp_int_mul, exp_pi_mul_I, (hasSum_eta hz).tsum_eq]
 
 /-- The twisted series of `eta_eq_tsum` is `√3 η`: split `n` modulo `3`; the classes `3j` and
 `3j + 1` both give the pentagonal series of `η` (the second after `j ↦ -j`), with factors
@@ -109,136 +74,50 @@ lemma eta_eq_tsum {z : ℂ} (hz : 0 < z.im) :
 lemma tsum_twisted {w : ℂ} (hw : 0 < w.im) :
     ∑' n : ℤ, cexp (-π * I * (2 * n - 1) / 6) * cexp (π * I * w * (2 * n - 1) ^ 2 / 12) =
       √3 * η w := by
-  set u : ℤ → ℂ := fun m ↦ cexp (π * I * w * m ^ 2 / 12) with hu
-  have hneg (j : ℤ) : cexp (-π * I * j) = (-1) ^ j := by
-    rw [show -π * I * j = j * (-(π * I)) by ring, exp_int_mul, exp_neg, exp_pi_mul_I, inv_neg_one]
-  have hsum : Summable fun n : ℤ ↦
-      cexp (-π * I * (2 * n - 1) / 6) * cexp (π * I * w * (2 * n - 1) ^ 2 / 12) := by
-    refine (((summable_jacobiTheta₂_term_iff (-(w + 1) / 6) (w / 3)).mpr
-      (by rw [div_ofNat_im]; exact div_pos hw three_pos)).mul_left
-        (cexp (π * I * w / 12 + π * I / 6))).congr fun n ↦ ?_
-    rw [jacobiTheta₂_term, ← exp_add, ← exp_add]
-    congr 1
-    ring
-  have h0 (j : ℤ) : cexp (-π * I * (2 * ↑(3 * j) - 1) / 6) *
-      cexp (π * I * w * (2 * ↑(3 * j) - 1) ^ 2 / 12) =
-        cexp (π * I / 6) * ((-1) ^ j * u (6 * j - 1)) := by
-    rw [← hneg, hu]
-    simp only
-    rw [← exp_add, ← exp_add, ← exp_add]
-    congr 1
-    push_cast
-    ring
-  have h1 (j : ℤ) : cexp (-π * I * (2 * ↑(3 * j + 1) - 1) / 6) *
-      cexp (π * I * w * (2 * ↑(3 * j + 1) - 1) ^ 2 / 12) =
-        cexp (-π * I / 6) * ((-1) ^ j * u (6 * j + 1)) := by
-    rw [← hneg, hu]
-    simp only
-    rw [← exp_add, ← exp_add, ← exp_add]
-    congr 1
-    push_cast
-    ring
-  have h2 (j : ℤ) : cexp (-π * I * (2 * ↑(3 * j + 2) - 1) / 6) *
-      cexp (π * I * w * (2 * ↑(3 * j + 2) - 1) ^ 2 / 12) = -I * ((-1) ^ j * u (6 * j + 3)) := by
-    rw [← hneg, hu, ← exp_neg_pi_div_two_mul_I]
-    simp only
-    rw [← exp_add, ← exp_add, ← exp_add]
-    congr 1
-    push_cast
-    ring
-  have hnegpow (j : ℤ) : (-1 : ℂ) ^ (-j) = (-1) ^ j := by rw [zpow_neg, ← inv_zpow, inv_neg_one]
-  have r1 : ∑' j : ℤ, (-1) ^ j * u (6 * j + 1) = ∑' j : ℤ, (-1) ^ j * u (6 * j - 1) := by
-    rw [← (Equiv.neg ℤ).tsum_eq]
-    congr 1
-    ext j
-    rw [Equiv.neg_apply, hnegpow, hu]
-    push_cast
-    ring_nf
-  have r2 : ∑' j : ℤ, (-1) ^ j * u (6 * j + 3) = 0 := by
-    have h := (Equiv.subLeft (-1 : ℤ)).tsum_eq fun j ↦ (-1) ^ j * u (6 * j + 3)
-    have hr (j : ℤ) : (-1 : ℂ) ^ (Equiv.subLeft (-1) j) * u (6 * Equiv.subLeft (-1) j + 3) =
-        -((-1) ^ j * u (6 * j + 3)) := by
-      rw [Equiv.subLeft_apply, show (-1 : ℤ) - j = -(1 + j) by ring, hnegpow,
-        zpow_add₀ (by norm_num), zpow_one, hu]
-      push_cast
-      ring_nf
-    simp only [hr, tsum_neg] at h
-    linear_combination -h / 2
-  have hη : η w = ∑' j : ℤ, (-1) ^ j * u (6 * j - 1) := by
-    rw [← (hasSum_eta hw).tsum_eq, hu]
-    push_cast
-    rfl
-  have hcos : cexp (π * I / 6) + cexp (-π * I / 6) = √3 := by
-    have h := Complex.cos.eq_def (π / 6)
-    have hc : Complex.cos (π / 6) = (√3 / 2 : ℝ) := by
-      rw [← Real.cos_pi_div_six]
-      push_cast
-      rfl
-    rw [hc] at h
-    push_cast at h
-    rw [show (π : ℂ) * I / 6 = π / 6 * I by ring, show -(π : ℂ) * I / 6 = -(π / 6) * I by ring]
-    linear_combination -2 * h
-  rw [tsum_int_eq_add_add hsum, tsum_congr h0, tsum_congr h1, tsum_congr h2, tsum_mul_left,
-    tsum_mul_left, tsum_mul_left, r1, r2, ← hη, ← hcos]
-  ring
+  rw [tsum_int_eq_add_add ?_, (((hasSum_eta hw).mul_left (cexp (π / 6 * I))).congr_fun fun j ↦ by
+      push_cast [← exp_neg_pi_mul_I, ← exp_int_mul, ← exp_add]; ring_nf).tsum_eq,
+    ← tsum_comp_neg, (((hasSum_eta hw).mul_left (cexp (-(π / 6) * I))).congr_fun fun j ↦ by
+      push_cast [← exp_pi_mul_I, ← exp_int_mul, ← exp_add]; ring_nf).tsum_eq,
+    self_eq_neg.mp <| ((Equiv.subLeft (-1)).tsum_eq _).symm.trans <| (tsum_congr fun j ↦ by
+      push_cast [Equiv.subLeft_apply, ← exp_add, ← exp_add_pi_mul_I, exp_eq_exp_iff_exists_int]
+      exact ⟨j, by ring⟩).trans tsum_neg]
+  · linear_combination η w * (2 * (by exact_mod_cast Real.cos_pi_div_six : cos (π / 6) = √3 / 2) -
+      two_cos (π / 6))
+  · exact (((summable_jacobiTheta₂_term_iff (-(w + 1) / 6) (w / 3)).mpr
+      (div_ofNat_im w 3 ▸ div_pos hw three_pos)).mul_left (cexp (π * I * (w + 2) / 12))).congr
+      fun n ↦ by simp only [jacobiTheta₂_term, ← exp_add]; ring_nf
 
 /-- **The transformation of `η²⁴`**: `η(-1/z)²⁴ = z¹² η(z)²⁴`. Raising `η = (-iz)^{-1/2} η(-1/z)`
 to the `24`th power removes the square root. -/
 lemma eta_neg_one_div_pow {z : ℂ} (hz : 0 < z.im) :
     η (-1 / z) ^ 24 = z ^ 12 * η z ^ 24 := by
-  have hz0 : z ≠ 0 := fun h ↦ by simp only [h, zero_im, lt_self_iff_false] at hz
-  have hw : 0 < (-1 / z).im := by
-    rw [neg_div, neg_im, one_div, inv_im, neg_div, neg_neg]
-    exact div_pos hz (normSq_pos.mpr hz0)
-  have h := eta_eq_tsum hz
-  rw [tsum_twisted hw] at h
-  have hx : ((-3 * I * z) ^ (1 / 2 : ℂ)) ^ 24 = (-3 * I * z) ^ 12 := by
-    rw [← cpow_nat_mul]
-    norm_num
-  have h3 : (√3 : ℂ) ^ 24 = 3 ^ 12 := by
-    rw [show 24 = 2 * 12 by rfl, pow_mul, ← ofReal_pow, Real.sq_sqrt (by norm_num)]
-    norm_num
-  have hI : I ^ 12 = 1 := by rw [show 12 = 4 * 3 by rfl, pow_mul, I_pow_four, one_pow]
-  have h24 := congrArg (· ^ 24) h
-  simp only [div_pow, mul_pow, one_pow, hx, h3, hI] at h24
-  rw [h24]
-  field_simp
+  rw [pow_mul (η z) 2 12, eta_eq_tsum hz, tsum_twisted (mod_cast im_pnat_div_pos 1 ⟨z, hz⟩)]
+  norm_num [field, ← ofReal_pow, mul_pow, ← cpow_nat_mul, ne_zero ⟨z, hz⟩]
 
 /-- `Δ = η²⁴` is invariant under `S`, proved through `eta_neg_one_div_pow` rather than through
 mathlib's `ModularForm.discriminant_S_invariant`, whose proof uses `ζ(2) = π² / 6`. -/
 lemma discriminant_slash_S : (discriminant ∣[(12 : ℤ)] ModularGroup.S) = discriminant := by
   ext z
-  suffices η (-(↑z)⁻¹) ^ 24 * ((z : ℂ) ^ 12)⁻¹ = η z ^ 24 by
-    rw [SL_slash_apply, UpperHalfPlane.modular_S_smul, ModularGroup.denom_S]
-    simpa only [discriminant, inv_neg, Int.reduceNeg, zpow_neg, zpow_ofNat] using this
-  rw [← one_div, ← neg_div, eta_neg_one_div_pow z.im_pos]
-  field_simp [z.ne_zero]
+  simp only [slash_S_apply, discriminant, ← one_div, div_neg_eq_neg_div', eta_neg_one_div_pow z.2]
+  field [z.ne_zero]
 
 /-- `Δ` as a cusp form of weight `12`. This is mathlib's `CuspForm.discriminant`, rebuilt on
 `discriminant_slash_S`. -/
 noncomputable def discriminantCuspForm : CuspForm 𝒮ℒ 12 where
   toFun := discriminant
-  slash_action_eq' A hA := by
-    obtain ⟨A, rfl⟩ := hA
-    exact slash_action_generators_SL2Z discriminant_slash_S discriminant_T_invariant A
-  holo' := by
-    rw [UpperHalfPlane.mdifferentiable_iff]
-    refine .congr (fun z hz ↦ (differentiableAt_eta_of_mem_upperHalfPlaneSet hz).pow
-      24 |>.differentiableWithinAt) fun z hz ↦ ?_
-    simp only [SlashInvariantForm.coe_mk, comp_apply, discriminant,
-      UpperHalfPlane.ofComplex_apply_of_im_pos hz, Pi.pow_apply]
-  zero_at_cusps' hc := by
-    rw [Subgroup.IsArithmetic.isCusp_iff_isCusp_SL2Z] at hc
-    rw [OnePoint.isZeroAt_iff_forall_SL2Z hc]
-    intro γ _
-    rw [slash_action_generators_SL2Z discriminant_slash_S discriminant_T_invariant]
-    exact discriminant_isZeroAtImInfty
+  slash_action_eq' := fun _ ⟨γ, hγ⟩ ↦
+    hγ ▸ slash_action_generators_SL2Z discriminant_slash_S discriminant_T_invariant γ
+  holo' z := ((differentiableAt_eta_of_mem_upperHalfPlaneSet z.2).pow 24).mdifferentiableAt.comp z
+    (mdifferentiable_coe z)
+  zero_at_cusps' hc := (OnePoint.isZeroAt_iff_forall_SL2Z hc).mpr fun γ _ ↦
+    (slash_action_generators_SL2Z discriminant_slash_S discriminant_T_invariant γ).symm ▸
+      discriminant_isZeroAtImInfty
 
+/-- `f / Δ` is invariant under the weight `k - 12` slash action of `SL(2, ℤ)`. -/
 lemma div_discriminant_slash {k : ℤ} (f : CuspForm 𝒮ℒ k) (γ : SL(2, ℤ)) :
-    (fun z ↦ f z / discriminant z) ∣[k - 12] γ = fun z ↦ f z / discriminant z := by
-  have hγ : (γ : GL (Fin 2) ℝ) ∈ 𝒮ℒ := ⟨γ, rfl⟩
-  change (⇑f / ⇑discriminantCuspForm) ∣[k - 12] γ = ⇑f / ⇑discriminantCuspForm
-  simp_rw [div_slash_SL2, ModularForm.SL_slash, slash_action_eqn _ _ hγ]
+    (fun z ↦ f z / discriminant z) ∣[k - 12] γ = fun z ↦ f z / discriminant z :=
+  (div_slash_SL2 k 12 γ f discriminantCuspForm).trans <| congrArg₂ (· / ·)
+    (slash_action_eqn f _ ⟨γ, rfl⟩) (slash_action_eqn discriminantCuspForm _ ⟨γ, rfl⟩)
 
 /-- A cusp form of weight `k` divided by `Δ` is a modular form of weight `k - 12`. This is the
 forward map of mathlib's `CuspForm.discriminantEquiv`, rebuilt on `discriminantCuspForm`. -/
@@ -246,19 +125,13 @@ noncomputable def divDiscriminant {k : ℤ} (f : CuspForm 𝒮ℒ k) : ModularFo
   toFun z := f z / discriminant z
   slash_action_eq' := fun _ ⟨γ, hγ⟩ ↦ hγ ▸ div_discriminant_slash f γ
   holo' := f.holo'.div discriminantCuspForm.holo' discriminant_ne_zero
-  bdd_at_cusps' {c} hc := by
-    rw [Subgroup.IsArithmetic.isCusp_iff_isCusp_SL2Z] at hc
-    rw [OnePoint.isBoundedAt_iff_forall_SL2Z hc]
-    intro γ _
-    rw [div_discriminant_slash f γ, IsBoundedAtImInfty, BoundedAtFilter]
-    exact (Asymptotics.div_isBoundedUnder_of_isBigO
-      (CuspForm.exp_decay_isBigO_discriminant f)).isBigO_one ℝ
+  bdd_at_cusps' hc := (OnePoint.isBoundedAt_iff_forall_SL2Z hc).mpr fun γ _ ↦
+    (div_discriminant_slash f γ).symm ▸
+      (Asymptotics.div_isBoundedUnder_of_isBigO f.exp_decay_isBigO_discriminant).isBigO_one ℝ
 
 /-- Cusp forms of weight `k < 12` vanish: dividing by `Δ` lands in negative weight. -/
-lemma cuspForm_eq_zero {k : ℤ} (hk : k < 12) (f : CuspForm 𝒮ℒ k) : f = 0 := by
-  ext z
-  have h : f z / discriminant z = 0 :=
-    congrFun (ModularFormClass.levelOne_neg_weight_eq_zero (by lia) (divDiscriminant f)) z
-  simpa only [zero_apply, div_eq_zero_iff, discriminant_ne_zero z, or_false] using h
+lemma cuspForm_eq_zero {k : ℤ} (hk : k < 12) (f : CuspForm 𝒮ℒ k) : f = 0 :=
+  CuspForm.ext fun z ↦ (div_eq_zero_iff.1 <| congrFun (ModularFormClass.levelOne_neg_weight_eq_zero
+    (by lia) (divDiscriminant f)) z).resolve_right (discriminant_ne_zero z)
 
 end BaselProblem.RamanujanUnnormalized
