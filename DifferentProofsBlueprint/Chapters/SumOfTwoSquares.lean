@@ -78,8 +78,8 @@ Every prime $`p \equiv 1 \pmod 4` is a sum of two squares.
 :::
 
 :::proof "thm:sos-zagier"
-Consider the finite set $`S = \{(x, y, z) \mid x, y, z > 0,\ x^2 + 4yz = p\}`. The windmill
-involution sends $`(x, y, z)` to $`(x + 2z,\ z,\ y - x - z)` when $`x < y - z`, to
+Consider the finite set $`S = \{(x, y, z) \in \mathbb{N}^3 \mid x, y, z > 0,\ x^2 + 4yz = p\}`.
+Zagier's involution sends $`(x, y, z)` to $`(x + 2z,\ z,\ y - x - z)` when $`x < y - z`, to
 $`(2y - x,\ y,\ x - y + z)` when $`y - z < x < 2y`, and to $`(x - 2y,\ x - y + z,\ y)` when
 $`x > 2y`; on $`S` the boundary cases $`x = y - z` and $`x = 2y` are impossible because $`p` is
 prime. It has exactly one fixed point (namely $`(1, 1, (p-1)/4)`), so $`|S|` is odd. Therefore the
