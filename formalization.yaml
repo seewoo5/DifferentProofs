@@ -573,6 +573,10 @@ fidelity:
       as its concrete Fibonacci number with three distinct prime factors.
     - The Dirichlet-style file covers only the residue classes 1 and 3 mod 4, not
       Dirichlet's theorem in general.
+    - Zagier's involution is formalized on `ℕ³`, like his set `S`. Natural-number
+      subtraction truncates, so the middle case's third coordinate `x - y + z`, whose
+      intermediate `x - y` is negative when `x < y`, is written `x + z - y`; the two
+      agree as integers.
     - Reusable supporting results are stated in mathlib-friendly generality under
       `DifferentProofsForMathlib/`, mirroring mathlib's directory layout, rather
       than in the narrow form each proof needs.
