@@ -240,7 +240,7 @@ status:
     (4 proofs), the infinitude of primes (9 proofs, including a Dirichlet-style pair
     for the classes 1 and 3 mod 4), the irrationality of sqrt 2 (3 proofs),
     Fermat's theorem on sums of two squares (4 proofs), the Basel problem (4 proofs),
-    the integer-rectangle tiling theorem of Wagon (12 of his 14 proofs), and two
+    the integer-rectangle tiling theorem of Wagon (all 14 of his proofs), and two
     combinatorial identities (Pascal's rule and the hockey-stick identity, each
     proved two ways). A Verso blueprint under `DifferentProofsBlueprint/` records the
     informal statements, proof sketches, and dependency graph; reusable supporting
@@ -528,19 +528,18 @@ fidelity:
       his per-proof local arguments are factored into shared lemmas
       (`IsTiling.sum_fgArea`, `Grid`, `CornerCount`, `Cells`, `Walks`) reused across
       proofs.
-    - Proof 11 (minimal cut-set, Seymour) follows the paper's graph argument, with
-      the planar duality proved for the tiling graph itself rather than for abstract
-      planar graphs, which mathlib cannot yet state (no planarity). The dual graph is
-      built in the concrete form Wagon reads off the embedding, its faces being the
-      V-links of proof 10 plus the two outer faces (`IntegerRectangle.CutSet.Face`).
-      Two changes, recorded in the module docstring: vertices (horizontal segments)
-      are handled as points up to the same-segment relation rather than as quotient
-      objects; and in place of a minimal cut and the cited "the duals of a minimal
-      cut's edges form a cycle", the cut around the reachable region is shown to
-      cross every inner face evenly and the two outer faces oddly
-      (`IntegerRectangle.CutSet.cutDeg_link` and friends) — the parity form of the
-      same duality — from which the dual left-to-right path that Wagon extracts from
-      his cycle falls out by a handshake count in `ZMod 2`.
+    - Proof 11 (minimal cut-set, Seymour) follows the paper on Seymour's graph itself,
+      whose vertices are the horizontal segments (classes of points of horizontal
+      edges) and whose edges are the tiles and the exterior edge. Mathlib has no
+      planar graphs, so the embedding Wagon draws is formalized as the rotation system
+      it determines (`CombinatorialMap`, in `DifferentProofsForMathlib`), and its faces
+      are proved to be the V-links of proof 10 and the two outer faces. The
+      well-known theorem the paper cites, that the edges of a minimal cut of a planar
+      graph form a cycle of the dual graph, is proved for planar combinatorial maps
+      in general (`CombinatorialMap.IsPlanar.isCycle_of_isBond`), planarity meaning
+      Euler characteristic 2. Wagon reads the planarity of Seymour's embedding off the
+      picture; here it is proved through the Jordan curve property, colouring the
+      segments by the parity of the tiles of an even edge set stacked under them.
     - Proof 14 (Sperner's lemma, Schmerl) does not prove geometric Sperner in
       general; mathlib has no such lemma either (leanprover-community/mathlib4#25231
       tracks it, and mathlib's `Sperner` is the antichain theorem). Drawing one
@@ -703,8 +702,8 @@ alignment:
       module: "DifferentProofs.IntegerRectangle.CutSet"
       status: "proved"
       note: >-
-        Planar duality is proved for the tiling graph concretely, in parity form; see
-        `fidelity.divergences`.
+        The cited planar duality theorem is proved for planar combinatorial maps in
+        general; see `fidelity.divergences`.
     - source: "Wagon, Proof 12 (sweep line, Bachman-Yannakakis)"
       lean: "IntegerRectangleTheorem_SweepLine"
       module: "DifferentProofs.IntegerRectangle.SweepLine"
