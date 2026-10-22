@@ -1164,10 +1164,10 @@ lemma rightFace_eq_rightFace (hT : IsTiling R T) (hp : Proper T)
     (hlo₂.trans (hp i).2.le) (min_le_left _ _)
 
 variable (hT : IsTiling R T) (hp : Proper T) in
-/-- **The face of a dart**: the face on the left of the tile's edge as it is drawn up from the
-bottom end, and on its right as drawn down from the top end; that is, the V-link carrying the left
-edge of the tile at its top end and the right edge at its bottom end, or the outer face on either
-side of the exterior edge. -/
+/-- **The face of a dart**: the face on the right of its edge, walked from the dart's end as the
+face permutation walks it. At the bottom end of a tile this is the face along the tile's right
+edge and at the top end the face along its left edge; at the bottom end of the exterior edge it
+is the left outer face and at the top end the right outer face. -/
 noncomputable def faceOf : Dart ι → Face R T
   | (some i, true) => leftFace hT hp i
   | (some i, false) => rightFace hT hp i
