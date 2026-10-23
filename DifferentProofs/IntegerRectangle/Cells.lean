@@ -144,12 +144,26 @@ lemma mem_reflectY_cell (S : Rectangle) (sx : Bool) (x y : ℝ) :
 
 @[simp] lemma transpose_height (S : Rectangle) : S.transpose.height = S.width := rfl
 
+/-- Reflecting in the vertical axis keeps H-tiles H-tiles. -/
+@[simp] lemma isHTile_reflectX {S : Rectangle} : S.reflectX.IsHTile ↔ S.IsHTile := by
+  simp only [IsHTile, reflectX_width]
+
+/-- Reflecting in the vertical axis keeps V-tiles V-tiles. -/
+@[simp] lemma isVTile_reflectX {S : Rectangle} : S.reflectX.IsVTile ↔ S.IsVTile := Iff.rfl
+
+/-- Transposing turns H-tiles into V-tiles. -/
+@[simp] lemma isHTile_transpose {S : Rectangle} : S.transpose.IsHTile ↔ S.IsVTile := Iff.rfl
+
+/-- Transposing turns V-tiles into H-tiles. -/
+@[simp] lemma isVTile_transpose {S : Rectangle} : S.transpose.IsVTile ↔ S.IsHTile := Iff.rfl
+
 lemma hasIntegerSide_reflectX {S : Rectangle} :
-    S.reflectX.HasIntegerSide ↔ S.HasIntegerSide := by simp [Rectangle.HasIntegerSide]
+    S.reflectX.HasIntegerSide ↔ S.HasIntegerSide :=
+  or_congr isHTile_reflectX isVTile_reflectX
 
 lemma hasIntegerSide_transpose {S : Rectangle} :
-    S.transpose.HasIntegerSide ↔ S.HasIntegerSide := by
-  simp [Rectangle.HasIntegerSide, or_comm]
+    S.transpose.HasIntegerSide ↔ S.HasIntegerSide :=
+  (or_congr isHTile_transpose isVTile_transpose).trans or_comm
 
 end Rectangle
 

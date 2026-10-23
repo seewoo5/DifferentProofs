@@ -8,14 +8,16 @@ public import DifferentProofs.IntegerRectangle.GridRefinement
 # The integer-rectangle theorem by induction on the number of H-tiles
 
 Robinson's ninth proof. Call a tile an *H-tile* if it is designated by its integer width and a
-*V-tile* if it is designated by its integer height. Splitting each tile along its designated side
-normalizes the tiling: every H-tile then has width exactly `1` and every V-tile height exactly `1`
-(`Normalized`, `IsTiling.normalized`). Robinson's induction runs on the number of H-tiles of a
-normalized tiling. If there are none, every tile has integer height and so does `R`. Otherwise
-pick an H-tile and grow a vertical strip of width `1` from it, upwards and downwards: the strip
-runs straight up through V-tiles until an H-tile blocks it, at which point it steps sideways onto
-that H-tile and continues. Deleting the strip and sliding what is to its right one unit leftwards
-tiles a rectangle one unit narrower with fewer H-tiles, and the induction applies to it.
+*V-tile* if it is designated by its integer height; here the H-tiles are the tiles of integer
+width (`Rectangle.IsHTile`), a tile with both sides integral among them, and the V-tiles the
+others. Splitting each tile along its designated side normalizes the tiling: every H-tile then has
+width exactly `1` and every V-tile height exactly `1` (`Normalized`, `IsTiling.normalized`).
+Robinson's induction runs on the number of H-tiles of a normalized tiling. If there are none,
+every tile has integer height and so does `R`. Otherwise pick an H-tile and grow a vertical strip
+of width `1` from it, upwards and downwards: the strip runs straight up through V-tiles until an
+H-tile blocks it, at which point it steps sideways onto that H-tile and continues. Deleting the
+strip and sliding what is to its right one unit leftwards tiles a rectangle one unit narrower
+with fewer H-tiles, and the induction applies to it.
 -/
 
 @[expose] public section
@@ -56,20 +58,17 @@ lemma Normalized.pos_height (hn : Normalized R T H) : R.y₀ < R.y₁ :=
   have ⟨i⟩ := hn.tiling.nonempty_index
   lt_of_le_of_lt (hn.tiling.le_tile_y₀ i) ((hn.proper i).2.trans_le (hn.tiling.tile_y₁_le i))
 
-/-- A tile is cut along its width when that is an integer, and along its height otherwise. -/
-def CutsWidth (S : Rectangle) : Prop := ∃ m : ℤ, S.width = m
-
 open scoped Classical in
-/-- The number of unit pieces a tile is cut into: its width if that is an integer, and its height
-otherwise. -/
+/-- The number of unit pieces a tile is cut into: an H-tile is cut along its width, so into as
+many pieces as its width, and any other tile along its height. -/
 noncomputable def pieceCount (S : Rectangle) : ℕ :=
-  if CutsWidth S then ⌊S.width⌋₊ else ⌊S.height⌋₊
+  if S.IsHTile then ⌊S.width⌋₊ else ⌊S.height⌋₊
 
 open scoped Classical in
 /-- The `j`-th unit piece of a tile, counted from its lower left corner along the side it is cut
 along. -/
 noncomputable def piece (S : Rectangle) (j : ℕ) : Rectangle :=
-  if CutsWidth S then
+  if S.IsHTile then
     { x₀ := S.x₀ + j, x₁ := S.x₀ + j + 1, y₀ := S.y₀, y₁ := S.y₁, hx := by linarith, hy := S.hy }
   else
     { x₀ := S.x₀, x₁ := S.x₁, y₀ := S.y₀ + j, y₁ := S.y₀ + j + 1, hx := S.hx, hy := by linarith }
@@ -82,25 +81,25 @@ private lemma add_floor_sub {a b : ℝ} (hab : a < b) (h : ∃ m : ℤ, b - a = 
   rw [hm, Nat.floor_intCast, ← Int.cast_natCast, Int.toNat_of_nonneg hm0]
   linarith
 
-/-- The pieces of a tile cut along its width exhaust that width. -/
-private lemma add_pieceCount_width (h : CutsWidth S) (hx : S.x₀ < S.x₁) :
+/-- The pieces of an H-tile exhaust its width. -/
+private lemma add_pieceCount_width (h : S.IsHTile) (hx : S.x₀ < S.x₁) :
     S.x₀ + pieceCount S = S.x₁ := by
   classical
   rw [pieceCount, ite_eq_left h]
   exact add_floor_sub hx h
 
-/-- The pieces of a tile cut along its height exhaust that height. -/
-private lemma add_pieceCount_height (hS : S.HasIntegerSide) (h : ¬ CutsWidth S) (hy : S.y₀ < S.y₁) :
+/-- The pieces of any other tile exhaust its height. -/
+private lemma add_pieceCount_height (hS : S.HasIntegerSide) (h : ¬ S.IsHTile) (hy : S.y₀ < S.y₁) :
     S.y₀ + pieceCount S = S.y₁ := by
   classical
   rw [pieceCount, ite_eq_right h]
-  exact add_floor_sub hy (hS.resolve_left h)
+  exact add_floor_sub hy (hS.isVTile_of_not_isHTile h)
 
-private lemma piece_width_of_cutsWidth (h : CutsWidth S) (j : ℕ) : (piece S j).width = 1 := by
+private lemma piece_width_of_isHTile (h : S.IsHTile) (j : ℕ) : (piece S j).width = 1 := by
   simp only [piece, ite_eq_left h, Rectangle.width]
   ring
 
-private lemma piece_height_of_not_cutsWidth (h : ¬ CutsWidth S) (j : ℕ) :
+private lemma piece_height_of_not_isHTile (h : ¬ S.IsHTile) (j : ℕ) :
     (piece S j).height = 1 := by
   simp only [piece, ite_eq_right h, Rectangle.height]
   ring
@@ -161,7 +160,7 @@ private lemma exists_mem_piece (hS : S.HasIntegerSide) (hnd : S.Nondegenerate) {
     ∃ j : ℕ, j < pieceCount S ∧ (x, y) ∈ (piece S j).toSetIoc := by
   classical
   obtain ⟨⟨h₁, h₂⟩, h₃, h₄⟩ := hz
-  by_cases h : CutsWidth S
+  by_cases h : S.IsHTile
   · obtain ⟨j, hj, hj₁, hj₂⟩ := exists_index h₁ h₂ (add_pieceCount_width h hnd.1)
     exact ⟨j, hj, by rw [Rectangle.mem_toSetIoc', piece, ite_eq_left h]; exact ⟨⟨hj₁, hj₂⟩, h₃, h₄⟩⟩
   · obtain ⟨j, hj, hj₁, hj₂⟩ := exists_index h₃ h₄ (add_pieceCount_height hS h hnd.2)
@@ -193,9 +192,10 @@ degenerate tiles and cut each of the others into unit pieces along a side of int
 noncomputable def pieceTiles (T : ι → Rectangle) (p : PieceIndex T) : Rectangle :=
   piece (properTiles T p.1) p.2
 
-/-- The H-tiles of the normalized tiling: the pieces of the tiles cut along their width. -/
-def PieceCutsWidth (T : ι → Rectangle) (p : PieceIndex T) : Prop :=
-  CutsWidth (properTiles T p.1)
+/-- The H-tiles of the normalized tiling: the pieces of the H-tiles, which are cut along their
+width. -/
+def PieceIsHTile (T : ι → Rectangle) (p : PieceIndex T) : Prop :=
+  (properTiles T p.1).IsHTile
 
 /-- **Cutting each tile into unit pieces normalizes a tiling.** Every tile has a side of integer
 length, at least one unit long since the tile is nondegenerate, and the half-open cells of the
@@ -203,13 +203,13 @@ pieces of a tile partition its own. -/
 theorem _root_.IntegerRectangle.IsTiling.normalized (hT : IsTiling R T) (hx : R.x₀ < R.x₁)
     (hy : R.y₀ < R.y₁)
     (hsides : ∀ i, (T i).HasIntegerSide) :
-    Normalized R (pieceTiles T) (PieceCutsWidth T) := by
+    Normalized R (pieceTiles T) (PieceIsHTile T) := by
   classical
   have hT₁ : IsTiling R (properTiles T) := hT.proper hx hy
   have hs : ∀ i : {i : ι // (T i).Nondegenerate}, (properTiles T i).HasIntegerSide :=
     fun i ↦ hsides i.1
-  refine ⟨?_, fun p ↦ piece_nondegenerate p.1.2 p.2, fun p hp ↦ piece_width_of_cutsWidth hp p.2,
-    fun p hp ↦ piece_height_of_not_cutsWidth hp p.2⟩
+  refine ⟨?_, fun p ↦ piece_nondegenerate p.1.2 p.2, fun p hp ↦ piece_width_of_isHTile hp p.2,
+    fun p hp ↦ piece_height_of_not_isHTile hp p.2⟩
   refine isTiling_of_toSetIoc hx hy
     (fun p ↦ (piece_subset (hs p.1) p.1.2 p.2.2).trans (hT₁.tile_subset p.1))
     (fun p q hpq ↦ ?_) fun z hz ↦ ?_
@@ -957,5 +957,5 @@ theorem IntegerRectangleTheorem_Staircase : IntegerRectangleTheorem := by
   · exact Or.inl ⟨0, by simp [Rectangle.width, ← hRx]⟩
   rcases eq_or_lt_of_le R.hy with hRy | hRy
   · exact Or.inr ⟨0, by simp [Rectangle.height, ← hRy]⟩
-  exact hasIntegerSide_of_normalized _ _ R (pieceTiles T) (PieceCutsWidth T) le_rfl
+  exact hasIntegerSide_of_normalized _ _ R (pieceTiles T) (PieceIsHTile T) le_rfl
     (hT.normalized hRx hRy hsides)

@@ -18,6 +18,12 @@ The elementary layer unfolds `Rectangle.toSet` and reads off that every tile of 
 inside the tiled rectangle (`Rectangle.mem_toSet`, `Rectangle.mem_interior_toSet`,
 `IsTiling.tile_subset`, and the four edge bounds `IsTiling.le_tile_x₀` … `IsTiling.tile_y₁_le`).
 
+It also names Wagon's two kinds of tile. An *H-tile* has integer width and a *V-tile* integer
+height (`Rectangle.IsHTile`, `Rectangle.IsVTile`), so the tiles of the theorem are exactly the
+rectangles that are one or the other (`Rectangle.hasIntegerSide_iff`). A tile with both sides
+integral is both. Proofs that need the two kinds disjoint designate such a tile one way: the
+staircase and reducible-link proofs count it as an H-tile, the cut-set proof as a V-tile.
+
 Next, a tiling is turned into an *exact* partition. Closed tiles overlap along shared edges, so a
 tiling only partitions the rectangle up to null sets; deleting each tile's left and bottom edges
 (`Rectangle.toSetIoc`) repairs this exactly.
@@ -90,6 +96,27 @@ noncomputable instance : DecidablePred Nondegenerate :=
 
 /-- A rectangle's width is nonnegative. -/
 lemma width_nonneg (R : Rectangle) : 0 ≤ R.width := sub_nonneg.mpr R.hx
+
+/-- A rectangle is an **H-tile**, in Wagon's terms, when its width, its horizontal side, is an
+integer. -/
+def IsHTile (S : Rectangle) : Prop := ∃ n : ℤ, S.width = n
+
+/-- A rectangle is a **V-tile**, in Wagon's terms, when its height, its vertical side, is an
+integer. -/
+def IsVTile (S : Rectangle) : Prop := ∃ n : ℤ, S.height = n
+
+/-- A rectangle has an integer side exactly when it is an H-tile or a V-tile. -/
+lemma hasIntegerSide_iff {S : Rectangle} : S.HasIntegerSide ↔ S.IsHTile ∨ S.IsVTile := Iff.rfl
+
+/-- A rectangle with an integer side that is not an H-tile is a V-tile. -/
+lemma HasIntegerSide.isVTile_of_not_isHTile {S : Rectangle} (h : S.HasIntegerSide)
+    (hS : ¬ S.IsHTile) : S.IsVTile :=
+  h.resolve_left hS
+
+/-- A rectangle with an integer side that is not a V-tile is an H-tile. -/
+lemma HasIntegerSide.isHTile_of_not_isVTile {S : Rectangle} (h : S.HasIntegerSide)
+    (hS : ¬ S.IsVTile) : S.IsHTile :=
+  h.resolve_right hS
 
 /-- A rectangle is a measurable subset of the plane. -/
 lemma measurableSet_toSet (R : Rectangle) : MeasurableSet R.toSet :=

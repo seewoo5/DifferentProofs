@@ -77,8 +77,8 @@ private lemma widthSum_split (h : ∀ i, p i ↔ q i ∨ r i) (hd : ∀ i, ¬(q 
 private lemma widthSum_eq_zero (h : ∀ i, ¬ p i) : widthSum T p = 0 :=
   Finset.sum_eq_zero fun i _ ↦ ite_eq_right (h i)
 
-/-- A width sum over tiles that all have integer width is an integer. -/
-private lemma widthSum_isInt (h : ∀ i, p i → ∃ n : ℤ, (T i).width = n) :
+/-- A width sum over H-tiles is an integer. -/
+private lemma widthSum_isInt (h : ∀ i, p i → (T i).IsHTile) :
     ∃ n : ℤ, widthSum T p = n := by
   classical
   choose! n hn using h
@@ -234,11 +234,11 @@ def IntHeight (R : Rectangle) (y : ℝ) : Prop := ∃ n : ℤ, y - R.y₀ = n
 
 private lemma intHeight_base (R : Rectangle) : IntHeight R R.y₀ := ⟨0, by simp⟩
 
-/-- A tile exactly one of whose horizontal edges is at integer height has non-integer height, so the
-hypothesis of the theorem forces its width to be an integer. -/
+/-- A tile exactly one of whose horizontal edges is at integer height has non-integer height, so it
+is not a V-tile, and the hypothesis of the theorem makes it an H-tile. -/
 private lemma width_isInt (hsides : ∀ i, (T i).HasIntegerSide) {i : ι}
-    (h : ¬ (IntHeight R (T i).y₀ ↔ IntHeight R (T i).y₁)) : ∃ n : ℤ, (T i).width = n :=
-  (hsides i).resolve_right fun ⟨m, hm⟩ ↦ h <|
+    (h : ¬ (IntHeight R (T i).y₀ ↔ IntHeight R (T i).y₁)) : (T i).IsHTile :=
+  (hsides i).isHTile_of_not_isVTile fun ⟨m, hm⟩ ↦ h <|
     have hm' : (T i).y₁ - (T i).y₀ = (m : ℝ) := hm
     ⟨fun ⟨k, hk⟩ ↦ ⟨m + k, by linarith [Int.cast_add (R := ℝ) m k]⟩,
       fun ⟨k, hk⟩ ↦ ⟨k - m, by linarith [Int.cast_sub (R := ℝ) k m]⟩⟩

@@ -84,14 +84,12 @@ theorem IsTiling.sum_fgArea {ι : Type} [Fintype ι] {R : Rectangle} {T : ι →
       (((nth_idxB i).le.trans (T i).hy).trans (nth_idxT i).ge))).trans ?_).symm
   rw [nth_idxL, nth_idxR, nth_idxB, nth_idxT, fgArea]
 
-/-! ### Tilings by tiles all of one designation -/
+/-! ### Tilings by H-tiles, or by V-tiles -/
 
-/-- **A tiling all of whose tiles have integer width tiles a rectangle of integer width.** The
-fg-area for the fractional part horizontally and the identity vertically vanishes on every tile,
-hence on `R`. -/
+/-- **A tiling by H-tiles tiles a rectangle of integer width.** The fg-area for the fractional
+part horizontally and the identity vertically vanishes on every tile, hence on `R`. -/
 theorem intWidth_of_forall {ι : Type} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
-    (hT : IsTiling R T) (hy : R.y₀ < R.y₁)
-    (h : ∀ i, ∃ m : ℤ, (T i).width = m) : ∃ m : ℤ, R.width = m := by
+    (hT : IsTiling R T) (hy : R.y₀ < R.y₁) (h : ∀ i, (T i).IsHTile) : R.IsHTile := by
   have key := hT.sum_fgArea Int.fract id
   rw [Finset.sum_eq_zero fun i _ ↦ ?_] at key
   · rw [fgArea] at key
@@ -105,10 +103,10 @@ theorem intWidth_of_forall {ι : Type} [Fintype ι] {R : Rectangle} {T : ι → 
     rw [fgArea, Int.fract_eq_fract.mpr ⟨m, by simpa [Rectangle.width] using hm⟩, sub_self,
       zero_mul]
 
-/-- **A tiling all of whose tiles have integer height tiles a rectangle of integer height.** -/
+/-- **A tiling by V-tiles tiles a rectangle of integer height**: transposed, it is a tiling by
+H-tiles. -/
 theorem intHeight_of_forall {ι : Type} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
-    (hT : IsTiling R T) (hx : R.x₀ < R.x₁)
-    (h : ∀ i, ∃ m : ℤ, (T i).height = m) : ∃ m : ℤ, R.height = m :=
+    (hT : IsTiling R T) (hx : R.x₀ < R.x₁) (h : ∀ i, (T i).IsVTile) : R.IsVTile :=
   intWidth_of_forall hT.transpose hx h
 
 end IntegerRectangle
