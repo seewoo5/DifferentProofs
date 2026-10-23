@@ -8,17 +8,18 @@ public import DifferentProofs.IntegerRectangle.GridRefinement
 
 Wagon's tenth proof, the variation on Robinson's induction due to Richard Bishop and Wagon. Call a
 tile an *H-tile* if it is designated by its integer width and a *V-tile* if it is designated by
-its integer height. A *V-link* is a maximal vertical segment of the tiling whose interior is
-crossed by no horizontal segment, and an *H-link* is its horizontal counterpart. A link is
-*reducible* if it is a V-link with only H-tiles along one of its sides, or an H-link with only
-V-tiles along one of its sides. Given a reducible V-link with only H-tiles on its right, let `w`
-be the width of the narrowest of them and push the tiles on its left `w` units rightwards: heights
-never change, so V-tiles stay V-tiles, and widths change by the integer `w`, so H-tiles stay
-H-tiles — while the narrowest tile on the right is squeezed away and the tiling loses a tile.
-Induction on the number of tiles then reduces everything to the claim that a reducible link always
-exists, and if none did there would be a chain of H-tiles running from the bottom of `R` to its
-top and a chain of V-tiles running from its left to its right, and those two chains would have to
-cross.
+its integer height; here the H-tiles are the tiles of integer width (`Rectangle.IsHTile`), a tile
+with both sides integral among them, and the V-tiles the others. A *V-link* is a maximal vertical
+segment of the tiling whose interior is crossed by no horizontal segment, and an *H-link* is its
+horizontal counterpart. A link is *reducible* if it is a V-link with only H-tiles along one of its
+sides, or an H-link with only V-tiles along one of its sides. Given a reducible V-link with only
+H-tiles on its right, let `w` be the width of the narrowest of them and push the tiles on its left
+`w` units rightwards: heights never change, so V-tiles stay V-tiles, and widths change by the
+integer `w`, so H-tiles stay H-tiles — while the narrowest tile on the right is squeezed away and
+the tiling loses a tile. Induction on the number of tiles then reduces everything to the claim
+that a reducible link always exists, and if none did there would be a chain of H-tiles running
+from the bottom of `R` to its top and a chain of V-tiles running from its left to its right, and
+those two chains would have to cross.
 
 Only one of each symmetric pair is developed here and the rest are read off it. H-links are the
 V-links of the transposed tiling (`IsTiling.transpose`), so nothing horizontal is defined
@@ -784,7 +785,7 @@ omit [Fintype ι] in
 /-- Pushing preserves having an integer side: heights never change, and widths change by the
 integer `w`, so V-tiles stay V-tiles and H-tiles stay H-tiles. -/
 private lemma hasIntegerSide_push (hp : Proper T) (hsides : ∀ i, (T i).HasIntegerSide)
-    (hred : ∀ i, IsRight l i → ∃ m : ℤ, (T i).width = m) {wm : ℤ} (hwm : w = wm) (i : ι) :
+    (hred : ∀ i, IsRight l i → (T i).IsHTile) {wm : ℤ} (hwm : w = wm) (i : ι) :
     (push l w hw hR i).HasIntegerSide := by
   have hy : (push l w hw hR i).height = (T i).height := by
     simp only [Rectangle.height, push_y₀, push_y₁]
@@ -810,8 +811,8 @@ private def IH (n : ℕ) : Prop :=
   ∀ (ι : Type) [Fintype ι] (R : Rectangle) (T : ι → Rectangle),
     Fintype.card ι ≤ n → IsTiling R T → (∀ i, (T i).HasIntegerSide) → R.HasIntegerSide
 
-/-- **One step of the induction.** A tiling with a V-link all of whose tiles on the right have
-integer width has an integer side, provided every tiling with fewer tiles does: push the tiles on
+/-- **One step of the induction.** A tiling with a V-link all of whose tiles on the right are
+H-tiles has an integer side, provided every tiling with fewer tiles does: push the tiles on
 the left of the link rightwards by the width `w` of the narrowest tile on its right. Heights never
 change and widths change by the integer `w`, so every tile keeps an integer side, while the
 narrowest tile on the right is squeezed to nothing — discarding it, the new tiling has fewer
@@ -819,7 +820,7 @@ tiles and the induction hypothesis applies. -/
 private theorem step_of_reducible_right {n : ℕ} (ih : ∀ m, m < n → IH m)
     (hcard : Fintype.card ι ≤ n) (hT : IsTiling R T) (hp : Proper T) (hRx : R.x₀ < R.x₁)
     (hRy : R.y₀ < R.y₁) (hsides : ∀ i, (T i).HasIntegerSide) (l : Link R T)
-    (hred : ∀ i, IsRight l i → ∃ m : ℤ, (T i).width = m) : R.HasIntegerSide := by
+    (hred : ∀ i, IsRight l i → (T i).IsHTile) : R.HasIntegerSide := by
   classical
   obtain ⟨k, hk, -, -⟩ := exists_isRight hT hp l l.lo_lt_hi le_rfl
   obtain ⟨i₀, hi₀, hmin⟩ := Finset.exists_min_image (Finset.univ.filter fun i ↦ IsRight l i)
@@ -851,26 +852,24 @@ the left-handed case is its image under the reflection in the vertical axis. -/
 private theorem step_of_reducible {n : ℕ} (ih : ∀ m, m < n → IH m)
     (hcard : Fintype.card ι ≤ n) (hT : IsTiling R T) (hp : Proper T) (hRx : R.x₀ < R.x₁)
     (hRy : R.y₀ < R.y₁) (hsides : ∀ i, (T i).HasIntegerSide) (l : Link R T)
-    (hl : l.Reducible fun i ↦ ∃ m : ℤ, (T i).width = m) : R.HasIntegerSide := by
+    (hl : l.Reducible fun i ↦ (T i).IsHTile) : R.HasIntegerSide := by
   obtain hred | hred := hl
   · exact step_of_reducible_right ih hcard hT hp hRx hRy hsides l hred
   · refine Rectangle.hasIntegerSide_reflectX.mp (step_of_reducible_right ih hcard hT.reflectX
       (properReflectX hp) ?_ hRy (fun i ↦ Rectangle.hasIntegerSide_reflectX.mpr (hsides i))
-      l.reflectX fun i hi ↦ ?_)
-    · simpa [Rectangle.reflectX] using hRx
-    · simpa using hred i (isRight_reflectX.mp hi)
+      l.reflectX fun i hi ↦ Rectangle.isHTile_reflectX.mpr (hred i (isRight_reflectX.mp hi)))
+    simpa [Rectangle.reflectX] using hRx
 
 /-- **A reducible H-link loses a tile**: a reducible V-link of the transposed tiling, whose
-V-tiles — the tiles with no integer width — have integer width once transposed. -/
+V-tiles, the tiles that are not H-tiles, become H-tiles once transposed. -/
 private theorem step_of_reducible_transpose {n : ℕ} (ih : ∀ m, m < n → IH m)
     (hcard : Fintype.card ι ≤ n) (hT : IsTiling R T) (hp : Proper T) (hRx : R.x₀ < R.x₁)
     (hRy : R.y₀ < R.y₁) (hsides : ∀ i, (T i).HasIntegerSide)
     (l : Link R.transpose fun i ↦ (T i).transpose)
-    (hl : l.Reducible fun i ↦ ¬ ∃ m : ℤ, (T i).width = m) : R.HasIntegerSide := by
-  refine Rectangle.hasIntegerSide_transpose.mp (step_of_reducible ih hcard hT.transpose
+    (hl : l.Reducible fun i ↦ ¬ (T i).IsHTile) : R.HasIntegerSide :=
+  Rectangle.hasIntegerSide_transpose.mp (step_of_reducible ih hcard hT.transpose
     (properTranspose hp) hRy hRx (fun i ↦ Rectangle.hasIntegerSide_transpose.mpr (hsides i)) l
-    (hl.imp fun i hi ↦ ?_))
-  simpa using (hsides i).resolve_left hi
+    (hl.imp fun i hi ↦ Rectangle.isHTile_transpose.mpr ((hsides i).isVTile_of_not_isHTile hi)))
 
 end IntegerRectangle.ReducibleLink
 
@@ -896,14 +895,14 @@ theorem IntegerRectangleTheorem_ReducibleLink : IntegerRectangleTheorem := by
         obtain ⟨i₀, hi₀⟩ := not_forall.mp hp
         have hlt := Fintype.card_subtype_lt (p := fun i ↦ (T i).Nondegenerate) hi₀
         exact ih _ (hlt.trans_le hcard) _ R _ le_rfl (hT.proper hRx hRy) fun i ↦ hsides i.1
-      by_cases hH : ∀ i, ∃ m : ℤ, (T i).width = m
+      by_cases hH : ∀ i, (T i).IsHTile
       · exact Or.inl (intWidth_of_forall hT hRy hH)
-      by_cases hV : ∀ i, ¬ ∃ m : ℤ, (T i).width = m
-      · exact Or.inr (intHeight_of_forall hT hRx fun i ↦ (hsides i).resolve_left (hV i))
+      by_cases hV : ∀ i, ¬ (T i).IsHTile
+      · exact Or.inr (intHeight_of_forall hT hRx fun i ↦ (hsides i).isVTile_of_not_isHTile (hV i))
       obtain ⟨b, hb⟩ := not_forall.mp hH
       obtain ⟨a, ha⟩ := not_forall.mp hV
       obtain ⟨l, hl⟩ | ⟨l, hl⟩ :=
-        exists_reducible (H := fun i ↦ ∃ m : ℤ, (T i).width = m) hT hp (not_not.mp ha) hb
+        exists_reducible (H := fun i ↦ (T i).IsHTile) hT hp (not_not.mp ha) hb
       · exact step_of_reducible ih hcard hT hp hRx hRy hsides l hl
       · exact step_of_reducible_transpose ih hcard hT hp hRx hRy hsides l hl
   intro ι _ R T hT hsides

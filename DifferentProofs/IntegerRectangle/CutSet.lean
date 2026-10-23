@@ -14,13 +14,14 @@ the vertical bisector of its tile embeds `Γ` in the plane, and the faces of the
 V-links of the tiling, "in the terminology of the preceding proof", with the two outer faces on
 either side of the exterior edge.
 
-Call a tile a V-tile when its height is an integer; by hypothesis the others, the H-tiles, have
-integer width. Let `S` consist of the exterior edge and the edges of the H-tiles. If deleting `S`
-leaves the bottom of `R` joined to its top, the path climbs across V-tiles and the height of `R`
-is an integer (`CutSet.int_sub_y₀_of_reflTransGen`). Otherwise a minimal `S' ⊆ S` cutting the
-bottom off from the top is a bond of `Γ` (`Graph.isBond_of_minimal`), and by the well-known
-theorem on planar graphs that Wagon cites, its edges form a cycle of the dual graph `Γ*`
-(`CombinatorialMap.IsPlanar.isCycle_of_isBond`). The cycle passes through the exterior edge,
+Call a tile a V-tile when its height is an integer (`Rectangle.IsVTile`), a tile with both sides
+integral among them; by hypothesis the others, the H-tiles, have integer width
+(`Rectangle.IsHTile`). Let `S` consist of the exterior edge and the edges of the H-tiles. If
+deleting `S` leaves the bottom of `R` joined to its top, the path climbs across V-tiles and the
+height of `R` is an integer (`CutSet.int_sub_y₀_of_reflTransGen`). Otherwise a minimal `S' ⊆ S`
+cutting the bottom off from the top is a bond of `Γ` (`Graph.isBond_of_minimal`), and by the
+well-known theorem on planar graphs that Wagon cites, its edges form a cycle of the dual graph
+`Γ*` (`CombinatorialMap.IsPlanar.isCycle_of_isBond`). The cycle passes through the exterior edge,
 which alone joins the bottom to the top, and the rest of it is a path from the left outer face to
 the right one across H-tiles, each step moving the abscissa by the integer width of the tile
 crossed: the width of `R` is an integer (`CutSet.intWidth_of_not_reflTransGen`).
@@ -1899,11 +1900,10 @@ variable (hT : IsTiling R T) (hp : Proper T) (hx : R.x₀ < R.x₁) (hy : R.y₀
 include hT hp hx hy
 
 /-- **First alternative: a path of V-tiles.** A vertex reached from the bottom of `R` in Seymour's
-graph with the edges of `S` deleted, `S` containing the exterior edge and every tile of
-non-integer height, sits an integer distance above the bottom of `R`: each step crosses a tile of
-integer height. -/
+graph with the edges of `S` deleted, `S` containing the exterior edge and every tile that is not
+a V-tile, sits an integer distance above the bottom of `R`: each step crosses a V-tile. -/
 lemma int_sub_y₀_of_reflTransGen {S : Set (Option ι)}
-    (hS : ∀ i, some i ∉ S → ∃ m : ℤ, (T i).height = m) (hnone : none ∈ S) {s : Seg T}
+    (hS : ∀ i, some i ∉ S → (T i).IsVTile) (hnone : none ∈ S) {s : Seg T}
     (h : Relation.ReflTransGen ((seymourMap hT hp hx hy).graph.deleteEdges S).Adj
       (vert hT hx hy (none, false)) s) :
     ∃ m : ℤ, s.y - R.y₀ = m := by
@@ -1931,16 +1931,16 @@ lemma int_sub_y₀_of_reflTransGen {S : Set (Option ι)}
       linarith
 
 /-- **Second alternative: a dual path of H-tiles.** When the bottom of `R` is cut off from its top
-in Seymour's graph with the edges of `S` deleted, `S` containing the exterior edge and the tiles
-of non-integer height only, a minimal `S' ⊆ S` cutting them off is a bond, which by planar duality
-is a cycle of the dual graph. The cycle passes through the exterior edge, since that edge alone
-joins the bottom to the top, and the rest of it is a path from the left outer face to the right
-one across H-tiles, each step moving the abscissa by the integer width of the tile crossed. -/
+in Seymour's graph with the edges of `S` deleted, `S` containing only the exterior edge and tiles
+that are not V-tiles, a minimal `S' ⊆ S` cutting them off is a bond, which by planar duality is a
+cycle of the dual graph. The cycle passes through the exterior edge, since that edge alone joins
+the bottom to the top, and the rest of it is a path from the left outer face to the right one
+across H-tiles, each step moving the abscissa by the integer width of the tile crossed. -/
 lemma intWidth_of_not_reflTransGen (hsides : ∀ i, (T i).HasIntegerSide) {S : Set (Option ι)}
-    (hS : ∀ i, some i ∈ S → ¬ ∃ m : ℤ, (T i).height = m)
+    (hS : ∀ i, some i ∈ S → ¬ (T i).IsVTile)
     (h : ¬ Relation.ReflTransGen ((seymourMap hT hp hx hy).graph.deleteEdges S).Adj
       (vert hT hx hy (none, false)) (vert hT hx hy (none, true))) :
-    ∃ m : ℤ, R.width = m := by
+    R.IsHTile := by
   classical
   set M := seymourMap hT hp hx hy
   -- A minimal `S' ⊆ S` cutting the bottom off from the top: a bond.
@@ -1967,7 +1967,7 @@ lemma intWidth_of_not_reflTransGen (hsides : ∀ i, (T i).HasIntegerSide) {S : S
     · exact absurd (he (hd.symm.trans hk₀.symm)) hk
     · exact absurd (he (hd.symm.trans hk₀.symm)) hk
     · rw [← show some i = e k from hd] at hek
-      obtain ⟨w, hw⟩ := (hsides i).resolve_right (hS i (hS'S hek))
+      obtain ⟨w, hw⟩ := (hsides i).isHTile_of_not_isVTile (hS i (hS'S hek))
       rw [Rectangle.width] at hw
       refine ⟨-w, ?_⟩
       rw [← hdv, ← hdv']
@@ -1976,7 +1976,7 @@ lemma intWidth_of_not_reflTransGen (hsides : ∀ i, (T i).HasIntegerSide) {S : S
       push_cast
       linarith
     · rw [← show some i = e k from hd] at hek
-      obtain ⟨w, hw⟩ := (hsides i).resolve_right (hS i (hS'S hek))
+      obtain ⟨w, hw⟩ := (hsides i).isHTile_of_not_isVTile (hS i (hS'S hek))
       rw [Rectangle.width] at hw
       refine ⟨w, ?_⟩
       rw [← hdv, ← hdv']
@@ -2016,11 +2016,10 @@ end IntegerRectangle
 
 open IntegerRectangle IntegerRectangle.CutSet in
 /-- **Minimal cut-set proof** (Seymour) of the integer-rectangle tiling theorem. In Seymour's graph
-of the nondegenerate tiles, delete the exterior edge and the tiles of non-integer height: either
-the top of `R` stays reachable from the bottom, across tiles of integer height, and the height of
-`R` is an integer; or a minimal set of deleted edges cutting it off is a bond, whose dual is a
-cycle through the exterior edge, and the rest of that cycle crosses `R` from left to right over
-tiles of integer width. -/
+of the nondegenerate tiles, delete the exterior edge and the tiles that are not V-tiles: either
+the top of `R` stays reachable from the bottom, across V-tiles, and the height of `R` is an
+integer; or a minimal set of deleted edges cutting it off is a bond, whose dual is a cycle through
+the exterior edge, and the rest of that cycle crosses `R` from left to right over H-tiles. -/
 theorem IntegerRectangleTheorem_CutSet : IntegerRectangleTheorem := by
   intro ι _ R T hT hsides
   classical
@@ -2031,7 +2030,7 @@ theorem IntegerRectangleTheorem_CutSet : IntegerRectangleTheorem := by
   have hT' := hT.proper hx hy
   have hp' := proper_properTiles T
   set S : Set (Option {i // (T i).Nondegenerate}) :=
-    {e | ∀ i, e = some i → ¬ ∃ m : ℤ, (properTiles T i).height = m}
+    {e | ∀ i, e = some i → ¬ (properTiles T i).IsVTile}
   by_cases hreach : Relation.ReflTransGen
       ((seymourMap hT' hp' hx hy).graph.deleteEdges S).Adj (vert hT' hx hy (none, false))
       (vert hT' hx hy (none, true))

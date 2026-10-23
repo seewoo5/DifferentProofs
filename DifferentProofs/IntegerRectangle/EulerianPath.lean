@@ -7,14 +7,15 @@ public import DifferentProofsForMathlib.Algebra.Order.Floor.Ring
 # The integer-rectangle theorem by an Eulerian path
 
 Wagon's seventh proof, due to Michael S. Paterson. Let `Γ` be the graph whose vertices are the
-corners of the tiles, two of them joined whenever they are the two ends of a horizontal side of a
-tile of integer width, or of a vertical side of a tile of integer height (`IsSide`, `Adj`). A tile
-having a vertex as a corner contributes exactly one edge there, so the degree of a vertex is the
-number of tiles having it as a corner: `2` or `4` away from the corners of `R`, by the local
-picture of how tiles fit together, and `1` at a corner of `R`. A walk that starts at a corner of
-`R` and repeats no edge can therefore not stop before it reaches another corner of `R`. Every edge
-of `Γ` is a segment of integer length parallel to an axis, so the ends of the walk differ by a
-vector with integer entries, and that is an integer side of `R`.
+corners of the tiles, two of them joined whenever they are the two ends of a horizontal side of an
+H-tile, a tile of integer width, or of a vertical side of a V-tile, a tile of integer height
+(`Rectangle.IsHTile`, `Rectangle.IsVTile`, `IsSide`, `Adj`). A tile having a vertex as a corner
+contributes exactly one edge there, so the degree of a vertex is the number of tiles having it as
+a corner: `2` or `4` away from the corners of `R`, by the local picture of how tiles fit
+together, and `1` at a corner of `R`. A walk that starts at a corner of `R` and repeats no edge
+can therefore not stop before it reaches another corner of `R`. Every edge of `Γ` is a segment of
+integer length parallel to an axis, so the ends of the walk differ by a vector with integer
+entries, and that is an integer side of `R`.
 
 Both ingredients survive here. The walk is `Reachable`, the reflexive-transitive closure of `Adj`;
 it preserves the pair of fractional parts of a point (`fracts_eq_of_reachable`), which is the
@@ -42,12 +43,12 @@ namespace IntegerRectangle.EulerianPath
 variable {ι : Type} {R : Rectangle} {T : ι → Rectangle} {p q : ℝ × ℝ}
 
 /-- `IsSide S p q` says that `p` and `q` are the two ends of one of the two sides of `S` that
-Paterson's graph uses: the horizontal sides of `S` when its width is an integer, the vertical
-sides when its height is. -/
+Paterson's graph uses: the horizontal sides of `S` when it is an H-tile, the vertical sides when
+it is a V-tile. -/
 def IsSide (S : Rectangle) (p q : ℝ × ℝ) : Prop :=
-  ((∃ n : ℤ, S.width = n) ∧
+  (S.IsHTile ∧
       ((p = (S.x₀, S.y₀) ∧ q = (S.x₁, S.y₀)) ∨ (p = (S.x₀, S.y₁) ∧ q = (S.x₁, S.y₁)))) ∨
-    ((∃ n : ℤ, S.height = n) ∧
+    (S.IsVTile ∧
       ((p = (S.x₀, S.y₀) ∧ q = (S.x₀, S.y₁)) ∨ (p = (S.x₁, S.y₀) ∧ q = (S.x₁, S.y₁))))
 
 /-- Adjacency in Paterson's graph `Γ`: two corners of a tile joined by a side of it that `Γ`
@@ -114,7 +115,8 @@ private lemma even_sum_cornerCount_tile (hsides : ∀ i, (T i).HasIntegerSide) (
   have key : ∀ {p q : ℝ × ℝ}, IsSide (T i) p q → p ∈ cornerFinset (T i) →
       q ∈ cornerFinset (T i) → (p ∈ component R T ↔ q ∈ component R T) :=
     fun h hp hq ↦ mem_component_iff ⟨i, Or.inl h⟩ (corner_mem_vertices hp) (corner_mem_vertices hq)
-  refine even_sum_cornerCount_of_sides _ ((hsides i).imp (fun h ↦ ⟨?_, ?_⟩) fun h ↦ ⟨?_, ?_⟩) <;>
+  refine even_sum_cornerCount_of_sides _
+    ((Rectangle.hasIntegerSide_iff.mp (hsides i)).imp (fun h ↦ ⟨?_, ?_⟩) fun h ↦ ⟨?_, ?_⟩) <;>
     exact key (by simp [IsSide, h]) (by simp [cornerFinset]) (by simp [cornerFinset])
 
 /-! ### The proof -/
