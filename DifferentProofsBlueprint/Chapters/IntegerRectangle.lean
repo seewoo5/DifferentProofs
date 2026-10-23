@@ -38,7 +38,8 @@ Wagon's theorem on tiling a rectangle by rectangles with an integer side.
 Stan Wagon's theorem (*Fourteen Proofs of a Result About Tiling a Rectangle*, Amer. Math. Monthly
 $`94` (1987) 601–617) states: whenever a rectangle is tiled by finitely many rectangles, each of
 which has at least one integer side, then the tiled rectangle has at least one integer side. Here a
-*tiling* is a covering by axis-parallel rectangles with pairwise-disjoint interiors.
+*tiling* is a covering by axis-parallel rectangles of positive width and height with
+pairwise-disjoint interiors.
 :::
 
 The first three proofs below are analytic and share one mechanism. To a rectangle $`[a,b] \times [c,d]` attach the
@@ -365,10 +366,10 @@ unit wide or one unit tall.
 :::
 
 :::proof "lem:int-rect-normalize"
-Discard the degenerate tiles and cut each remaining tile into unit pieces along a side of integer
-length, of which it has at least one, and which is at least one unit long since the tile is
-nondegenerate. The half-open cells of the pieces of a tile partition its own, so the cells of all
-the pieces still partition those of $`R`.
+Cut each tile into unit pieces along a side of integer length, of which it has at least one, and
+which is at least one unit long since the tile has positive width and height. The half-open cells of
+the pieces of a tile partition its own, so the cells of all the pieces still partition those of
+$`R`.
 :::
 
 :::lemma_ "lem:int-rect-column" (parent := "grp:int-rect") (lean := "IntegerRectangle.Staircase.exists_column")
@@ -412,10 +413,11 @@ strip one unit leftwards tiles the rectangle one unit narrower.
 :::proof "lem:int-rect-cut"
 Each tile is cut at a single abscissa: its right edge if it lies left of the strip, its left edge
 less one if it lies right of the strip, and the left edge of the strip if it lies inside it — and
-since the staircase is a wall {uses "lem:int-rect-staircase"}[] the same alternative holds at all
-of that tile's heights. A point of the shrunken rectangle left of the strip comes from the point
-itself and one to its right from its translate one unit rightwards, so the half-open cells of the
-pieces partition those of the shrunken rectangle.
+since the staircase is a wall {uses "lem:int-rect-staircase"}[] the same alternative holds at all of
+that tile's heights. A point of the shrunken rectangle left of the strip comes from the point itself
+and one to its right from its translate one unit rightwards, so the half-open cells of the pieces
+partition those of the shrunken rectangle. Pieces of zero width have empty cells and are discarded;
+a tile inside the strip leaves only such pieces.
 :::
 
 :::theorem "thm:int-rect-induction" (parent := "grp:int-rect") (lean := "IntegerRectangleTheorem_Staircase") (proofColor := "#fbcfe8")
@@ -458,14 +460,16 @@ horizontal edge arriving at the line from both sides — would share a point wit
 :::lemma_ "lem:int-rect-link-push" (parent := "grp:int-rect") (lean := "IntegerRectangle.ReducibleLink.isTiling_push")
 Let $`T` tile $`R`, let a V-link of the tiling be given, and let $`w > 0` be at most the width of
 every tile abutting the link on its right. Pushing every tile on the left of the link $`w` units
-rightwards, and paring every tile on its right back by $`w`, again tiles $`R`.
+rightwards, and paring every tile on its right back by $`w`, again tiles $`R`, once the tiles
+squeezed to zero width are discarded.
 :::
 
 :::proof "lem:int-rect-link-push"
 The tiles on either side of the link cut it into consecutive pieces
 {uses "lem:int-rect-link-side"}[], so the strip of width $`w` that the tiles on the left sweep out
 is exactly the strip that the tiles on the right vacate; no other tile can reach into it, and the
-half-open cells of the new family therefore still partition those of $`R`.
+half-open cells of the new family therefore still partition those of $`R`. A tile squeezed to zero
+width has an empty cell, so discarding it changes nothing.
 :::
 
 :::lemma_ "lem:int-rect-link-exists" (parent := "grp:int-rect") (lean := "IntegerRectangle.ReducibleLink.exists_reducible")
@@ -490,16 +494,15 @@ A rectangle tiled by rectangles each with an integer side has an integer side.
 :::
 
 :::proof "thm:int-rect-links"
-Induct on the number of tiles. Degenerate tiles have empty half-open cells and may be discarded.
-If every tile has integer width the fg-area for the fractional part horizontally and the identity
-vertically vanishes on every tile, hence on $`R`, so $`R` has integer width; likewise if every
-tile has integer height. Otherwise some link is reducible {uses "lem:int-rect-link-exists"}[], say
-a V-link with only H-tiles on its right; take for $`w` the width of the narrowest of them and push
-{uses "lem:int-rect-link-push"}[]. Heights never change, so V-tiles stay V-tiles, and widths change
-by the integer $`w`, so H-tiles stay H-tiles; but the narrowest tile on the right is squeezed to
-nothing, so the new tiling of $`R` has fewer tiles and the induction hypothesis applies. The three
-other ways a link can be reducible are this one read in the mirror image of the tiling, in its
-transpose, and in the mirror image of its transpose.
+Induct on the number of tiles. If every tile has integer width the fg-area for the fractional part
+horizontally and the identity vertically vanishes on every tile, hence on $`R`, so $`R` has integer
+width; likewise if every tile has integer height. Otherwise some link is reducible
+{uses "lem:int-rect-link-exists"}[], say a V-link with only H-tiles on its right; take for $`w` the
+width of the narrowest of them and push {uses "lem:int-rect-link-push"}[]. Heights never change, so
+V-tiles stay V-tiles, and widths change by the integer $`w`, so H-tiles stay H-tiles; but the
+narrowest tile on the right is squeezed to nothing, so the new tiling of $`R` has fewer tiles and
+the induction hypothesis applies. The three other ways a link can be reducible are this one read in
+the mirror image of the tiling, in its transpose, and in the mirror image of its transpose.
 :::
 
 Eleventh proof: a minimal cut-set (Paul Seymour, Bell Communications Research). Form a graph
@@ -605,10 +608,9 @@ A rectangle tiled by rectangles each with an integer side has an integer side.
 :::
 
 :::proof "thm:int-rect-cut"
-Prune the tiling to its nondegenerate tiles, form Seymour's graph
-{uses "lem:int-rect-cut-vertices"}[] and delete $`S`. If the top of $`R` is still reachable
-from the bottom, the height of $`R` is an integer {uses "lem:int-rect-cut-steps"}[]; otherwise
-the width is {uses "lem:int-rect-cut-path"}[].
+Form Seymour's graph {uses "lem:int-rect-cut-vertices"}[] and delete $`S`. If the top of $`R` is
+still reachable from the bottom, the height of $`R` is an integer {uses "lem:int-rect-cut-steps"}[];
+otherwise the width is {uses "lem:int-rect-cut-path"}[].
 :::
 
 Twelfth proof: a sweep line (Bachman–Yannakakis). This one does not use the analytic engine above.
