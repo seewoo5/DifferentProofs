@@ -18,9 +18,8 @@ lower-left corner of `R`, and rather than the tile corners we sum over *all* its
 (`latticeIcc`), which changes nothing since a non-corner contributes `0` on both sides. Corners
 are counted with multiplicity (`cornerCount`), so degenerate tiles need no separate treatment.
 
-The double count itself is `IsTiling.even_sum_cornerCount`, shared with the seventh proof: the
-grid `X ×ˢ Y` here plays the part played there by a connected component of the graph of tile
-sides.
+The double count itself is `IsTiling.even_sum_cornerCount`, which sums over the grid `X ×ˢ Y` the
+corner parity that the seventh proof uses point by point.
 -/
 
 @[expose] public section

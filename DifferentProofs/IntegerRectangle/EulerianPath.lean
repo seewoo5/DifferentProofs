@@ -2,29 +2,41 @@ module
 
 public import DifferentProofs.IntegerRectangle.CornerCount
 public import DifferentProofsForMathlib.Algebra.Order.Floor.Ring
+public import DifferentProofsForMathlib.Combinatorics.Graph.DartPairing
 
 /-!
 # The integer-rectangle theorem by an Eulerian path
 
 Wagon's seventh proof, due to Michael S. Paterson. Let `Γ` be the graph whose vertices are the
 corners of the tiles, two of them joined whenever they are the two ends of a horizontal side of an
-H-tile, a tile of integer width, or of a vertical side of a V-tile, a tile of integer height
-(`Rectangle.IsHTile`, `Rectangle.IsVTile`, `IsSide`, `Adj`). A tile having a vertex as a corner
-contributes exactly one edge there, so the degree of a vertex is the number of tiles having it as
-a corner: `2` or `4` away from the corners of `R`, by the local picture of how tiles fit
-together, and `1` at a corner of `R`. A walk that starts at a corner of `R` and repeats no edge
-can therefore not stop before it reaches another corner of `R`. Every edge of `Γ` is a segment of
-integer length parallel to an axis, so the ends of the walk differ by a vector with integer
-entries, and that is an integer side of `R`.
+H-tile, a tile of integer width, or of a vertical side of a V-tile, a tile of integer height. A
+tile having a vertex as a corner contributes exactly one edge there, so the degree of a vertex is
+the number of tiles having it as a corner: `2` or `4` away from the corners of `R`, by the local
+picture of how tiles fit together, and `1` at a corner of `R`. A walk that starts at a corner of
+`R` and repeats no edge can therefore not stop before it reaches another corner of `R`. Every
+edge of `Γ` is a segment of integer length parallel to an axis, so the ends of the walk differ by
+a vector with integer entries, and that is an integer side of `R`.
 
-Both ingredients survive here. The walk is `Reachable`, the reflexive-transitive closure of `Adj`;
-it preserves the pair of fractional parts of a point (`fracts_eq_of_reachable`), which is the
-integrality of the edges. The vertex degrees are used only through their parity, and that parity
-is the corner parity of `CornerCount`, so the trail is not built step by step: the corners of the
-tiles in the connected component of the lower-left corner of `R` are evenly many, because every
-edge of `Γ` has both or neither of its ends in the component, hence so are the corners of `R`
-there (`IsTiling.even_sum_cornerCount`). One of them is the lower-left corner itself, so there is
-a second one — a corner of `R` reached by a walk (`exists_reachable_corner`).
+`Γ` is built as a multigraph (`patersonGraph`), through its darts (`patersonDarts`): a dart is a
+tile together with one of its four corners, and the two darts of an edge are the two ends of a
+side of a tile. Each tile contributes two opposite sides, its horizontal ones if it is an H-tile
+and its vertical ones otherwise, so that a tile with both sides integral counts as an H-tile, as
+in the staircase and reducible-link proofs. Labelling each dart by its corner point gives `Γ`
+(`DartPairing.labelGraph`). It is not a simple graph: two H-tiles of the same width stacked on
+each other share a side, which is a double edge of `Γ`. Its vertices are all the points of the
+plane, those that are not corners of tiles being isolated.
+
+The degree of a vertex is the number of darts at it, which is the number of corners the tiles have
+there (`card_darts_eq`), and only its parity is used. That is the corner parity of `CornerCount`,
+which replaces Wagon's local picture: unless `R` is degenerate, the vertices of odd degree are
+exactly its corners (`odd_card_darts_iff`).
+
+Paterson walks a trail from a corner of `R` until it gets stuck. Mathlib's multigraphs have no
+walks yet, so the handshake lemma stands in for the trail: a vertex of odd degree is joined by a
+chain of edges to another vertex of odd degree (`DartPairing.exists_ne_reflTransGen_of_odd`). For
+the lower-left corner of `R` that is another corner of `R` (`exists_reachable_corner`). A chain of
+edges of `Γ` preserves the pair of fractional parts of a point (`fracts_eq_of_reachable`), which
+is the integrality of the edges.
 
 ## Main result
 
@@ -38,28 +50,55 @@ open Finset
 
 namespace IntegerRectangle.EulerianPath
 
-/-! ### Paterson's graph -/
-
 variable {ι : Type} {R : Rectangle} {T : ι → Rectangle} {p q : ℝ × ℝ}
 
-/-- `IsSide S p q` says that `p` and `q` are the two ends of one of the two sides of `S` that
-Paterson's graph uses: the horizontal sides of `S` when it is an H-tile, the vertical sides when
-it is a V-tile. -/
-def IsSide (S : Rectangle) (p q : ℝ × ℝ) : Prop :=
-  (S.IsHTile ∧
-      ((p = (S.x₀, S.y₀) ∧ q = (S.x₁, S.y₀)) ∨ (p = (S.x₀, S.y₁) ∧ q = (S.x₁, S.y₁)))) ∨
-    (S.IsVTile ∧
-      ((p = (S.x₀, S.y₀) ∧ q = (S.x₀, S.y₁)) ∨ (p = (S.x₁, S.y₀) ∧ q = (S.x₁, S.y₁))))
+/-! ### Paterson's graph -/
 
-/-- Adjacency in Paterson's graph `Γ`: two corners of a tile joined by a side of it that `Γ`
-uses. -/
-def Adj (T : ι → Rectangle) (p q : ℝ × ℝ) : Prop := ∃ i, IsSide (T i) p q ∨ IsSide (T i) q p
+/-- The corner of the tile `T d.1` named by `d.2`: on its right side if `d.2.1`, on its top side
+if `d.2.2`. -/
+def corner (T : ι → Rectangle) (d : ι × Bool × Bool) : ℝ × ℝ :=
+  (if d.2.1 then (T d.1).x₁ else (T d.1).x₀, if d.2.2 then (T d.1).y₁ else (T d.1).y₀)
 
-/-- There is a walk in `Γ` from `p` to `q`: a chain of points in which consecutive ones are the
-ends of a side of a tile that `Γ` uses. -/
-def Reachable (T : ι → Rectangle) : ℝ × ℝ → ℝ × ℝ → Prop := Relation.ReflTransGen (Adj T)
+open scoped Classical in
+/-- The other end of the side that the tile `T d.1` contributes to `Γ` at its corner `d.2`: the
+corner across its width if it is an H-tile, across its height otherwise. -/
+noncomputable def otherEnd (T : ι → Rectangle) (d : ι × Bool × Bool) : ι × Bool × Bool :=
+  if (T d.1).IsHTile then (d.1, !d.2.1, d.2.2) else (d.1, d.2.1, !d.2.2)
 
-private lemma Adj.symm (h : Adj T p q) : Adj T q p := h.imp fun _ ↦ Or.symm
+lemma otherEnd_involutive (T : ι → Rectangle) : Function.Involutive (otherEnd T) := by
+  rintro ⟨i, a, b⟩
+  by_cases h : (T i).IsHTile <;> simp only [otherEnd, h, ↓reduceIte, Bool.not_not]
+
+lemma otherEnd_ne (T : ι → Rectangle) (d : ι × Bool × Bool) : otherEnd T d ≠ d := by
+  unfold otherEnd
+  split_ifs <;>
+    simp only [ne_eq, Prod.ext_iff, Bool.not_ne_self, and_false, false_and, not_false_eq_true]
+
+open scoped Classical in
+/-- **The darts of Paterson's graph**: the pairs of a tile and one of its four corners. The edge
+`(i, b)` is the bottom or top side of `T i`, according to `b`, if `T i` is an H-tile, and its left
+or right side otherwise; its two darts are its two ends. -/
+noncomputable def patersonDarts (T : ι → Rectangle) :
+    DartPairing (ι × Bool) (ι × Bool × Bool) where
+  edgePerm := (otherEnd_involutive T).toPerm
+  edge d := (d.1, if (T d.1).IsHTile then d.2.2 else d.2.1)
+  edgePerm_edgePerm := otherEnd_involutive T
+  edgePerm_ne := otherEnd_ne T
+  edge_eq_edge_iff := by
+    rintro ⟨i, a, b⟩ ⟨i', a', b'⟩
+    simp only [Function.Involutive.coe_toPerm, otherEnd, Prod.mk.injEq]
+    by_cases hi : i = i'
+    · subst hi
+      by_cases h : (T i).IsHTile <;> simp only [h, ↓reduceIte, Prod.mk.injEq, true_and] <;>
+        revert a b a' b' <;> decide
+    · by_cases h : (T i).IsHTile <;>
+        simp only [h, hi, Ne.symm hi, ↓reduceIte, Prod.mk.injEq, false_and, or_self]
+  edge_surjective := fun e ↦ ⟨(e.1, e.2, e.2), by simp only [ite_self, Prod.mk.eta]⟩
+
+/-- **Paterson's graph** `Γ`: the darts of `patersonDarts` labelled by their corners, so that each
+side a tile contributes joins its two ends. -/
+noncomputable def patersonGraph (T : ι → Rectangle) : Graph (ℝ × ℝ) (ι × Bool) :=
+  (patersonDarts T).labelGraph (corner T)
 
 /-! ### The edges of `Γ` have integer length -/
 
@@ -67,77 +106,81 @@ private lemma Adj.symm (h : Adj T p q) : Adj T q p := h.imp fun _ ↦ Or.symm
 differ by a vector with integer entries. -/
 noncomputable def fracts (p : ℝ × ℝ) : ℝ × ℝ := (Int.fract p.1, Int.fract p.2)
 
-private lemma fracts_eq_of_isSide {S : Rectangle} (h : IsSide S p q) : fracts p = fracts q := by
-  obtain ⟨h', ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩⟩ | ⟨h', ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩⟩ := h <;>
-    simp [fracts, Int.fract_eq_fract'.mpr h']
-
-private lemma fracts_eq_of_adj (h : Adj T p q) : fracts p = fracts q :=
-  h.elim fun _ h ↦ h.elim fracts_eq_of_isSide fun h ↦ (fracts_eq_of_isSide h).symm
+private lemma fracts_eq_of_adj (hsides : ∀ i, (T i).HasIntegerSide)
+    (h : (patersonGraph T).Adj p q) : fracts p = fracts q := by
+  obtain ⟨-, ⟨i, a, b⟩, -, rfl, rfl⟩ := h
+  by_cases hH : (T i).IsHTile
+  · cases a <;> simp only [fracts, corner, patersonDarts, Function.Involutive.coe_toPerm, otherEnd,
+      hH, ↓reduceIte, Bool.not_false, Bool.not_true, Bool.false_eq_true,
+      Int.fract_eq_fract'.mpr hH]
+  · have hV := (hsides i).isVTile_of_not_isHTile hH
+    cases b <;> simp only [fracts, corner, patersonDarts, Function.Involutive.coe_toPerm, otherEnd,
+      hH, ↓reduceIte, Bool.not_false, Bool.not_true, Bool.false_eq_true,
+      Int.fract_eq_fract'.mpr hV]
 
 /-- **A walk in `Γ` moves by a vector with integer entries.** Each of its edges is a side of a
 tile whose length is an integer, and which is parallel to an axis. -/
-theorem fracts_eq_of_reachable (h : Reachable T p q) : fracts p = fracts q :=
+theorem fracts_eq_of_reachable (hsides : ∀ i, (T i).HasIntegerSide)
+    (h : Relation.ReflTransGen (patersonGraph T).Adj p q) : fracts p = fracts q :=
   Relation.reflTransGen_le_of_equivalence_of_le (r := fun p q ↦ fracts p = fracts q)
-    ⟨fun _ ↦ rfl, Eq.symm, Eq.trans⟩ (fun _ _ ↦ fracts_eq_of_adj) p q h
+    ⟨fun _ ↦ rfl, Eq.symm, Eq.trans⟩ (fun _ _ ↦ fracts_eq_of_adj hsides) p q h
 
-/-! ### The component of the lower-left corner -/
+/-! ### The degrees of `Γ` -/
 
 variable [Fintype ι]
 
-open scoped Classical in
-/-- The four corners of a rectangle. -/
-noncomputable def cornerFinset (S : Rectangle) : Finset (ℝ × ℝ) :=
-  {(S.x₀, S.y₀), (S.x₁, S.y₀), (S.x₀, S.y₁), (S.x₁, S.y₁)}
+/-- **The degree of a point in `Γ`**, the number of darts at it, is the number of corners the
+tiles have there. -/
+theorem card_darts_eq (p : ℝ × ℝ) :
+    Nat.card {d // corner T d = p} = ∑ i, cornerCount (T i) p.1 p.2 := by
+  classical
+  rw [Nat.card_eq_fintype_card, Fintype.card_subtype, card_eq_sum_ones, sum_filter,
+    Fintype.sum_prod_type]
+  refine sum_congr rfl fun i _ ↦ ?_
+  simp only [Fintype.sum_prod_type, Fintype.sum_bool, corner, cornerCount, xCount, yCount,
+    Prod.ext_iff, add_mul, mul_add, ite_zero_mul_ite_zero, mul_one, Bool.false_eq_true,
+    ↓reduceIte]
+  ring
 
-open scoped Classical in
-/-- The vertices of `Γ`: the corners of the tiles, together with those of `R`. -/
-noncomputable def vertices (R : Rectangle) (T : ι → Rectangle) : Finset (ℝ × ℝ) :=
-  cornerFinset R ∪ univ.biUnion fun i ↦ cornerFinset (T i)
-
-open scoped Classical in
-/-- The connected component of the lower-left corner of `R` in `Γ`: the vertices that a walk
-starting there reaches. -/
-noncomputable def component (R : Rectangle) (T : ι → Rectangle) : Finset (ℝ × ℝ) :=
-  (vertices R T).filter (Reachable T (R.x₀, R.y₀))
-
-private lemma corner_mem_vertices {i : ι} (hp : p ∈ cornerFinset (T i)) : p ∈ vertices R T :=
-  mem_union_right _ (mem_biUnion.mpr ⟨i, mem_univ i, hp⟩)
-
-private lemma mem_component_iff (h : Adj T p q) (hp : p ∈ vertices R T) (hq : q ∈ vertices R T) :
-    p ∈ component R T ↔ q ∈ component R T := by
-  simp only [component, mem_filter, hp, hq, true_and]
-  exact ⟨fun hr ↦ hr.tail h, fun hr ↦ hr.tail h.symm⟩
-
-/-- **Both or neither end of an edge of `Γ` lies in the component**, so a tile has an even number
-of corners there: the two ends of each of the sides it contributes to `Γ` go together. -/
-private lemma even_sum_cornerCount_tile (hsides : ∀ i, (T i).HasIntegerSide) (i : ι) :
-    Even (∑ z ∈ component R T, cornerCount (T i) z.1 z.2) := by
-  have key : ∀ {p q : ℝ × ℝ}, IsSide (T i) p q → p ∈ cornerFinset (T i) →
-      q ∈ cornerFinset (T i) → (p ∈ component R T ↔ q ∈ component R T) :=
-    fun h hp hq ↦ mem_component_iff ⟨i, Or.inl h⟩ (corner_mem_vertices hp) (corner_mem_vertices hq)
-  refine even_sum_cornerCount_of_sides _
-    ((Rectangle.hasIntegerSide_iff.mp (hsides i)).imp (fun h ↦ ⟨?_, ?_⟩) fun h ↦ ⟨?_, ?_⟩) <;>
-    exact key (by simp [IsSide, h]) (by simp [cornerFinset]) (by simp [cornerFinset])
+/-- **The vertices of odd degree in `Γ` are the corners of `R`**: by corner parity, the tiles
+have an odd number of corners at a point exactly when `R` does. -/
+theorem odd_card_darts_iff (hT : IsTiling R T) (p : ℝ × ℝ) :
+    Odd (Nat.card {d // corner T d = p}) ↔ Odd (cornerCount R p.1 p.2) := by
+  rw [card_darts_eq, ← ZMod.natCast_eq_one_iff_odd, ← ZMod.natCast_eq_one_iff_odd,
+    hT.sum_cornerCount_mod_two]
 
 /-! ### The proof -/
 
 /-- **The walk of Paterson's proof.** A walk in `Γ` leads from the lower-left corner of `R` to
-another of its corners. The lower-left corner lies in its own component, so `R` has an odd number
-of corners there unless a second one does too; but the tiles have an even number of corners in the
-component, and by corner parity so has `R`. -/
-theorem exists_reachable_corner (hT : IsTiling R T) (hsides : ∀ i, (T i).HasIntegerSide) :
-    Reachable T (R.x₀, R.y₀) (R.x₁, R.y₀) ∨ Reachable T (R.x₀, R.y₀) (R.x₀, R.y₁) ∨
-      Reachable T (R.x₀, R.y₀) (R.x₁, R.y₁) := by
-  classical
-  by_contra! hcon
-  have hmem : (R.x₀, R.y₀) ∈ component R T :=
-    mem_filter.mpr ⟨mem_union_left _ (by simp [cornerFinset]), .refl⟩
-  have hnot : ∀ {z : ℝ × ℝ}, ¬Reachable T (R.x₀, R.y₀) z → z ∉ component R T :=
-    fun hz h ↦ hz (mem_filter.mp h).2
-  have key := hT.even_sum_cornerCount (even_sum_cornerCount_tile (R := R) hsides)
-  rw [sum_cornerCount_eq, ite_eq_left hmem, ite_eq_right (hnot hcon.1),
-    ite_eq_right (hnot hcon.2.1), ite_eq_right (hnot hcon.2.2)] at key
-  simp at key
+another of its corners. If `R` is degenerate, another of its corners is the lower-left one itself.
+Otherwise the lower-left corner is a vertex of odd degree, so the handshake lemma joins it to
+another vertex of odd degree, and that is a corner of `R`. -/
+theorem exists_reachable_corner (hT : IsTiling R T) :
+    Relation.ReflTransGen (patersonGraph T).Adj (R.x₀, R.y₀) (R.x₁, R.y₀) ∨
+      Relation.ReflTransGen (patersonGraph T).Adj (R.x₀, R.y₀) (R.x₀, R.y₁) ∨
+      Relation.ReflTransGen (patersonGraph T).Adj (R.x₀, R.y₀) (R.x₁, R.y₁) := by
+  rcases R.hx.eq_or_lt with hx | hx
+  · exact .inl (hx ▸ .refl)
+  rcases R.hy.eq_or_lt with hy | hy
+  · exact .inr (.inl (hy ▸ .refl))
+  have hodd : Odd (Nat.card {d // corner T d = (R.x₀, R.y₀)}) := by
+    rw [odd_card_darts_iff hT]
+    simp only [cornerCount, xCount, yCount, hx.ne', hy.ne', ↓reduceIte, add_zero, mul_one, odd_one]
+  obtain ⟨⟨u, v⟩, hne, hreach, hodd'⟩ := (patersonDarts T).exists_ne_reflTransGen_of_odd _ hodd
+  rw [odd_card_darts_iff hT] at hodd'
+  have hu : R.x₀ = u ∨ R.x₁ = u := by
+    by_contra! h
+    simp only [cornerCount, xCount, h.1, h.2, ↓reduceIte, add_zero, zero_mul,
+      Nat.not_odd_zero] at hodd'
+  have hv : R.y₀ = v ∨ R.y₁ = v := by
+    by_contra! h
+    simp only [cornerCount, yCount, h.1, h.2, ↓reduceIte, add_zero, mul_zero,
+      Nat.not_odd_zero] at hodd'
+  rcases hu with rfl | rfl <;> rcases hv with rfl | rfl
+  · exact absurd rfl hne
+  · exact .inr (.inl hreach)
+  · exact .inl hreach
+  · exact .inr (.inr hreach)
 
 end IntegerRectangle.EulerianPath
 
@@ -147,7 +190,7 @@ joins the lower-left corner of `R` to another of its corners, and moves by a vec
 entries; whichever corner it reaches, that is an integer side of `R`. -/
 theorem IntegerRectangleTheorem_EulerianPath : IntegerRectangleTheorem := by
   intro ι _ R T hT hsides
-  obtain h | h | h := exists_reachable_corner hT hsides
-  · exact .inl (Int.fract_eq_fract'.mp (congrArg Prod.fst (fracts_eq_of_reachable h)))
-  · exact .inr (Int.fract_eq_fract'.mp (congrArg Prod.snd (fracts_eq_of_reachable h)))
-  · exact .inl (Int.fract_eq_fract'.mp (congrArg Prod.fst (fracts_eq_of_reachable h)))
+  obtain h | h | h := exists_reachable_corner hT
+  · exact .inl (Int.fract_eq_fract'.mp (congrArg Prod.fst (fracts_eq_of_reachable hsides h)))
+  · exact .inr (Int.fract_eq_fract'.mp (congrArg Prod.snd (fracts_eq_of_reachable hsides h)))
+  · exact .inl (Int.fract_eq_fract'.mp (congrArg Prod.fst (fracts_eq_of_reachable hsides h)))

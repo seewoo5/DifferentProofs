@@ -254,12 +254,20 @@ can therefore not stop before it reaches another corner of $`R`. Every edge of $
 segment of integer length parallel to an axis, so the two corners differ by a vector with integer
 entries, and that is an integer side of $`R`.
 
+The formalization builds $`\Gamma` as a multigraph through its darts, a dart being a tile together
+with one of its four corners. Each tile contributes its two horizontal sides if its width is an
+integer and its two vertical sides otherwise, and the two darts of such a side are its two ends.
+Two tiles of the same integer width stacked on each other share a side, which is then a double
+edge of $`\Gamma`. The degree of a vertex is the number of darts at it, which is the number of
+tiles having it as a corner.
+
 Of the degrees only the parity is ever used. Wagon reads it off the local picture — a point other
 than a corner of $`R` is a corner of $`2` or $`4` tiles — which is a statement about how tiles fit
 together around a point. It follows instead from the fg-area additivity of the thirteenth proof
-below, with no local analysis at all, in the form of the corner parity lemma; that lemma and the
-double count following it are shared with the eighth proof. Corners are counted with multiplicity,
-so degenerate tiles need no separate treatment.
+below, with no local analysis at all, in the form of the corner parity lemma, which the eighth
+proof shares. Corners are counted with multiplicity, so degenerate tiles need no separate
+treatment. Nor is the walk built step by step: what makes it reach a second corner of $`R` is the
+handshake lemma, which stands in for it here since mathlib's multigraphs have no walks yet.
 
 :::lemma_ "lem:int-rect-corner-parity" (parent := "grp:int-rect") (lean := "IntegerRectangle.IsTiling.sum_cornerCount_mod_two")
 Let $`T` tile $`R`. At every point of the plane, the tiles have in total a number of corners
@@ -276,31 +284,28 @@ it is additive over the tiling {uses "lem:int-rect-fgarea"}[], and modulo $`2` s
 addition agree, so each signed count may be replaced by the corner count.
 :::
 
-:::lemma_ "lem:int-rect-double-count" (parent := "grp:int-rect") (lean := "IntegerRectangle.IsTiling.even_sum_cornerCount")
-Let $`T` tile $`R` and let $`Z` be a finite set of points of the plane in which every tile has an
-even number of corners. Then $`R` has an even number of corners in $`Z`.
+:::lemma_ "lem:handshake" (parent := "grp:int-rect") (lean := "DartPairing.exists_ne_reflTransGen_of_odd")
+In a finite multigraph, a vertex of odd degree is joined by a walk to another vertex of odd
+degree.
 :::
 
-:::proof "lem:int-rect-double-count"
-Count the incidences between the points of $`Z` and the tiles having them as a corner. Tile by
-tile the total is even by hypothesis. Counting the same incidences point by point instead, and
-replacing each point's count by the corresponding count for $`R`
-{uses "lem:int-rect-corner-parity"}[], leaves the parity unchanged, so the number of corners of
-$`R` in $`Z` is even too.
+:::proof "lem:handshake"
+The vertices that walks from it reach form a union of connected components, so every edge at one
+of them has both of its ends among them, and their degrees add up to twice the number of these
+edges. That sum is even, so besides the degree of the starting vertex another of its terms is odd.
 :::
 
 :::lemma_ "lem:int-rect-euler-walk" (parent := "grp:int-rect") (lean := "IntegerRectangle.EulerianPath.exists_reachable_corner")
-Let $`T` tile $`R`, every tile having an integer side. Then some walk in $`\Gamma` leads from the
-lower-left corner of $`R` to another corner of $`R`.
+Let $`T` tile $`R`. Then some walk in $`\Gamma` leads from the lower-left corner of $`R` to another
+corner of $`R`.
 :::
 
 :::proof "lem:int-rect-euler-walk"
-Take for $`Z` the connected component of the lower-left corner of $`R`, that is, the vertices a
-walk starting there reaches. An edge of $`\Gamma` has both of its ends in $`Z` or neither, and the
-sides that a tile with an integer side contributes to $`\Gamma` pair up its four corners; so every
-tile has an even number of corners in $`Z`, and by the double count
-{uses "lem:int-rect-double-count"}[] so has $`R`. The lower-left corner of $`R` is one of them,
-hence not the only one.
+The degree of a vertex is the number of tiles having it as a corner, so by corner parity
+{uses "lem:int-rect-corner-parity"}[] the vertices of odd degree are the corners of $`R`, counted
+with multiplicity. If $`R` is degenerate, its lower-left corner is another of its corners as
+well. Otherwise the lower-left corner has degree $`1` modulo $`2`, and by the handshake lemma
+{uses "lem:handshake"}[] a walk leads from it to another vertex of odd degree, a corner of $`R`.
 :::
 
 :::theorem "thm:int-rect-euler" (parent := "grp:int-rect") (lean := "IntegerRectangleTheorem_EulerianPath") (proofColor := "#fbcfe8")
@@ -317,11 +322,24 @@ width or the height of $`R` is an integer.
 
 Eighth proof: a bipartite graph, Wagon's variation on the preceding proof. Place $`R` in standard
 position and join each point of the lattice $`\mathbb{Z} \times \mathbb{Z}` to the tiles having it
-as a corner; then count the edges of that graph in the two possible ways. It is the same count as
-before, taken over a lattice grid instead of a connected component of $`\Gamma`. The lattice used
-below is the one through the lower-left corner of $`R`, which replaces the standard position, and
-rather than the tile corners the count runs over all lattice points of $`R`, which changes nothing
-since a non-corner contributes $`0` on both sides.
+as a corner; then count the edges of that graph in the two possible ways, point by point through
+the corner parity of the preceding proof. The lattice used below is the one through the lower-left
+corner of $`R`, which replaces the standard position, and rather than the tile corners the count
+runs over all lattice points of $`R`, which changes nothing since a non-corner contributes $`0` on
+both sides.
+
+:::lemma_ "lem:int-rect-double-count" (parent := "grp:int-rect") (lean := "IntegerRectangle.IsTiling.even_sum_cornerCount")
+Let $`T` tile $`R` and let $`Z` be a finite set of points of the plane in which every tile has an
+even number of corners. Then $`R` has an even number of corners in $`Z`.
+:::
+
+:::proof "lem:int-rect-double-count"
+Count the incidences between the points of $`Z` and the tiles having them as a corner. Tile by
+tile the total is even by hypothesis. Counting the same incidences point by point instead, and
+replacing each point's count by the corresponding count for $`R`
+{uses "lem:int-rect-corner-parity"}[], leaves the parity unchanged, so the number of corners of
+$`R` in $`Z` is even too.
+:::
 
 :::lemma_ "lem:int-rect-bipartite-count" (parent := "grp:int-rect") (lean := "IntegerRectangle.BipartiteGraph.even_sum_cornerCount")
 Let $`T` tile $`R`, and let $`X` and $`Y` be finite sets of abscissae and of ordinates such that
@@ -534,9 +552,9 @@ sets meeting every face evenly form the kernel of the boundary of the dual graph
 in the kernel, since walking round a face crosses an edge cut an even number of times, and the
 two have dimensions $`\#V - 1` and $`\#E - \#F + 1`, which Euler's formula makes equal. So a bond
 is a minimal nonempty edge set meeting every face evenly. Such a set is a cycle: the rest of it
-joins the two ends of any of its edges, by a parity count over the faces reachable from one of
-them, and a shortest such path closes up with the edge to a cycle which, being even, is all of
-it.
+joins the two ends of any of its edges, by the handshake lemma {uses "lem:handshake"}[], since
+those two ends are the only faces it meets an odd number of times, and a shortest such path closes
+up with the edge to a cycle which, being even, is all of it.
 :::
 
 :::lemma_ "lem:int-rect-cut-vertices" (parent := "grp:int-rect") (lean := "IntegerRectangle.CutSet.sameCycle_of_vert_eq")
