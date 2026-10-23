@@ -16,7 +16,9 @@ integral-flavoured proofs.
 
 The elementary layer unfolds `Rectangle.toSet` and reads off that every tile of a tiling sits
 inside the tiled rectangle (`Rectangle.mem_toSet`, `Rectangle.mem_interior_toSet`,
-`IsTiling.tile_subset`, and the four edge bounds `IsTiling.le_tile_x₀` … `IsTiling.tile_y₁_le`).
+`IsTiling.tile_subset`, and the four edge bounds `IsTiling.le_tile_x₀` … `IsTiling.tile_y₁_le`),
+so that the tiled rectangle, like its tiles, has positive width and height (`IsTiling.x₀_lt_x₁`,
+`IsTiling.y₀_lt_y₁`).
 
 It also names Wagon's two kinds of tile. An *H-tile* has integer width and a *V-tile* integer
 height (`Rectangle.IsHTile`, `Rectangle.IsVTile`), so the tiles of the theorem are exactly the
@@ -86,10 +88,11 @@ lemma mem_interior_toSet {R : Rectangle} {z : ℝ × ℝ}
   rw [Rectangle.toSet, interior_prod_eq, interior_Icc, interior_Icc]
   exact h
 
-/-- A rectangle is *nondegenerate* when it has positive width and positive height — equivalently,
-when its interior is nonempty. Degenerate rectangles have empty half-open cells, so a tiling can
-always be pruned down to its nondegenerate tiles (`IsTiling.proper`). -/
-def Nondegenerate (S : Rectangle) : Prop := S.x₀ < S.x₁ ∧ S.y₀ < S.y₁
+/-- A rectangle is nondegenerate exactly when its interior is nonempty. -/
+lemma nondegenerate_iff_nonempty_interior {S : Rectangle} :
+    S.Nondegenerate ↔ (interior S.toSet).Nonempty := by
+  rw [Rectangle.toSet, interior_prod_eq, interior_Icc, interior_Icc, Set.prod_nonempty_iff,
+    Set.nonempty_Ioo, Set.nonempty_Ioo, Nondegenerate]
 
 noncomputable instance : DecidablePred Nondegenerate :=
   fun S ↦ inferInstanceAs (Decidable (S.x₀ < S.x₁ ∧ S.y₀ < S.y₁))
@@ -166,6 +169,24 @@ lemma IsTiling.le_tile_x₀ (hT : IsTiling R T) (i : ι) : R.x₀ ≤ (T i).x₀
 lemma IsTiling.tile_x₁_le (hT : IsTiling R T) (i : ι) : (T i).x₁ ≤ R.x₁ :=
   (Rectangle.mem_toSet.mp (hT.tile_subset i (show ((T i).x₁, (T i).y₁) ∈ (T i).toSet from
     Rectangle.mem_toSet.mpr ⟨⟨(T i).hx, le_rfl⟩, ⟨(T i).hy, le_rfl⟩⟩))).1.2
+
+/-- A tile of a tiling has positive width. -/
+lemma IsTiling.tile_x₀_lt_x₁ (hT : IsTiling R T) (i : ι) : (T i).x₀ < (T i).x₁ :=
+  (hT.nondegenerate i).1
+
+/-- A tile of a tiling has positive height. -/
+lemma IsTiling.tile_y₀_lt_y₁ (hT : IsTiling R T) (i : ι) : (T i).y₀ < (T i).y₁ :=
+  (hT.nondegenerate i).2
+
+/-- A tiled rectangle has positive width, since its tiles do. -/
+lemma IsTiling.x₀_lt_x₁ (hT : IsTiling R T) : R.x₀ < R.x₁ :=
+  have ⟨i⟩ := hT.nonempty_index
+  (hT.le_tile_x₀ i).trans_lt ((hT.tile_x₀_lt_x₁ i).trans_le (hT.tile_x₁_le i))
+
+/-- A tiled rectangle has positive height, since its tiles do. -/
+lemma IsTiling.y₀_lt_y₁ (hT : IsTiling R T) : R.y₀ < R.y₁ :=
+  have ⟨i⟩ := hT.nonempty_index
+  (hT.le_tile_y₀ i).trans_lt ((hT.tile_y₀_lt_y₁ i).trans_le (hT.tile_y₁_le i))
 
 end Tiles
 

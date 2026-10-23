@@ -15,8 +15,7 @@ exactly one tile, while a lattice point that is not a corner of `R` is a corner 
 
 Here `R` is not put in standard position; instead the lattice used is the one through the
 lower-left corner of `R`, and rather than the tile corners we sum over *all* its points in `R`
-(`latticeIcc`), which changes nothing since a non-corner contributes `0` on both sides. Corners
-are counted with multiplicity (`cornerCount`), so degenerate tiles need no separate treatment.
+(`latticeIcc`), which changes nothing since a non-corner contributes `0` on both sides.
 
 The double count itself is `IsTiling.even_sum_cornerCount`, shared with the seventh proof: the
 grid `X ×ˢ Y` here plays the part played there by a connected component of the graph of tile

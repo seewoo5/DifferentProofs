@@ -181,6 +181,10 @@ theorem IsTiling.map (hT : IsTiling R T) {f : (ℝ × ℝ) ≃ₜ (ℝ × ℝ)} 
   interiorDisjoint i j hij := by
     simp only [hg, ← f.preimage_interior]
     exact (hT.interiorDisjoint hij).preimage f
+  nondegenerate i := by
+    rw [Rectangle.nondegenerate_iff_nonempty_interior, hg, ← f.preimage_interior]
+    exact (Rectangle.nondegenerate_iff_nonempty_interior.mp (hT.nondegenerate i)).preimage
+      f.surjective
 
 /-- Transposing the plane carries a tiling to a tiling. -/
 theorem IsTiling.transpose (hT : IsTiling R T) : IsTiling R.transpose fun i ↦ (T i).transpose :=
@@ -227,12 +231,12 @@ theorem IsTiling.existsUnique_cell (hT : IsTiling R T) (sx sy : Bool) {x y : ℝ
     exact hT.reflectY.existsUnique_toSetIoc hz
   · exact hT.existsUnique_toSetIoc hz
 
-/-- **Recognising a tiling from its half-open cells.** A family of rectangles inside a
-nondegenerate `R` whose half-open cells are pairwise disjoint and cover the half-open cell of `R`
+/-- **Recognising a tiling from its half-open cells.** A family of nondegenerate rectangles inside
+a nondegenerate `R` whose half-open cells are pairwise disjoint and cover the half-open cell of `R`
 is a tiling of `R`: the cells sit between the interiors and the closed tiles, so they control both
 conditions at once. -/
 theorem isTiling_of_toSetIoc (hx : R.x₀ < R.x₁) (hy : R.y₀ < R.y₁)
-    (hsub : ∀ i, (T i).toSet ⊆ R.toSet)
+    (hnd : ∀ i, (T i).Nondegenerate) (hsub : ∀ i, (T i).toSet ⊆ R.toSet)
     (hdisj : Pairwise (Function.onFun Disjoint fun i ↦ (T i).toSetIoc))
     (hcover : R.toSetIoc ⊆ ⋃ i, (T i).toSetIoc) : IsTiling R T where
   cover := by
@@ -249,6 +253,7 @@ theorem isTiling_of_toSetIoc (hx : R.x₀ < R.x₁) (hy : R.y₀ < R.y₁)
       rw [Rectangle.toSet, interior_prod_eq, interior_Icc, interior_Icc]
       exact Set.prod_mono Set.Ioo_subset_Ioc_self Set.Ioo_subset_Ioc_self
     exact (hdisj hij).mono (h i) (h j)
+  nondegenerate := hnd
 
 /-- A cell of a tile sits inside the corresponding cell of the tiled rectangle. -/
 lemma IsTiling.cell_subset (hT : IsTiling R T) (sx sy : Bool) (i : ι) :
@@ -268,48 +273,29 @@ theorem IsTiling.eq_of_mem_cell (hT : IsTiling R T) {sx sy : Bool} {x y : ℝ} {
     i = j :=
   (hT.existsUnique_cell sx sy (hT.cell_subset sx sy i hi)).unique hi hj
 
-/-! ### Proper tilings -/
+/-! ### Pruning degenerate rectangles -/
 
-/-- A family of rectangles is *proper* when each of its members is nondegenerate. Degenerate tiles
-are harmless but carry no information, and every tiling can be pruned down to a proper one
-(`IsTiling.proper`). -/
-def Proper (T : ι → Rectangle) : Prop := ∀ i, (T i).Nondegenerate
+/-- The nondegenerate members of a family of rectangles, reindexed by the indices that carry
+one. -/
+def prune (T : ι → Rectangle) (i : {i : ι // (T i).Nondegenerate}) : Rectangle := T i.1
 
-omit [Fintype ι] in
-/-- Transposing the plane preserves properness. -/
-lemma properTranspose (hp : Proper T) : Proper fun i ↦ (T i).transpose :=
-  fun i ↦ ⟨(hp i).2, (hp i).1⟩
-
-omit [Fintype ι] in
-/-- Reflecting the plane in the vertical axis preserves properness. -/
-lemma properReflectX (hp : Proper T) : Proper fun i ↦ (T i).reflectX := fun i ↦
-  ⟨by simpa [Rectangle.reflectX] using (hp i).1, (hp i).2⟩
-
-omit [Fintype ι] in
-/-- Reflecting the plane in the horizontal axis preserves properness. -/
-lemma properReflectY (hp : Proper T) : Proper fun i ↦ (T i).reflectY := fun i ↦
-  ⟨(hp i).1, by simpa [Rectangle.reflectY] using (hp i).2⟩
-
-/-- The nondegenerate tiles of a family, reindexed by the indices that carry one. -/
-def properTiles (T : ι → Rectangle) (i : {i : ι // (T i).Nondegenerate}) : Rectangle := T i.1
-
-omit [Fintype ι] in
-/-- Pruning a family of rectangles leaves a proper one. -/
-lemma proper_properTiles (T : ι → Rectangle) : Proper (properTiles T) := fun i ↦ i.2
-
-/-- **Degenerate tiles may be discarded.** The half-open cell of a degenerate rectangle is empty,
-so it contributes nothing to the partition and the nondegenerate tiles alone still tile `R`. -/
-theorem IsTiling.proper (hT : IsTiling R T) (hx : R.x₀ < R.x₁) (hy : R.y₀ < R.y₁) :
-    IsTiling R (properTiles T) := by
-  refine isTiling_of_toSetIoc hx hy (fun i ↦ hT.tile_subset i.1)
-    (fun i j hij ↦ hT.pairwiseDisjoint_toSetIoc (Subtype.coe_ne_coe.mpr hij)) fun z hz ↦ ?_
-  obtain ⟨i, hi, -⟩ := hT.existsUnique_toSetIoc hz
+/-- **Recognising a tiling after pruning.** Cutting up or moving the tiles of a tiling can leave
+degenerate rectangles behind. A family of rectangles inside a nondegenerate `R` whose half-open
+cells are pairwise disjoint and cover the half-open cell of `R` still has its nondegenerate members
+tiling `R`, since the half-open cell of a degenerate rectangle is empty. -/
+theorem isTiling_prune_of_toSetIoc (hx : R.x₀ < R.x₁) (hy : R.y₀ < R.y₁)
+    (hsub : ∀ i, (T i).toSet ⊆ R.toSet)
+    (hdisj : Pairwise (Function.onFun Disjoint fun i ↦ (T i).toSetIoc))
+    (hcover : R.toSetIoc ⊆ ⋃ i, (T i).toSetIoc) : IsTiling R (prune T) := by
+  refine isTiling_of_toSetIoc hx hy (fun i ↦ i.2) (fun i ↦ hsub i.1)
+    (fun i j hij ↦ hdisj (Subtype.coe_ne_coe.mpr hij)) fun z hz ↦ ?_
+  obtain ⟨i, hi⟩ := Set.mem_iUnion.mp (hcover hz)
   exact Set.mem_iUnion.mpr ⟨⟨i, hi.1.1.trans_le hi.1.2, hi.2.1.trans_le hi.2.2⟩, hi⟩
 
 /-- **Two distinct tiles that overlap in height lie one strictly to the left of the other.** The
 point just inside the upper right corner of the leftmost of the two right edges would otherwise
 be in the lower-left cell of both. -/
-lemma IsTiling.separated_x_of_overlap_y (hT : IsTiling R T) (hp : Proper T) {i j : ι}
+lemma IsTiling.separated_x_of_overlap_y (hT : IsTiling R T) {i j : ι}
     (hij : i ≠ j) (h : max (T i).y₀ (T j).y₀ < min (T i).y₁ (T j).y₁) :
     (T i).x₁ ≤ (T j).x₀ ∨ (T j).x₁ ≤ (T i).x₀ := by
   by_contra hcon
@@ -322,7 +308,7 @@ lemma IsTiling.separated_x_of_overlap_y (hT : IsTiling R T) (hp : Proper T) {i j
   have hc₂ : min (T i).x₁ (T j).x₁ ≤ (T j).x₁ := min_le_right _ _
   exact hij (hT.eq_of_mem_cell (sx := true) (sy := true)
     (x := min (T i).x₁ (T j).x₁) (y := min (T i).y₁ (T j).y₁)
-    ⟨⟨lt_min (hp i).1 hcon.2, hc₁⟩, by linarith, hb₁⟩
-    ⟨⟨lt_min hcon.1 (hp j).1, hc₂⟩, by linarith, hb₂⟩)
+    ⟨⟨lt_min (hT.tile_x₀_lt_x₁ i) hcon.2, hc₁⟩, by linarith, hb₁⟩
+    ⟨⟨lt_min hcon.1 (hT.tile_x₀_lt_x₁ j), hc₂⟩, by linarith, hb₂⟩)
 
 end IntegerRectangle
