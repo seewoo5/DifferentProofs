@@ -12,6 +12,7 @@
     "IntegerRectangleTheorem_BipartiteGraph",
     "IntegerRectangleTheorem_Staircase",
     "IntegerRectangleTheorem_ReducibleLink",
+    "IntegerRectangleTheorem_CutSet",
     "IntegerRectangleTheorem_SweepLine",
     "IntegerRectangleTheorem_StepFunction",
     "IntegerRectangleTheorem_Sperner"

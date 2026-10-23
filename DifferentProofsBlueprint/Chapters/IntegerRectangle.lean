@@ -8,6 +8,7 @@ import DifferentProofs.IntegerRectangle.Checkerboard
 import DifferentProofs.IntegerRectangle.ComplexIntegral
 import DifferentProofs.IntegerRectangle.CornerCount
 import DifferentProofs.IntegerRectangle.CountingSquares
+import DifferentProofs.IntegerRectangle.CutSet
 import DifferentProofs.IntegerRectangle.Defs
 import DifferentProofs.IntegerRectangle.EulerianPath
 import DifferentProofs.IntegerRectangle.GridRefinement
@@ -499,6 +500,115 @@ by the integer $`w`, so H-tiles stay H-tiles; but the narrowest tile on the righ
 nothing, so the new tiling of $`R` has fewer tiles and the induction hypothesis applies. The three
 other ways a link can be reducible are this one read in the mirror image of the tiling, in its
 transpose, and in the mirror image of its transpose.
+:::
+
+Eleventh proof: a minimal cut-set (Paul Seymour, Bell Communications Research). Form a graph
+$`\Gamma`: its vertices are the horizontal segments of the tiling, and its edges are the tiles —
+each tile joins the segment carrying its bottom edge to the segment carrying its top edge — plus
+one exterior edge running around the outside of $`R` from its bottom edge to its top edge.
+Drawing each edge up the vertical bisector of its tile embeds $`\Gamma` in the plane, and the
+faces of the embedding are the V-links of the tenth proof together with the two outer faces on
+either side of the exterior edge. Call a tile a V-tile when its height is an integer, an H-tile
+(of integer width) otherwise, and let $`S` collect the H-tile edges together with the exterior
+edge. If deleting $`S` leaves the bottom of $`R` connected to its top, a path of V-tiles climbs
+from bottom to top and the height of $`R` is an integer. Otherwise Seymour passes to a minimal
+$`S' \subseteq S` cutting the bottom off from the top and invokes a well-known theorem for planar
+graphs: the duals of its edges form a cycle in the dual graph $`\Gamma^*`. The cycle must use the
+dual of the exterior edge — that edge alone joins bottom to top — and deleting it leaves a dual
+path from the left outer face to the right one whose steps cross H-tiles, so the width of $`R` is
+an integer.
+
+The formalization builds the embedding as the rotation system the drawing determines: the darts
+are the two ends of each edge, and the rotation turns each dart counterclockwise round its
+segment. A rotation system is planar when it is connected and its Euler characteristic is two,
+and the well-known theorem is proved for planar rotation systems in general.
+
+:::theorem "thm:planar-bond-cycle" (parent := "grp:int-rect") (lean := "CombinatorialMap.IsPlanar.isCycle_of_isBond")
+In a planar combinatorial map, the edges of a bond of the graph, a minimal nonempty edge cut, form
+a cycle of the dual graph.
+:::
+
+:::proof "thm:planar-bond-cycle"
+Over $`\mathbb{Z}/2`, the edge cuts of the graph form the image of its coboundary, and the edge
+sets meeting every face evenly form the kernel of the boundary of the dual graph. The image lies
+in the kernel, since walking round a face crosses an edge cut an even number of times, and the
+two have dimensions $`\#V - 1` and $`\#E - \#F + 1`, which Euler's formula makes equal. So a bond
+is a minimal nonempty edge set meeting every face evenly. Such a set is a cycle: the rest of it
+joins the two ends of any of its edges, by a parity count over the faces reachable from one of
+them, and a shortest such path closes up with the edge to a cycle which, being even, is all of
+it.
+:::
+
+:::lemma_ "lem:int-rect-cut-vertices" (parent := "grp:int-rect") (lean := "IntegerRectangle.CutSet.sameCycle_of_vert_eq")
+The vertices of the rotation system are the horizontal segments: the darts at a segment form one
+orbit of the rotation.
+:::
+
+:::proof "lem:int-rect-cut-vertices"
+Along the tiles below a segment the rotation passes from each tile to the next one on the right
+for as long as the segment goes on, then round the right end of the segment to the tiles above
+it, along which it moves left, and round the left end back below.
+:::
+
+:::lemma_ "lem:int-rect-cut-faces" (parent := "grp:int-rect") (lean := "IntegerRectangle.CutSet.sameCycle_of_faceOf_eq")
+The faces of the rotation system are the V-links and the two outer faces.
+:::
+
+:::proof "lem:int-rect-cut-faces"
+Following a dart to the other end of its edge and turning there stays on the V-link carrying the
+corresponding vertical edge of the tile, because the corners the rotation turns round inside a
+V-link are not blocked. Round a V-link the face permutation climbs its left side tile by tile
+{uses "lem:int-rect-link-side"}[], crosses its top end to the right side, and descends that side;
+round the outer faces it runs along the left and right edges of $`R` and the exterior edge.
+:::
+
+:::lemma_ "lem:int-rect-cut-planar" (parent := "grp:int-rect") (lean := "IntegerRectangle.CutSet.seymourMap_isPlanar")
+The embedding of Seymour's graph is planar.
+:::
+
+:::proof "lem:int-rect-cut-planar"
+The graph is connected, every segment being joined to the bottom of $`R` through the tiles
+below it. An edge set meeting every face evenly is an edge cut: colour each segment by the parity
+of the tiles of the set stacked under it. The colour does not depend on where along the segment it
+is read, because the tiles a moving column gains and loses abut V-links lying wholly below the
+segment, each met evenly {uses "lem:int-rect-cut-faces"}[]; crossing a tile changes the colour
+exactly when the tile is in the set, and crossing the exterior edge exactly when it is, by the
+parity at the left outer face. So the cut space of the graph and the cycle space of the dual
+coincide, and comparing their dimensions is Euler's formula.
+:::
+
+:::lemma_ "lem:int-rect-cut-steps" (parent := "grp:int-rect") (lean := "IntegerRectangle.CutSet.int_sub_y₀_of_reflTransGen")
+With $`S` deleted, every vertex reached from the bottom of $`R` sits an integer distance above
+it.
+:::
+
+:::proof "lem:int-rect-cut-steps"
+Each step of the path crosses a V-tile, up or down, changing the height by an integer.
+:::
+
+:::lemma_ "lem:int-rect-cut-path" (parent := "grp:int-rect") (lean := "IntegerRectangle.CutSet.intWidth_of_not_reflTransGen")
+If deleting $`S` cuts the bottom of $`R` off from its top, the width of $`R` is an integer.
+:::
+
+:::proof "lem:int-rect-cut-path"
+A minimal $`S' \subseteq S` cutting the bottom off from the top is a bond of $`\Gamma`, so by
+planarity {uses "lem:int-rect-cut-planar"}[] and planar duality {uses "thm:planar-bond-cycle"}[]
+its edges form a cycle of $`\Gamma^*`, whose vertices are the V-links and the outer faces
+{uses "lem:int-rect-cut-faces"}[]. The cycle passes through the dual of the exterior edge, which
+moves the abscissa from one side of $`R` to the other. Every other step crosses an H-tile and
+moves the abscissa by its integer width, and round the cycle the abscissa comes back, so the
+width of $`R` is an integer.
+:::
+
+:::theorem "thm:int-rect-cut" (parent := "grp:int-rect") (lean := "IntegerRectangleTheorem_CutSet") (proofColor := "#fbcfe8")
+A rectangle tiled by rectangles each with an integer side has an integer side.
+:::
+
+:::proof "thm:int-rect-cut"
+Prune the tiling to its nondegenerate tiles, form Seymour's graph
+{uses "lem:int-rect-cut-vertices"}[] and delete $`S`. If the top of $`R` is still reachable
+from the bottom, the height of $`R` is an integer {uses "lem:int-rect-cut-steps"}[]; otherwise
+the width is {uses "lem:int-rect-cut-path"}[].
 :::
 
 Twelfth proof: a sweep line (Bachman–Yannakakis). This one does not use the analytic engine above.

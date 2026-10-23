@@ -5,6 +5,10 @@ public import DifferentProofsForMathlib.Algebra.Order.Floor.Ring
 public import DifferentProofsForMathlib.Analysis.Complex.Periodic
 public import DifferentProofsForMathlib.Analysis.Real.Pi.Irrational
 public import DifferentProofsForMathlib.Combinatorics.Enumerative.Involution
+public import DifferentProofsForMathlib.Combinatorics.Graph.CombinatorialMap
+public import DifferentProofsForMathlib.Combinatorics.Graph.Connected.Basic
+public import DifferentProofsForMathlib.Combinatorics.Graph.Connected.EdgeCut
+public import DifferentProofsForMathlib.Combinatorics.Graph.Cycle
 public import DifferentProofsForMathlib.Data.Finset.Powerset
 public import DifferentProofsForMathlib.MeasureTheory.Measure.Stieltjes
 public import DifferentProofsForMathlib.MeasureTheory.Measure.Typeclasses.NoAtoms

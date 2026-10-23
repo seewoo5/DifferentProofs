@@ -33,7 +33,7 @@ sources:                       # [required] list of sources or an original proof
     authors: ["Stan Wagon"]
     id: "Amer. Math. Monthly 94 (1987), no. 7, 601-617; https://www.jstor.org/stable/2322213"
     type: "article"
-    location: "Proofs 1-10, 12, 13 of the fourteen (11 and 14 not yet formalized)"
+    location: "All fourteen proofs"
     relationship: "formalizes"
     license: ""
     author_endorsement: "not-contacted"
@@ -240,7 +240,7 @@ status:
     (4 proofs), the infinitude of primes (9 proofs, including a Dirichlet-style pair
     for the classes 1 and 3 mod 4), the irrationality of sqrt 2 (3 proofs),
     Fermat's theorem on sums of two squares (4 proofs), the Basel problem (4 proofs),
-    the integer-rectangle tiling theorem of Wagon (12 of his 14 proofs), and two
+    the integer-rectangle tiling theorem of Wagon (all 14 of his proofs), and two
     combinatorial identities (Pascal's rule and the hockey-stick identity, each
     proved two ways). A Verso blueprint under `DifferentProofsBlueprint/` records the
     informal statements, proof sketches, and dependency graph; reusable supporting
@@ -403,6 +403,10 @@ status:
       file: "DifferentProofs/IntegerRectangle/ReducibleLink.lean"
       sorry_count: 0
       axioms: *standard_axioms
+    - declaration: "IntegerRectangleTheorem_CutSet"
+      file: "DifferentProofs/IntegerRectangle/CutSet.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
     - declaration: "IntegerRectangleTheorem_SweepLine"
       file: "DifferentProofs/IntegerRectangle/SweepLine.lean"
       sorry_count: 0
@@ -524,8 +528,18 @@ fidelity:
       his per-proof local arguments are factored into shared lemmas
       (`IsTiling.sum_fgArea`, `Grid`, `CornerCount`, `Cells`, `Walks`) reused across
       proofs.
-    - Wagon's proof 11 (minimal cut-set, Seymour) is not formalized; it needs planar
-      duality and a planar min-cut theorem, which mathlib does not have.
+    - Proof 11 (minimal cut-set, Seymour) follows the paper on Seymour's graph itself,
+      whose vertices are the horizontal segments (classes of points of horizontal
+      edges) and whose edges are the tiles and the exterior edge. Mathlib has no
+      planar graphs, so the embedding Wagon draws is formalized as the rotation system
+      it determines (`CombinatorialMap`, in `DifferentProofsForMathlib`), and its faces
+      are proved to be the V-links of proof 10 and the two outer faces. The
+      well-known theorem the paper cites, that the edges of a minimal cut of a planar
+      graph form a cycle of the dual graph, is proved for planar combinatorial maps
+      in general (`CombinatorialMap.IsPlanar.isCycle_of_isBond`), planarity meaning
+      Euler characteristic 2. Wagon reads the planarity of Seymour's embedding off the
+      picture; here it is proved through the Jordan curve property, colouring the
+      segments by the parity of the tiles of an even edge set stacked under them.
     - Proof 14 (Sperner's lemma, Schmerl) does not prove geometric Sperner in
       general; mathlib has no such lemma either (leanprover-community/mathlib4#25231
       tracks it, and mathlib's `Sperner` is the antichain theorem). Drawing one
@@ -620,7 +634,7 @@ alignment:
       lean: "IntegerRectangleTheorem"
       module: "DifferentProofs.IntegerRectangle.Defs"
       status: "proved"
-      note: "Proved twelve ways, following Wagon's numbering."
+      note: "Proved fourteen ways, following Wagon's numbering."
     - source: "Pascal's rule"
       lean: "PascalIdentity"
       module: "DifferentProofs.CombinatorialIdentities.Defs"
@@ -684,12 +698,12 @@ alignment:
       status: "proved"
       note: ""
     - source: "Wagon, Proof 11 (minimal cut-set, Seymour)"
-      lean: ""
-      module: ""
-      status: "not-formalized"
+      lean: "IntegerRectangleTheorem_CutSet"
+      module: "DifferentProofs.IntegerRectangle.CutSet"
+      status: "proved"
       note: >-
-        Needs planar duality and a min-cut theorem for planar graphs (the existence
-        direction of Hex duality), which mathlib does not have.
+        The cited planar duality theorem is proved for planar combinatorial maps in
+        general; see `fidelity.divergences`.
     - source: "Wagon, Proof 12 (sweep line, Bachman-Yannakakis)"
       lean: "IntegerRectangleTheorem_SweepLine"
       module: "DifferentProofs.IntegerRectangle.SweepLine"
