@@ -1,6 +1,6 @@
 module
 
-public import DifferentProofs.IntegerRectangle.Grid
+public import DifferentProofs.IntegerRectangle.Tiling.Grid
 public import Mathlib.Algebra.BigOperators.Intervals
 public import Mathlib.Algebra.BigOperators.Ring.Finset
 public import Mathlib.Algebra.CharP.Two

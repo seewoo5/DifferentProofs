@@ -1,6 +1,6 @@
 module
 
-public import DifferentProofs.IntegerRectangle.Basic
+public import DifferentProofs.IntegerRectangle.Tiling.Integral
 public import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 
 /-!

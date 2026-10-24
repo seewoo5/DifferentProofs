@@ -1,6 +1,6 @@
 module
 
-public import DifferentProofs.IntegerRectangle.Basic
+public import DifferentProofs.IntegerRectangle.Tiling.Basic
 public import Mathlib.Data.Nat.Prime.Int
 public import Mathlib.Data.Nat.Prime.Infinite
 

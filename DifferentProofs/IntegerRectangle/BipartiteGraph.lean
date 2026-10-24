@@ -1,6 +1,6 @@
 module
 
-public import DifferentProofs.IntegerRectangle.CornerCount
+public import DifferentProofs.IntegerRectangle.Tiling.CornerCount
 public import DifferentProofsForMathlib.Algebra.BigOperators.Ring.Finset
 
 /-!

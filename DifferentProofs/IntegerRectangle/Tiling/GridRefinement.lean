@@ -1,6 +1,6 @@
 module
 
-public import DifferentProofs.IntegerRectangle.Grid
+public import DifferentProofs.IntegerRectangle.Tiling.Grid
 public import Mathlib.Algebra.BigOperators.Intervals
 public import Mathlib.Algebra.BigOperators.Ring.Finset
 
@@ -19,7 +19,7 @@ that each axis gets its own function. The fg-area is additive over a tiling:
 `IsTiling.sum_fgArea`.
 
 The proof is Wagon's, and rides on the grid spanned by the tiling
-(`DifferentProofs.IntegerRectangle.Grid`): every open grid cell lies in a unique tile
+(`DifferentProofs.IntegerRectangle.Tiling.Grid`): every open grid cell lies in a unique tile
 (`Grid.cellTile`), and the cells of a tile fill out a product of index intervals
 (`Grid.cellTile_eq_iff`). Summing the fg-area of the cells therefore counts every cell exactly
 once, tile by tile, and over a product of index intervals the sum telescopes in both coordinates

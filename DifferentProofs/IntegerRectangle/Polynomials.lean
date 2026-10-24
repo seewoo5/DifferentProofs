@@ -1,6 +1,6 @@
 module
 
-public import DifferentProofs.IntegerRectangle.GridRefinement
+public import DifferentProofs.IntegerRectangle.Tiling.GridRefinement
 public import Mathlib.Algebra.Polynomial.Roots
 
 /-!
