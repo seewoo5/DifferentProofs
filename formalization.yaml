@@ -529,17 +529,17 @@ fidelity:
       (`IsTiling.sum_fgArea`, `Grid`, `CornerCount`, `Cells`, `Walks`) reused across
       proofs.
     - Proof 7 (Eulerian path, Paterson) builds Paterson's graph as a mathlib multigraph
-      through its darts (`DartPairing`, in `DifferentProofsForMathlib`): a dart is a tile
-      together with one of its corners and is labelled by that corner point, and each
-      tile contributes its horizontal sides if its width is an integer and its vertical
-      sides otherwise. The vertex set is the whole plane, the points that are not
-      corners of tiles being isolated vertices. Paterson walks a trail from a corner of
-      the tiled rectangle until it gets stuck at another corner; mathlib's multigraphs
-      have no walks yet, so the handshake lemma stands in for the trail
-      (`DartPairing.exists_ne_reflTransGen_of_odd`): a vertex of odd degree is joined by
-      a chain of edges, the reflexive-transitive closure of adjacency, to another vertex
-      of odd degree. The parity of the degrees is not read off the local picture of how
-      tiles meet at a point, as in the paper, but from corner parity
+      through its half-edges (`HalfEdgePairing`, in `DifferentProofsForMathlib`): a
+      half-edge is a tile together with one of its corners and is labelled by that
+      corner point, and each tile contributes its horizontal sides if its width is an
+      integer and its vertical sides otherwise. The vertex set is the whole plane, the
+      points that are not corners of tiles being isolated vertices. Paterson walks a
+      trail from a corner of the tiled rectangle until it gets stuck at another corner;
+      mathlib's multigraphs have no walks yet, so the handshake lemma stands in for the
+      trail (`HalfEdgePairing.exists_ne_reflTransGen_of_odd`): a vertex of odd degree is
+      joined by a chain of edges, the reflexive-transitive closure of adjacency, to
+      another vertex of odd degree. The parity of the degrees is not read off the local
+      picture of how tiles meet at a point, as in the paper, but from corner parity
       (`IsTiling.sum_cornerCount_mod_two`), a consequence of fg-area additivity.
     - Proof 11 (minimal cut-set, Seymour) follows the paper on Seymour's graph itself,
       whose vertices are the horizontal segments (classes of points of horizontal
@@ -695,8 +695,10 @@ alignment:
       module: "DifferentProofs.IntegerRectangle.EulerianPath"
       status: "proved"
       note: >-
-        Paterson's graph is a mathlib multigraph built from darts, and the handshake
-        lemma stands in for his trail; see `fidelity.divergences`.
+        Paterson's graph is built as an actual mathlib multigraph. His trail argument
+        is replaced by the handshake lemma, because mathlib's multigraphs have no walks
+        yet. The proof 7 item under `fidelity.divergences` in this file gives the
+        details.
     - source: "Wagon, Proof 8 (bipartite graph)"
       lean: "IntegerRectangleTheorem_BipartiteGraph"
       module: "DifferentProofs.IntegerRectangle.BipartiteGraph"

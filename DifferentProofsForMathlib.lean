@@ -9,7 +9,7 @@ public import DifferentProofsForMathlib.Combinatorics.Graph.CombinatorialMap
 public import DifferentProofsForMathlib.Combinatorics.Graph.Connected.Basic
 public import DifferentProofsForMathlib.Combinatorics.Graph.Connected.EdgeCut
 public import DifferentProofsForMathlib.Combinatorics.Graph.Cycle
-public import DifferentProofsForMathlib.Combinatorics.Graph.DartPairing
+public import DifferentProofsForMathlib.Combinatorics.Graph.HalfEdgePairing
 public import DifferentProofsForMathlib.Data.Finset.Powerset
 public import DifferentProofsForMathlib.MeasureTheory.Measure.Stieltjes
 public import DifferentProofsForMathlib.MeasureTheory.Measure.Typeclasses.NoAtoms

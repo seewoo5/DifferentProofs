@@ -8,7 +8,7 @@ module
 public import DifferentProofsForMathlib.Combinatorics.Graph.Connected.Basic
 public import DifferentProofsForMathlib.Combinatorics.Graph.Connected.EdgeCut
 public import DifferentProofsForMathlib.Combinatorics.Graph.Cycle
-public import DifferentProofsForMathlib.Combinatorics.Graph.DartPairing
+public import DifferentProofsForMathlib.Combinatorics.Graph.HalfEdgePairing
 public import Mathlib.Algebra.CharP.Two
 public import Mathlib.Algebra.Field.ZMod
 public import Mathlib.Algebra.GroupWithZero.Indicator
@@ -30,10 +30,10 @@ by the types `V`, `E` and `F`, through labelings of the darts whose fibres are e
 
 The **graph** of a map has the vertices and edges of the map, and its **dual graph** has the faces
 as vertices, the edge of a dart joining the faces of its two darts: both are graphs of the
-underlying `DartPairing`, for the labelings of the darts by vertices and by faces
-(`DartPairing.labelGraph`). A map is **planar**, an embedding in the sphere, when its graph is
-connected and its Euler characteristic `#V - #E + #F` is `2`; by the classification of surfaces
-this is the usual combinatorial definition of planarity.
+underlying pairing of half-edges (`HalfEdgePairing`), for the labelings of the darts by vertices
+and by faces (`HalfEdgePairing.labelGraph`). A map is **planar**, an embedding in the sphere, when
+its graph is connected and its Euler characteristic `#V - #E + #F` is `2`; by the classification
+of surfaces this is the usual combinatorial definition of planarity.
 
 ## Main results
 
@@ -52,8 +52,8 @@ of times. For a connected map they have dimensions `#V - 1` and `#E - #F + 1`, s
 makes them equal. A bond is then a minimal nonempty edge set meeting every face evenly, and such a
 set is a cycle of the dual graph (`CombinatorialMap.isCycle_of_minimal`): the rest of it joins the
 two ends of any of its edges, by the handshake lemma
-(`DartPairing.even_card_of_forall_adj_restrict`), and a shortest path between them closes up with
-the edge to a cycle that, being even, is all of it.
+(`HalfEdgePairing.even_card_of_forall_adj_restrict`), and a shortest path between them closes up
+with the edge to a cycle that, being even, is all of it.
 
 This file is intended for `Mathlib/Combinatorics/Graph/CombinatorialMap.lean`.
 
@@ -70,8 +70,8 @@ open Finset Matrix
 rotation `vertexPerm` around the vertices and the fixed-point-free involution `edgePerm` pairing
 the two darts of each edge, together with labelings `vert`, `edge` and `face` of the darts whose
 fibres are the orbits of `vertexPerm`, of `edgePerm` and of `vertexPerm * edgePerm`. The
-involution and the edge labeling form the underlying `DartPairing`. -/
-structure CombinatorialMap (V E F D : Type*) extends DartPairing E D where
+involution and the edge labeling form the underlying pairing of half-edges. -/
+structure CombinatorialMap (V E F D : Type*) extends HalfEdgePairing E D where
   /-- The rotation, turning each dart to the next one around its vertex. -/
   vertexPerm : Equiv.Perm D
   /-- The vertex of a dart. -/

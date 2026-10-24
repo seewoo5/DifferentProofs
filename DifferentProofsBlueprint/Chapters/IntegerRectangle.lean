@@ -254,12 +254,12 @@ can therefore not stop before it reaches another corner of $`R`. Every edge of $
 segment of integer length parallel to an axis, so the two corners differ by a vector with integer
 entries, and that is an integer side of $`R`.
 
-The formalization builds $`\Gamma` as a multigraph through its darts, a dart being a tile together
-with one of its four corners. Each tile contributes its two horizontal sides if its width is an
-integer and its two vertical sides otherwise, and the two darts of such a side are its two ends.
-Two tiles of the same integer width stacked on each other share a side, which is then a double
-edge of $`\Gamma`. The degree of a vertex is the number of darts at it, which is the number of
-tiles having it as a corner.
+The formalization builds $`\Gamma` as a multigraph through its half-edges, or darts, a dart being a
+tile together with one of its four corners. Each tile contributes its two horizontal sides if its
+width is an integer and its two vertical sides otherwise, and the two darts of such a side are its
+two ends. Two tiles of the same integer width stacked on each other share a side, which is then a
+double edge of $`\Gamma`. The degree of a vertex is the number of darts at it, which is the number
+of tiles having it as a corner.
 
 Of the degrees only the parity is ever used. Wagon reads it off the local picture — a point other
 than a corner of $`R` is a corner of $`2` or $`4` tiles — which is a statement about how tiles fit
@@ -284,7 +284,7 @@ it is additive over the tiling {uses "lem:int-rect-fgarea"}[], and modulo $`2` s
 addition agree, so each signed count may be replaced by the corner count.
 :::
 
-:::lemma_ "lem:handshake" (parent := "grp:int-rect") (lean := "DartPairing.exists_ne_reflTransGen_of_odd")
+:::lemma_ "lem:handshake" (parent := "grp:int-rect") (lean := "HalfEdgePairing.exists_ne_reflTransGen_of_odd")
 In a finite multigraph, a vertex of odd degree is joined by a walk to another vertex of odd
 degree.
 :::
