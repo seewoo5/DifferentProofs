@@ -144,10 +144,10 @@ theorem IsTiling.sum_cornerCount_eq (hT : IsTiling R T) (u v : ℝ) :
       cornerCount (T i) u v + 2 * (#(quadrants (T i) u v) / 2) := fun i ↦ by
     obtain ⟨h, h₄⟩ := cornerCount_eq_ite (hT.nondegenerate i) u v
     rw [h]
-    split_ifs <;> omega
+    split_ifs <;> lia
   rw [Finset.sum_congr rfl fun i _ ↦ hsplit i, Finset.sum_add_distrib, ← Finset.mul_sum] at hQ
   rw [hR]
-  split_ifs <;> omega
+  split_ifs <;> lia
 
 /-- **Corner parity.** At every point of the plane, the tiles have in total a number of corners
 congruent modulo `2` to the number of corners of `R` there: away from the corners of `R` it is

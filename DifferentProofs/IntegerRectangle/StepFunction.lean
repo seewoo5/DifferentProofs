@@ -90,7 +90,7 @@ private lemma sum_product_sub (F G : ℕ → ℝ) {a b c d : ℕ} (hab : a ≤ b
     (by rw [Finset.sum_Ico_sub F hab, Finset.sum_Ico_sub G hcd])
 
 open Finset in
-/-- **The grid refinement** (Wagon, after Hochster and Maté), for arbitrary `f, g : ℝ → ℝ`:
+/-- **The grid refinement** (Wagon, after Hochster and Máté), for arbitrary `f, g : ℝ → ℝ`:
 summing `(f x₁ - f x₀) · (g y₁ - g y₀)` over the tiles of a tiling gives the same quantity for the
 tiled rectangle. The tile edges span a grid; every open grid cell lies in exactly one tile, the
 cells of a tile fill a product of index intervals, and the sum telescopes in both coordinates. -/
@@ -118,7 +118,7 @@ theorem sum_fgArea (hT : IsTiling R T) (f g : ℝ → ℝ) :
 
 /-! ### Hochster and Máté's graph -/
 
-/-- The vertices of Hochster and Maté's graph: the points of the bottom edge of `R` below a
+/-- The vertices of Hochster and Máté's graph: the points of the bottom edge of `R` below a
 vertical edge of the tiling, and the points of the left edge of `R` level with a horizontal one. -/
 noncomputable def vertices (R : Rectangle) (T : ι → Rectangle) : Finset (ℝ × ℝ) :=
   gridX R T ×ˢ {R.y₀} ∪ {R.x₀} ×ˢ gridY R T
@@ -131,7 +131,7 @@ def bot {x : ℝ} (hx : x ∈ gridX R T) : vertices R T :=
 def left {y : ℝ} (hy : y ∈ gridY R T) : vertices R T :=
   ⟨(R.x₀, y), Finset.mem_union_right _ (Finset.mem_product.mpr ⟨Finset.mem_singleton_self _, hy⟩)⟩
 
-/-- **Hochster and Maté's graph** `Γ`. Two vertices on the bottom edge of `R` are joined when an
+/-- **Hochster and Máté's graph** `Γ`. Two vertices on the bottom edge of `R` are joined when an
 H-tile spans the interval between them, and two vertices on its left edge when a V-tile does. -/
 def graph (R : Rectangle) (T : ι → Rectangle) : SimpleGraph (vertices R T) :=
   SimpleGraph.fromRel fun p q ↦ ∃ i,
@@ -234,8 +234,8 @@ theorem reachable (hT : IsTiling R T) (hsides : ∀ i, (T i).HasIntegerSide) :
 end IntegerRectangle.StepFunction
 
 open IntegerRectangle IntegerRectangle.StepFunction in
-/-- **Step-function proof** (Hochster–Maté) of the integer-rectangle tiling theorem. The corner of
-`R` lies in the same component of Hochster and Maté's graph as the corner at the other end of its
+/-- **Step-function proof** (Hochster–Máté) of the integer-rectangle tiling theorem. The corner of
+`R` lies in the same component of Hochster and Máté's graph as the corner at the other end of its
 bottom edge or of its left edge (`reachable`), and a walk in the graph moves by a vector with
 integer entries. -/
 theorem IntegerRectangleTheorem_StepFunction : IntegerRectangleTheorem := by

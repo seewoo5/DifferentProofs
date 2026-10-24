@@ -756,7 +756,7 @@ fractional part of the width of $`R` equals the fractional part of $`f` below $`
 being the theorem — so $`f` is frozen at the top before taking fractional parts.)
 :::
 
-Thirteenth proof: step functions (Hochster–Maté). Take the bottom and left edges of $`R` for the
+Thirteenth proof: step functions (Hochster–Máté). Take the bottom and left edges of $`R` for the
 axes, which replaces the standard position, and let $`\Gamma` be the graph whose vertices are the
 points of the x-axis at which some tile has a vertical edge and the points of the y-axis at which
 some tile has a horizontal edge; two vertices on the x-axis are joined when an H-tile spans the
