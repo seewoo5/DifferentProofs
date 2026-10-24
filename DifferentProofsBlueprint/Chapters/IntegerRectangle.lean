@@ -156,13 +156,13 @@ $`R`, because those of the tiling are and do; a tile collapsed to a segment has 
 cell and is discarded.
 :::
 
-Fourth proof: counting squares (Ruzsa, Gilbert). Wagon translates every grid line of the tiling
-that lies off the lattice through the corner of $`R` onto the nearest half-integer line, leaving
-lattice lines fixed; the tiling becomes a tiling of a translated rectangle all of whose
-coordinates sit on the half-unit grid, so every rectangle in it is a union of
-$`\tfrac12 \times \tfrac12` squares — the checkerboard cells of the third proof — and the argument
-is a parity count of those squares. As with the polynomial proof below, the fg-area supplies the
-count without the auxiliary tiling having to be built.
+Fourth proof: counting squares (Ruzsa, Gilbert). Place $`R` in standard position and translate
+every vertical line of the tiling with a noninteger abscissa $`a` to the half-integer line
+$`x = \lfloor a\rfloor + \tfrac12`, and likewise the horizontal lines, the integral lines staying
+put. Here the lattice is based at the lower-left corner of $`R`, which replaces the standard
+position. The translated tiles tile a translated rectangle all of whose coordinates lie on the
+half-unit grid, so every rectangle in it is a union of $`\tfrac12 \times \tfrac12` squares — the
+checkerboard cells of the third proof — and the argument is a parity count of those squares.
 
 :::lemma_ "lem:int-rect-cell-parity" (parent := "grp:int-rect") (lean := "IntegerRectangle.CountingSquares.even_cellIndex_iff")
 Measure a coordinate $`x` from a base point $`a` by the integer
@@ -176,15 +176,19 @@ $`2\lfloor x - a\rfloor` in the first case and $`2\lfloor x - a\rfloor + 1` in t
 :::
 
 :::lemma_ "lem:int-rect-cellcount" (parent := "grp:int-rect") (lean := "IntegerRectangle.CountingSquares.sum_cellCount")
-The number of half-unit squares covered by the translation of a rectangle — the product of the
-increments of the two grid coordinates across it — is additive over a tiling.
+The translated tiles contain, in all, as many half-unit squares as the translated rectangle, and a
+translated rectangle contains as many squares as the product of the increments of the two grid
+coordinates across it.
 :::
 
 :::proof "lem:int-rect-cellcount"
-That number is by definition the fg-area of the pair of grid coordinate functions, so this is
-fg-area additivity {uses "lem:int-rect-fgarea"}[], read back in the integers. It is what Wagon gets
-from the auxiliary tiling, here without having to check that the translated tiles tile the
-translated rectangle.
+The translation keeps the order of the lines, so the translated tiles tile the translated
+rectangle {uses "lem:int-rect-move-lines"}[]. Count the squares by their upper right corners: a
+square lies in a rectangle whose edges are grid lines exactly when its upper right corner lies in
+the half-open cell of the rectangle, so every square of the translated rectangle lies in exactly
+one translated tile {uses "lem:int-rect-partition"}[], and a rectangle whose edges are the grid
+lines $`c_0 \le c_1` and $`d_0 \le d_1` half-steps from the corner of $`R` contains
+$`(c_1 - c_0)(d_1 - d_0)` squares.
 :::
 
 :::theorem "thm:int-rect-counting" (parent := "grp:int-rect") (lean := "IntegerRectangleTheorem_CountingSquares") (proofColor := "#fbcfe8")
@@ -192,14 +196,14 @@ A rectangle tiled by rectangles each with an integer side has an integer side.
 :::
 
 :::proof "thm:int-rect-counting"
-Base the half-unit grid at the lower-left corner of $`R`. The endpoints of a side of integer
-length $`n` are $`n` apart, so the translation moves them equally and the increment of the grid
-coordinate across that side is $`2n`: every tile covers an even number of squares, and hence
-{uses "lem:int-rect-cellcount"}[] so does $`R`. The corner of $`R` has grid coordinate $`0`, so
-that count is the product of the grid coordinates of the far edges of $`R`, and one of the two
-factors is even — which says {uses "lem:int-rect-cell-parity"}[] that the corresponding side of
-$`R` has integer length. (Wagon phrases the last step as a contradiction: a translated rectangle
-with no integer side has both sides equal to half an odd integer, hence an odd number of squares.)
+The endpoints of a side of integer length $`n` are $`n` apart, so the translation moves them
+equally and the increment of the grid coordinate across that side is $`2n`: every translated tile
+contains an even number of squares, and hence {uses "lem:int-rect-cellcount"}[] so does the
+translated rectangle. The corner of $`R` has grid coordinate $`0`, so that count is the product of
+the grid coordinates of the far edges of $`R`, and one of the two factors is even — which says
+{uses "lem:int-rect-cell-parity"}[] that the corresponding side of $`R` has integer length.
+(Wagon phrases the last step as a contradiction: a translated rectangle with no integer side has
+both sides equal to half an odd integer, hence an odd number of squares.)
 :::
 
 Fifth proof: polynomials (Douady). Through the lower-left corner of $`R`, fix the two coordinate
