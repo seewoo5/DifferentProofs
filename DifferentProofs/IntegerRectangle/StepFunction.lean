@@ -1,6 +1,6 @@
 module
 
-public import DifferentProofs.IntegerRectangle.GridRefinement
+public import DifferentProofs.IntegerRectangle.Tiling.GridRefinement
 
 /-!
 # The integer-rectangle theorem via step functions

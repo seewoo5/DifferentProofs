@@ -1,6 +1,6 @@
 module
 
-public import DifferentProofs.IntegerRectangle.Basic
+public import DifferentProofs.IntegerRectangle.Tiling.Integral
 public import Mathlib.MeasureTheory.Integral.IntervalIntegral.Periodic
 public import Mathlib.MeasureTheory.Function.Floor
 

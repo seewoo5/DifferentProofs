@@ -1,6 +1,6 @@
 module
 
-public import DifferentProofs.IntegerRectangle.Cells
+public import DifferentProofs.IntegerRectangle.Tiling.Cells
 
 /-!
 # Walking along the tiles of a tiling

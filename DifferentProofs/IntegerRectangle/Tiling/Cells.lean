@@ -1,6 +1,6 @@
 module
 
-public import DifferentProofs.IntegerRectangle.Basic
+public import DifferentProofs.IntegerRectangle.Tiling.Basic
 
 /-!
 # Symmetries of a tiling, and the four tiles at a point

@@ -1,6 +1,6 @@
 module
 
-public import DifferentProofs.IntegerRectangle.GridRefinement
+public import DifferentProofs.IntegerRectangle.Tiling.GridRefinement
 public import DifferentProofsForMathlib.Algebra.Order.Floor.Ring
 
 /-!

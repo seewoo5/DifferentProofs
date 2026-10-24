@@ -1,6 +1,6 @@
 module
 
-public import DifferentProofs.IntegerRectangle.Cells
+public import DifferentProofs.IntegerRectangle.Tiling.Cells
 public import Mathlib.Data.Finset.Sort
 public import Mathlib.Data.List.GetD
 
@@ -17,8 +17,9 @@ lines.
 
 This is the common combinatorial refinement of a tiling, shared by the proofs that need to count
 something cell by cell: the fg-area is summed over it in
-`DifferentProofs.IntegerRectangle.GridRefinement`, and the complete edges of Schmerl's Sperner
-argument are counted over its horizontal segments in `DifferentProofs.IntegerRectangle.Sperner`.
+`DifferentProofs.IntegerRectangle.Tiling.GridRefinement`, and the complete edges of Schmerl's
+Sperner argument are counted over its horizontal segments in
+`DifferentProofs.IntegerRectangle.Sperner`.
 
 The sorting of the edge coordinates is handled by `Finset.sort`; the `nth` layer below turns the
 sorted list into a total function `ℕ → ℝ`, so that all sums range over `Finset.range` and
