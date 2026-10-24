@@ -241,24 +241,23 @@ the moved $`R` is $`(w + t) \times (h + t)` and its area has quadratic coefficie
 contradiction.
 :::
 
-Sixth proof: prime numbers (Robinson). Wagon scales the tiling by a prime $`p` and rounds all tile
-corners to integers, which requires verifying that the rounded rectangles tile again. Instead we
-count lattice points: rounding is hidden inside a floor, and the re-tiling is replaced by the fact
-that the *half-open* cells of a tiling — each tile minus its left and bottom edges — genuinely
-partition the half-open cell of $`R`, with no null sets involved.
+Sixth proof: prime numbers (Robinson). For a prime $`p`, scale the tiling by $`p` and replace every
+tile corner $`(x, y)` of the scaled tiling by $`(\lfloor x\rfloor, \lfloor y\rfloor)`. This moves
+the vertical line $`x = a` to $`x = \lfloor pa\rfloor` and the horizontal line $`y = b` to
+$`y = \lfloor pb\rfloor`, keeping their order, so the rounded tiles tile the rounded rectangle, an
+integer-sided rectangle tiled by integer-sided rectangles; a tile narrower or lower than $`1/p` may
+collapse to a segment and drop out.
 
-:::lemma_ "lem:int-rect-count" (parent := "grp:int-rect") (lean := "IntegerRectangle.Primes.card_latticePoints_eq_sum")
-For $`p > 0`, the number of points of the lattice $`\tfrac1p\mathbb{Z} \times \tfrac1p\mathbb{Z}`
-in the half-open cell of $`R` is the sum of the numbers of such points in the half-open cells of
-the tiles. Moreover the count for a rectangle $`[x_0,x_1] \times [y_0,y_1]` is the product
-$`(\lfloor p x_1 \rfloor - \lfloor p x_0 \rfloor)(\lfloor p y_1 \rfloor - \lfloor p y_0 \rfloor)`.
+:::lemma_ "lem:int-rect-round" (parent := "grp:int-rect") (lean := "IntegerRectangle.Primes.dvd_area_round")
+If every tile has an integer side and the rounded rectangle does not collapse, its area is a
+multiple of $`p`.
 :::
 
-:::proof "lem:int-rect-count"
-A lattice point $`(a/p, b/p)` lies in the half-open cell iff $`\lfloor p x_0\rfloor < a \le
-\lfloor p x_1\rfloor` and likewise for $`b`, which gives the product formula; additivity is then
-exactly the exact-partition property {uses "lem:int-rect-partition"}[] of the half-open cells, read
-through this membership description.
+:::proof "lem:int-rect-round"
+A tile side of integer length $`n` rounds to one of length
+$`\lfloor p x_0 + pn\rfloor - \lfloor p x_0\rfloor = pn`, so the area of every rounded tile is a
+multiple of $`p`, and the area of the rounded rectangle is the sum of these areas
+{uses "lem:int-rect-move-lines"}[] {uses "lem:int-rect-area"}[].
 :::
 
 :::lemma_ "lem:int-rect-near" (parent := "grp:int-rect") (lean := "IntegerRectangle.Primes.exists_side_near_int")
@@ -267,10 +266,10 @@ within $`1/p` of an integer.
 :::
 
 :::proof "lem:int-rect-near"
-A tile side of integer length $`n` contributes the floor-difference factor
-$`\lfloor p x_0 + pn\rfloor - \lfloor p x_0\rfloor = pn`, so every tile's lattice count is
-divisible by $`p`, and by additivity {uses "lem:int-rect-count"}[] so is the count of $`R`, a
-product of two floor differences. Primality forces $`p` to divide one factor, say
+The sides of the rounded rectangle are integers that differ from those of the scaled-up rectangle
+by less than $`1`. If one of them is $`0`, the corresponding side of $`R` is shorter than $`1/p`.
+Otherwise the area of the rounded rectangle is a multiple of $`p` {uses "lem:int-rect-round"}[],
+and $`p` being prime, so is one of its sides, say
 $`\lfloor p x_1\rfloor - \lfloor p x_0\rfloor = pm`; then $`p(x_1 - x_0) - pm` is a difference of
 two floor remainders, each in $`[0,1)`, so $`|`width$` - m| < 1/p`.
 :::
