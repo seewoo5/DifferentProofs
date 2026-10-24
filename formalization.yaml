@@ -526,9 +526,11 @@ fidelity:
       formalization instead bases the integrand, lattice, or grid at the tiled
       rectangle's own corner, which avoids translating the tiling. What several proofs
       share is factored into the files of `IntegerRectangle/Tiling/`: the exact
-      partition of a tiling into half-open cells, its grid and the additivity of the
-      fg-area over it (`IsTiling.sum_fgArea`), walks from tile to tile (proofs 9 and
-      10), and the corners of the tiles at a point (proofs 7 and 8).
+      partition of a tiling into half-open cells and the additivity of area, its grid
+      and the additivity of the fg-area over it (`IsTiling.sum_fgArea`), the auxiliary
+      tilings obtained by moving its lines in order (`IsTiling.image`, for proofs 4, 5
+      and 6), walks from tile to tile (proofs 9 and 10), and the corners of the tiles
+      at a point (proofs 7 and 8).
     - Proof 7 (Eulerian path, Paterson) builds Paterson's graph as a mathlib multigraph
       through its half-edges (`HalfEdgePairing`, in `DifferentProofsForMathlib`): a
       half-edge is a tile together with one of its corners and is labelled by that

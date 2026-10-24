@@ -7,6 +7,7 @@ import DifferentProofs.IntegerRectangle.BipartiteGraph
 import DifferentProofs.IntegerRectangle.Checkerboard
 import DifferentProofs.IntegerRectangle.ComplexIntegral
 import DifferentProofs.IntegerRectangle.Tiling.CornerCount
+import DifferentProofs.IntegerRectangle.Tiling.Image
 import DifferentProofs.IntegerRectangle.CountingSquares
 import DifferentProofs.IntegerRectangle.CutSet
 import DifferentProofs.IntegerRectangle.Defs
@@ -110,6 +111,51 @@ to the triangle wave $`\min(r, 1-r)`, with $`r` the fractional part of $`b - s`,
 unless $`b - s \in \mathbb{Z}`; hence $`R` has an integer side.
 :::
 
+Wagon's fourth, fifth and sixth proofs each build an auxiliary tiling by moving the lines of the
+given one without changing their order, and compare a count or an area over the two tilings. They
+rest on three facts about tilings.
+
+:::lemma_ "lem:int-rect-partition" (parent := "grp:int-rect") (lean := "IntegerRectangle.IsTiling.iUnion_toSetIoc")
+The half-open cells of the tiles of a tiling — each tile with its left and bottom edges removed —
+are pairwise disjoint, and their union is the half-open cell of the tiled rectangle.
+:::
+
+:::proof "lem:int-rect-partition"
+Disjointness: a point common to two half-open cells moves down-and-left — to the midpoint between
+the higher of the two lower-left corners and the point itself — into the interiors of both tiles,
+contradicting interior-disjointness. Covering: a point of the ambient half-open cell is approached
+from below-left; every such nudge stays in $`R`, hence in some tile, and since there are finitely
+many tiles one tile contains nudges arbitrarily close in. That tile is closed, so it contains the
+point, and the nudges witness the two strict inequalities of its half-open cell.
+:::
+
+:::lemma_ "lem:int-rect-area" (parent := "grp:int-rect") (lean := "IntegerRectangle.IsTiling.sum_area")
+The areas of the tiles of a tiling add up to the area of the tiled rectangle.
+:::
+
+:::proof "lem:int-rect-area"
+The area of a rectangle is the Lebesgue measure of its half-open cell, and the half-open cells of
+the tiles partition that of the tiled rectangle {uses "lem:int-rect-partition"}[].
+:::
+
+:::lemma_ "lem:int-rect-move-lines" (parent := "grp:int-rect") (lean := "IntegerRectangle.IsTiling.image")
+Let $`T` tile $`R`, and move every vertical line $`x = a` of the tiling to $`x = \varphi(a)` and
+every horizontal line $`y = b` to $`y = \psi(b)`, by maps $`\varphi` and $`\psi` keeping the order
+of the abscissae of the vertical lines and of the ordinates of the horizontal ones. If $`R` does
+not collapse, the moved tiles that do not collapse to segments tile the moved $`R`.
+:::
+
+:::proof "lem:int-rect-move-lines"
+By half-open cells {uses "lem:int-rect-partition"}[]. Pull a point $`z` back to the point whose
+abscissa is the leftmost vertical line of the tiling whose image is not to the left of $`z`, or a
+point beyond the tiling if there is none, and whose ordinate is the lowest horizontal line whose
+image is not below $`z`. Since the moves keep the order of the lines, this point lies in the
+half-open cell of a tile, or of $`R`, exactly when $`z` lies in that of its image. So the
+half-open cells of the moved tiles are pairwise disjoint and cover the half-open cell of the moved
+$`R`, because those of the tiling are and do; a tile collapsed to a segment has an empty half-open
+cell and is discarded.
+:::
+
 Fourth proof: counting squares (Ruzsa, Gilbert). Wagon translates every grid line of the tiling
 that lies off the lattice through the corner of $`R` onto the nearest half-integer line, leaving
 lattice lines fixed; the tiling becomes a tiling of a translated rectangle all of whose
@@ -190,20 +236,6 @@ corners to integers, which requires verifying that the rounded rectangles tile a
 count lattice points: rounding is hidden inside a floor, and the re-tiling is replaced by the fact
 that the *half-open* cells of a tiling — each tile minus its left and bottom edges — genuinely
 partition the half-open cell of $`R`, with no null sets involved.
-
-:::lemma_ "lem:int-rect-partition" (parent := "grp:int-rect") (lean := "IntegerRectangle.IsTiling.iUnion_toSetIoc")
-The half-open cells of the tiles of a tiling are pairwise disjoint and their union is the half-open
-cell of the tiled rectangle.
-:::
-
-:::proof "lem:int-rect-partition"
-Disjointness: a point common to two half-open cells moves down-and-left — to the midpoint between
-the higher of the two lower-left corners and the point itself — into the interiors of both tiles,
-contradicting interior-disjointness. Covering: a point of the ambient half-open cell is approached
-from below-left; every such nudge stays in $`R`, hence in some tile, and since there are finitely
-many tiles one tile contains nudges arbitrarily close in. That tile is closed, so it contains the
-point, and the nudges witness the two strict inequalities of its half-open cell.
-:::
 
 :::lemma_ "lem:int-rect-count" (parent := "grp:int-rect") (lean := "IntegerRectangle.Primes.card_latticePoints_eq_sum")
 For $`p > 0`, the number of points of the lattice $`\tfrac1p\mathbb{Z} \times \tfrac1p\mathbb{Z}`
