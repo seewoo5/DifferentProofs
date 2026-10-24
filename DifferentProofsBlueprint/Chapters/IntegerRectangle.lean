@@ -206,11 +206,22 @@ the grid coordinates of the far edges of $`R`, and one of the two factors is eve
 both sides equal to half an odd integer, hence an odd number of squares.)
 :::
 
-Fifth proof: polynomials (Douady). Through the lower-left corner of $`R`, fix the two coordinate
-lattices and introduce a parameter $`t`. Move a vertical grid line by $`t` when its x-coordinate is
-off the x-lattice, and move a horizontal grid line by $`t` when its y-coordinate is off the
-y-lattice; leave lattice lines fixed. The perturbed areas become honest polynomials in $`t`; the
-fg-area formalizes them without separately constructing the auxiliary tiling.
+Fifth proof: polynomials (Douady). With the lattices again based at the lower-left corner of $`R`
+and a parameter $`t`, move a vertical line of the tiling by $`t` when its abscissa is off the
+lattice and a horizontal line by $`t` when its ordinate is, leaving the lattice lines fixed. For
+$`t` smaller than the least gap between the lines of the tiling the moved lines keep their order,
+and the areas of the moved rectangles are polynomials in $`t`.
+
+:::lemma_ "lem:int-rect-poly-sum" (parent := "grp:int-rect") (lean := "IntegerRectangle.Polynomials.sum_areaPoly")
+As a polynomial in $`t`, the area of the moved $`R` is the sum of the areas of the moved tiles.
+:::
+
+:::proof "lem:int-rect-poly-sum"
+For $`t` in an interval $`[0, \delta)` the moved lines keep their order, so the moved tiles tile
+the moved rectangle {uses "lem:int-rect-move-lines"}[] and the area of the moved rectangle is the
+sum of theirs {uses "lem:int-rect-area"}[]. The two polynomials therefore agree at infinitely many
+points, so they are equal.
+:::
 
 :::theorem "thm:int-rect-polynomials" (parent := "grp:int-rect") (lean := "IntegerRectangleTheorem_Polynomials") (proofColor := "#fbcfe8")
 A rectangle tiled by rectangles each with an integer side has an integer side.
@@ -218,21 +229,16 @@ A rectangle tiled by rectangles each with an integer side has an integer side.
 
 :::proof "thm:int-rect-polynomials"
 Let $`\varepsilon_x(u)` be $`0` when $`u - R_x \in \mathbb{Z}` and $`1` otherwise, and similarly
-define $`\varepsilon_y`; perturb the coordinates by $`\varphi_t(u) = u + t\varepsilon_x(u)` and
-$`\psi_t(v) = v + t\varepsilon_y(v)`. The perturbed area of a rectangle $`S` is then the value at
-$`t` of the polynomial $`P_S = (\Delta\varepsilon_x X + w)(\Delta\varepsilon_y X + h)`, with
-$`w, h` the sides of $`S` and $`\Delta\varepsilon` the indicator increments across them; its
-quadratic coefficient is the fg-area of the indicator pair. If a tile has an integer side, the two
-endpoints of that side have the same indicator, the corresponding factor is constant, and the
-quadratic coefficient vanishes: the tile's perturbed area is linear or constant in $`t`, as in
-Wagon's text. Additivity of the fg-area {uses "lem:int-rect-fgarea"}[] equates $`\sum_i P_{T_i}`
-with $`P_R` at every real $`t` — Wagon needs $`t` small so that the moved segments still bound a
-tiling, the algebraic identity does not — hence $`\sum_i P_{T_i} = P_R` as polynomials. If neither
-side of $`R` is an integer, each lower endpoint has indicator $`0` and each upper endpoint $`1`,
-so the quadratic coefficient of $`P_R` is $`1`; comparing $`X^2`-coefficients yields $`0 = 1`, a
-contradiction. (A polynomial-free variant of the same computation: each tile's term is affine in
-$`t`, so the second finite difference $`F(2) - 2F(1) + F(0)` of the identity vanishes tile by
-tile, while it equals $`2` on $`(w + t)(h + t)`.)
+define $`\varepsilon_y`, so that the lines move by $`\varphi_t(u) = u + t\varepsilon_x(u)` and
+$`\psi_t(v) = v + t\varepsilon_y(v)`. The area of a moved rectangle $`S` is the value at $`t` of
+the polynomial $`P_S = (\Delta\varepsilon_x X + w)(\Delta\varepsilon_y X + h)`, with $`w, h` the
+sides of $`S` and $`\Delta\varepsilon` the indicator increments across them. If a tile has an
+integer side, the two endpoints of that side have the same indicator, the corresponding factor is
+constant, and the quadratic coefficient vanishes: the area of the moved tile is linear or constant
+in $`t`, and hence {uses "lem:int-rect-poly-sum"}[] so is the area of the moved $`R`. If neither
+side of $`R` is an integer, each lower endpoint has indicator $`0` and each upper endpoint $`1`, so
+the moved $`R` is $`(w + t) \times (h + t)` and its area has quadratic coefficient $`1`, a
+contradiction.
 :::
 
 Sixth proof: prime numbers (Robinson). Wagon scales the tiling by a prime $`p` and rounds all tile
