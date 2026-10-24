@@ -16,8 +16,9 @@ We formalize the result of Stan Wagon, *Fourteen Proofs of a Result About Tiling
 Following Wagon, a *tiling* of a rectangle is a covering by finitely many axis-parallel
 rectangles with pairwise-disjoint interiors. We model an axis-parallel rectangle by its
 lower-left and upper-right corners (`Rectangle`), read off its planar point set (`Rectangle.toSet`),
-and record the tiling hypothesis in `IsTiling`. The theorem to be proved is
-`IntegerRectangleTheorem`.
+and record the tiling hypothesis in `IsTiling`. A `Rectangle` may be degenerate, a segment or a
+point, but the tiles of a tiling are genuine rectangles, of positive width and height
+(`Rectangle.Nondegenerate`). The theorem to be proved is `IntegerRectangleTheorem`.
 -/
 
 @[expose] public section
@@ -55,11 +56,16 @@ def height (R : Rectangle) : ℝ := R.y₁ - R.y₀
 def HasIntegerSide (R : Rectangle) : Prop :=
   (∃ n : ℤ, R.width = n) ∨ (∃ n : ℤ, R.height = n)
 
+/-- A rectangle is *nondegenerate* when it has positive width and positive height — equivalently,
+when its interior is nonempty. -/
+def Nondegenerate (R : Rectangle) : Prop := R.x₀ < R.x₁ ∧ R.y₀ < R.y₁
+
 end Rectangle
 
 /-- `IsTiling R T` says that the finite family of rectangles `T` tiles the rectangle `R`: the
-tiles cover `R` and have pairwise-disjoint interiors. This is Wagon's notion of a tiling, "a
-covering with interior pairwise-disjoint sets".
+tiles cover `R`, have pairwise-disjoint interiors, and are nondegenerate. This is Wagon's notion of
+a tiling, "a covering with interior pairwise-disjoint sets", by genuine rectangles: a degenerate
+tile, a segment or a point, has empty interior, so it could lie anywhere in `R`.
 
 The index type intentionally lives in `Type`: every finite family can be reindexed by `Fin n`, and
 fixing its universe prevents independent tile-index universes from appearing across the proofs. -/
@@ -69,6 +75,8 @@ structure IsTiling {ι : Type} [Fintype ι] (R : Rectangle) (T : ι → Rectangl
   /-- Distinct tiles have disjoint interiors. -/
   interiorDisjoint :
     Pairwise fun i j ↦ Disjoint (interior (T i).toSet) (interior (T j).toSet)
+  /-- Every tile has positive width and height. -/
+  nondegenerate : ∀ i, (T i).Nondegenerate
 
 end IntegerRectangle
 
