@@ -266,9 +266,8 @@ Of the degrees only the parity is ever used. Wagon reads it off the local pictur
 than a corner of $`R` is a corner of $`2` or $`4` tiles — which is a statement about how tiles fit
 together around a point. It follows instead from the fg-area additivity of the thirteenth proof
 below, with no local analysis at all, in the form of the corner parity lemma, which the eighth
-proof shares. Corners are counted with multiplicity, so degenerate tiles need no separate
-treatment. Nor is the walk built step by step: what makes it reach a second corner of $`R` is the
-handshake lemma, which stands in for it here since mathlib's multigraphs have no walks yet.
+proof shares. Nor is the walk built step by step: what makes it reach a second corner of $`R` is
+the handshake lemma, which stands in for it here since mathlib's multigraphs have no walks yet.
 
 :::lemma_ "lem:int-rect-corner-parity" (parent := "grp:int-rect") (lean := "IntegerRectangle.IsTiling.sum_cornerCount_mod_two")
 Let $`T` tile $`R`. At every point of the plane, the tiles have in total a number of corners
@@ -303,10 +302,9 @@ corner of $`R`.
 
 :::proof "lem:int-rect-euler-walk"
 The degree of a vertex is the number of tiles having it as a corner, so by corner parity
-{uses "lem:int-rect-corner-parity"}[] the vertices of odd degree are the corners of $`R`, counted
-with multiplicity. If $`R` is degenerate, its lower-left corner is another of its corners as
-well. Otherwise the lower-left corner has degree $`1` modulo $`2`, and by the handshake lemma
-{uses "lem:handshake"}[] a walk leads from it to another vertex of odd degree, a corner of $`R`.
+{uses "lem:int-rect-corner-parity"}[] the vertices of odd degree are the corners of $`R`. The
+lower-left corner is one of them, and by the handshake lemma {uses "lem:handshake"}[] a walk leads
+from it to another vertex of odd degree, which is another corner of $`R`.
 :::
 
 :::theorem "thm:int-rect-euler" (parent := "grp:int-rect") (lean := "IntegerRectangleTheorem_EulerianPath") (proofColor := "#fbcfe8")

@@ -28,8 +28,8 @@ plane, those that are not corners of tiles being isolated.
 
 The degree of a vertex is the number of darts at it, which is the number of corners the tiles have
 there (`card_darts_eq`), and only its parity is used. That is the corner parity of `CornerCount`,
-which replaces Wagon's local picture: unless `R` is degenerate, the vertices of odd degree are
-exactly its corners (`odd_card_darts_iff`).
+which replaces Wagon's local picture: the vertices of odd degree are exactly the corners of `R`
+(`odd_card_darts_iff`), each of which lies on exactly one tile.
 
 Paterson walks a trail from a corner of `R` until it gets stuck. Mathlib's multigraphs have no
 walks yet, so the handshake lemma stands in for the trail: a vertex of odd degree is joined by a
@@ -135,9 +135,8 @@ theorem odd_card_darts_iff (hT : IsTiling R T) (p : ℝ × ℝ) :
 /-! ### The proof -/
 
 /-- **The walk of Paterson's proof.** A walk in `Γ` leads from the lower-left corner of `R` to
-another of its corners. If `R` is degenerate, another of its corners is the lower-left one itself.
-Otherwise the lower-left corner is a vertex of odd degree, so the handshake lemma joins it to
-another vertex of odd degree, and that is a corner of `R`. -/
+another of its corners: the lower-left corner is a vertex of odd degree, so the handshake lemma
+joins it to another vertex of odd degree, and that is a corner of `R`. -/
 theorem exists_reachable_corner (hT : IsTiling R T) :
     Relation.ReflTransGen (patersonGraph T).Adj (R.x₀, R.y₀) (R.x₁, R.y₀) ∨
       Relation.ReflTransGen (patersonGraph T).Adj (R.x₀, R.y₀) (R.x₀, R.y₁) ∨
