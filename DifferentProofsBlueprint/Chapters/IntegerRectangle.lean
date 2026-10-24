@@ -13,6 +13,7 @@ import DifferentProofs.IntegerRectangle.CutSet
 import DifferentProofs.IntegerRectangle.Defs
 import DifferentProofs.IntegerRectangle.EulerianPath
 import DifferentProofs.IntegerRectangle.Tiling.GridRefinement
+import DifferentProofs.IntegerRectangle.Tiling.Slice
 import DifferentProofs.IntegerRectangle.Polynomials
 import DifferentProofs.IntegerRectangle.Primes
 import DifferentProofs.IntegerRectangle.RealIntegral
@@ -409,6 +410,35 @@ four tiles {uses "lem:int-rect-local-picture"}[], so this one is another corner 
 on the lattice through the lower-left corner it is an integer width or height away from it.
 :::
 
+The two inductive proofs that follow treat as immediate the case of a tiling all of whose tiles
+have integer width, or all of whose tiles have integer height. It is settled by slicing the tiling
+along a line, the geometric ingredient of the twelfth proof below.
+
+:::lemma_ "lem:int-rect-slice" (parent := "grp:int-rect") (lean := "IntegerRectangle.widthSum_slice")
+Let $`T` tile $`R` and let $`t` be a height between the bottom and the top of $`R` avoiding every
+horizontal tile edge. Then the widths of the tiles crossed by the line $`y = t` add up to the width
+of $`R`.
+:::
+
+:::proof "lem:int-rect-slice"
+Length along the line $`y = t` is a measure on the plane, so it adds up over the half-open cells of
+the tiles, which partition that of $`R` {uses "lem:int-rect-partition"}[]. Because $`t` avoids the
+horizontal edges, the line meets the half-open cell of a tile, in an interval as long as the tile
+is wide, exactly when it crosses the tile; and it meets the half-open cell of $`R` in an interval
+of the full width, since it is not the bottom edge of $`R`: the tile containing the point of the
+left edge of $`R` at height $`t` reaches below it.
+:::
+
+:::lemma_ "lem:int-rect-all-h" (parent := "grp:int-rect") (lean := "IntegerRectangle.intWidth_of_forall")
+If every tile of a tiling of $`R` has integer width, then so has $`R`; and likewise for heights.
+:::
+
+:::proof "lem:int-rect-all-h"
+A horizontal line through $`R` avoiding the finitely many heights of horizontal tile edges crosses
+tiles whose widths add up to the width of $`R` {uses "lem:int-rect-slice"}[], and these widths are
+integers. For heights, transpose the tiling.
+:::
+
 Ninth proof: induction (Raphael Robinson). Call a tile an *H-tile* if it is designated by its
 integer width and a *V-tile* if it is designated by its integer height. Cutting every tile into
 unit pieces along its designated side normalizes the tiling: every H-tile is then exactly one unit
@@ -485,7 +515,8 @@ A rectangle tiled by rectangles each with an integer side has an integer side.
 
 :::proof "thm:int-rect-induction"
 Normalize the tiling {uses "lem:int-rect-normalize"}[] and induct on the number of its H-tiles.
-With no H-tile every tile has integer height, hence so does $`R`. Otherwise grow the staircase
+With no H-tile every tile has integer height, hence so does $`R`
+{uses "lem:int-rect-all-h"}[]. Otherwise grow the staircase
 from an H-tile {uses "lem:int-rect-staircase"}[]. If $`R` is narrower than two units then the
 H-tile leaves no room beside it and $`R` is exactly one unit wide. Otherwise cut the staircase out
 {uses "lem:int-rect-cut"}[]: heights never change, so V-tiles stay V-tiles, and an H-tile is
@@ -553,9 +584,8 @@ A rectangle tiled by rectangles each with an integer side has an integer side.
 :::
 
 :::proof "thm:int-rect-links"
-Induct on the number of tiles. If every tile has integer width the fg-area for the fractional part
-horizontally and the identity vertically vanishes on every tile, hence on $`R`, so $`R` has integer
-width; likewise if every tile has integer height. Otherwise some link is reducible
+Induct on the number of tiles. If every tile has integer width then so has $`R`, and if every tile
+has integer height then so has $`R` {uses "lem:int-rect-all-h"}[]. Otherwise some link is reducible
 {uses "lem:int-rect-link-exists"}[], say a V-link with only H-tiles on its right; take for $`w` the
 width of the narrowest of them and push {uses "lem:int-rect-link-push"}[]. Heights never change, so
 V-tiles stay V-tiles, and widths change by the integer $`w`, so H-tiles stay H-tiles; but the
@@ -674,21 +704,8 @@ otherwise the width is {uses "lem:int-rect-cut-path"}[].
 
 Twelfth proof: a sweep line (Bachman–Yannakakis). This one does not use the analytic engine above.
 Instead of an integral it propagates a conserved quantity upward through the tiling, and the only
-geometry it needs is what a horizontal cut of a tiling looks like — the slice lemma below.
-
-:::lemma_ "lem:int-rect-slice" (parent := "grp:int-rect") (lean := "IntegerRectangle.SweepLine.widthSum_slice")
-Let $`T` tile $`R` and let $`t` be a height between the bottom and the top of $`R` avoiding every
-horizontal tile edge. Then the widths of the tiles crossed by the line $`y = t` add up to the width
-of $`R`.
-:::
-
-:::proof "lem:int-rect-slice"
-Because $`t` avoids the horizontal edges, a tile met by the line at all is crossed through its
-interior, and its trace on the line is the closed interval spanned by its width. The traces cover
-the full cross-section of $`R` at height $`t` because the tiles cover $`R`, and two distinct traces
-meet in a null set: an interior point of both traces would be an interior point of both tiles.
-Additivity of one-dimensional Lebesgue measure over this almost-disjoint cover gives the claim.
-:::
+geometry it needs is what a horizontal cut of a tiling looks like — the slice lemma of the ninth
+and tenth proofs.
 
 :::lemma_ "lem:int-rect-conservation" (parent := "grp:int-rect") (lean := "IntegerRectangle.SweepLine.gain_eq_loss")
 At every height $`c` strictly between the bottom and the top of $`R`, the tiles whose bottom edge
