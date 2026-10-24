@@ -5,10 +5,10 @@ Authors: Seewoo Lee
 -/
 module
 
-public import DifferentProofsForMathlib.Combinatorics.Enumerative.Involution
 public import DifferentProofsForMathlib.Combinatorics.Graph.Connected.Basic
 public import DifferentProofsForMathlib.Combinatorics.Graph.Connected.EdgeCut
 public import DifferentProofsForMathlib.Combinatorics.Graph.Cycle
+public import DifferentProofsForMathlib.Combinatorics.Graph.HalfEdgePairing
 public import Mathlib.Algebra.CharP.Two
 public import Mathlib.Algebra.Field.ZMod
 public import Mathlib.Algebra.GroupWithZero.Indicator
@@ -29,10 +29,11 @@ walks along the boundary of a face. `CombinatorialMap V E F D` names the vertice
 by the types `V`, `E` and `F`, through labelings of the darts whose fibres are exactly the orbits.
 
 The **graph** of a map has the vertices and edges of the map, and its **dual graph** has the faces
-as vertices, the edge of a dart joining the faces of its two darts. A map is **planar**, an
-embedding in the sphere, when its graph is connected and its Euler characteristic
-`#V - #E + #F` is `2`; by the classification of surfaces this is the usual combinatorial
-definition of planarity.
+as vertices, the edge of a dart joining the faces of its two darts: both are graphs of the
+underlying pairing of half-edges (`HalfEdgePairing`), for the labelings of the darts by vertices
+and by faces (`HalfEdgePairing.labelGraph`). A map is **planar**, an embedding in the sphere, when
+its graph is connected and its Euler characteristic `#V - #E + #F` is `2`; by the classification
+of surfaces this is the usual combinatorial definition of planarity.
 
 ## Main results
 
@@ -50,8 +51,9 @@ graph; both maps come from incidence matrices. In any map the image lies in the 
 of times. For a connected map they have dimensions `#V - 1` and `#E - #F + 1`, so Euler's formula
 makes them equal. A bond is then a minimal nonempty edge set meeting every face evenly, and such a
 set is a cycle of the dual graph (`CombinatorialMap.isCycle_of_minimal`): the rest of it joins the
-two ends of any of its edges, by a parity count, and a shortest path between them closes up with
-the edge to a cycle that, being even, is all of it.
+two ends of any of its edges, by the handshake lemma
+(`HalfEdgePairing.even_card_of_forall_adj_restrict`), and a shortest path between them closes up
+with the edge to a cycle that, being even, is all of it.
 
 This file is intended for `Mathlib/Combinatorics/Graph/CombinatorialMap.lean`.
 
@@ -67,25 +69,18 @@ open Finset Matrix
 /-- A **combinatorial map** with vertices `V`, edges `E` and faces `F` on the darts `D`: the
 rotation `vertexPerm` around the vertices and the fixed-point-free involution `edgePerm` pairing
 the two darts of each edge, together with labelings `vert`, `edge` and `face` of the darts whose
-fibres are the orbits of `vertexPerm`, of `edgePerm` and of `vertexPerm * edgePerm`. -/
-structure CombinatorialMap (V E F D : Type*) where
+fibres are the orbits of `vertexPerm`, of `edgePerm` and of `vertexPerm * edgePerm`. The
+involution and the edge labeling form the underlying pairing of half-edges. -/
+structure CombinatorialMap (V E F D : Type*) extends HalfEdgePairing E D where
   /-- The rotation, turning each dart to the next one around its vertex. -/
   vertexPerm : Equiv.Perm D
-  /-- The involution exchanging the two darts of each edge. -/
-  edgePerm : Equiv.Perm D
   /-- The vertex of a dart. -/
   vert : D → V
-  /-- The edge of a dart. -/
-  edge : D → E
   /-- The face of a dart. -/
   face : D → F
-  edgePerm_edgePerm (d : D) : edgePerm (edgePerm d) = d
-  edgePerm_ne (d : D) : edgePerm d ≠ d
   vert_eq_vert_iff (d d' : D) : vert d = vert d' ↔ vertexPerm.SameCycle d d'
-  edge_eq_edge_iff (d d' : D) : edge d = edge d' ↔ d' = d ∨ d' = edgePerm d
   face_eq_face_iff (d d' : D) : face d = face d' ↔ (vertexPerm * edgePerm).SameCycle d d'
   vert_surjective : Function.Surjective vert
-  edge_surjective : Function.Surjective edge
   face_surjective : Function.Surjective face
 
 namespace CombinatorialMap
@@ -106,40 +101,9 @@ lemma face_facePerm (d : D) : M.face (M.facePerm d) = M.face d :=
 lemma vert_facePerm (d : D) : M.vert (M.facePerm d) = M.vert (M.edgePerm d) :=
   M.vert_vertexPerm _
 
-lemma edge_edgePerm (d : D) : M.edge (M.edgePerm d) = M.edge d :=
-  ((M.edge_eq_edge_iff _ _).mpr (.inr rfl)).symm
-
 /-! ### The graph and the dual graph -/
 
-/-- The multigraph whose vertices are the labels `lab` of the darts and whose edges are those of
-the map, the edge of a dart `d` joining the label of `d` to the label of the other dart of its
-edge. Labelling darts by their vertices gives the graph of the map, by their faces its dual. -/
-def labelGraph (lab : D → W) : Graph W E where
-  vertexSet := Set.univ
-  IsLink e x y := ∃ d, M.edge d = e ∧ lab d = x ∧ lab (M.edgePerm d) = y
-  edgeSet := Set.univ
-  isLink_symm _ _ := ⟨fun _ _ ⟨d, hd, hx, hy⟩ ↦
-    ⟨M.edgePerm d, (M.edge_edgePerm d).trans hd, hy,
-      (congrArg lab (M.edgePerm_edgePerm d)).trans hx⟩⟩
-  eq_or_eq_of_isLink_of_isLink := by
-    rintro e x y v w ⟨d, rfl, rfl, rfl⟩ ⟨d', hd', rfl, rfl⟩
-    rcases (M.edge_eq_edge_iff d d').mp hd'.symm with rfl | rfl
-    · exact .inl rfl
-    · exact .inr (by rw [M.edgePerm_edgePerm])
-  edge_mem_iff_exists_isLink e := by
-    obtain ⟨d, rfl⟩ := M.edge_surjective e
-    exact iff_of_true trivial ⟨_, _, d, rfl, rfl, rfl⟩
-  left_mem_of_isLink _ _ _ _ := trivial
-
-lemma labelGraph_isLink {lab : D → W} {e : E} {x y : W} :
-    (M.labelGraph lab).IsLink e x y ↔ ∃ d, M.edge d = e ∧ lab d = x ∧ lab (M.edgePerm d) = y :=
-  Iff.rfl
-
-lemma labelGraph_isLink_dart (lab : D → W) (d : D) :
-    (M.labelGraph lab).IsLink (M.edge d) (lab d) (lab (M.edgePerm d)) :=
-  ⟨d, rfl, rfl, rfl⟩
-
-/-- The graph of the map. -/
+/-- The graph of the map: the darts labeled by their vertices. -/
 def graph : Graph V E := M.labelGraph M.vert
 
 /-- The dual graph of the map: its vertices are the faces, and the edge of a dart joins the faces
@@ -500,14 +464,11 @@ theorem isCycle_of_minimal (lab : D → W) {C : Set E}
     by_contra hw
     set K : Set W := {x | Relation.ReflTransGen r (lab d₀) x}
     have hK₀ : lab d₀ ∈ K := Relation.ReflTransGen.refl
-    -- The darts of `C'` carrying labels in `K` pair off under `edgePerm`...
+    -- By the handshake lemma, the darts of `C'` carrying labels in `K` are evenly many...
     have hpair : Even (#{d | lab d ∈ K ∧ M.edge d ∈ C'}) := by
-      refine even_card_of_involution_of_forall_ne (s := ({d | lab d ∈ K ∧ M.edge d ∈ C'} :
-        Finset D)) (f := M.edgePerm) (fun d hd ↦ ?_) (fun d _ ↦ M.edgePerm_edgePerm d)
-        fun d _ ↦ M.edgePerm_ne d
-      rw [mem_filter] at hd ⊢
-      refine ⟨mem_univ _, ?_, by rw [M.edge_edgePerm]; exact hd.2.2⟩
-      exact Relation.ReflTransGen.tail hd.2.1 ⟨M.edge d, hd.2.2, M.labelGraph_isLink_dart lab d⟩
+      rw [← Fintype.card_subtype, ← Nat.card_eq_fintype_card]
+      exact M.even_card_of_forall_adj_restrict lab C' fun _ _ hx hxy ↦
+        Relation.ReflTransGen.tail hx hxy
     -- ...yet, counted through the labels, there is an odd number of them.
     have hsplit : ∀ d, C'.indicator (1 : E → ZMod 2) (M.edge d) =
         C.indicator 1 (M.edge d) - ({M.edge d₀} : Set E).indicator 1 (M.edge d) := by

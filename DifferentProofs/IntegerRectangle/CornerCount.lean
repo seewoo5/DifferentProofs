@@ -7,8 +7,8 @@ public import Mathlib.Data.ZMod.Basic
 # Counting the corners of the tiles of a tiling
 
 Two of Wagon's proofs — the Eulerian path of Paterson and its bipartite-graph variation — count
-incidences between the tiles of a tiling and a set of points, each tile being joined to the points
-that are corners of it. This file is what they share: the corner count and its two properties.
+incidences between the tiles of a tiling and points of the plane, each tile being joined to the
+points that are corners of it. This file is what they share: the corner count and its parity.
 
 The number of corners a rectangle has at a point, the four corners being counted with multiplicity
 so that degenerate rectangles need no separate treatment, is `cornerCount`. Wagon reads its
@@ -24,11 +24,10 @@ the fg-area of a rectangle is its corner count at the point with the left and bo
 negatively (`cornerSign`), which is additive over a tiling for free and which mod `2` is the corner
 count itself.
 
-Summing the corner parity over a finite set `Z` of points gives the double count
-`IsTiling.even_sum_cornerCount`: if every tile has an even number of corners in `Z`, then so has
-`R`. The number of corners a rectangle has in `Z` is read off by `sum_cornerCount_eq`. The two
-proofs differ only in the set `Z` they use: a connected component of the graph of designated tile
-sides for the seventh proof, a lattice grid for the eighth.
+The seventh proof uses the corner parity point by point, the number of corners the tiles have at
+a point being its degree in Paterson's graph. The eighth sums it over a finite set `Z` of points, a
+lattice grid, in the double count `IsTiling.even_sum_cornerCount`: if every tile has an even number
+of corners in `Z`, then so has `R`.
 -/
 
 @[expose] public section
@@ -87,24 +86,6 @@ theorem IsTiling.sum_cornerCount_mod_two (hT : IsTiling R T) (u v : ℝ) :
   simpa [← cornerSign_cast] using congrArg (fun m : ℤ ↦ (m : ZMod 2)) key
 
 /-! ### The double count -/
-
-/-- **The corners of a rectangle in a finite set of points**, counted with multiplicity. -/
-theorem sum_cornerCount_eq (S : Rectangle) (Z : Finset (ℝ × ℝ)) :
-    ∑ z ∈ Z, cornerCount S z.1 z.2 =
-      ((if (S.x₀, S.y₀) ∈ Z then 1 else 0) + (if (S.x₁, S.y₀) ∈ Z then 1 else 0)) +
-        ((if (S.x₀, S.y₁) ∈ Z then 1 else 0) + (if (S.x₁, S.y₁) ∈ Z then 1 else 0)) := by
-  simp only [cornerCount, xCount, yCount, add_mul, mul_add, ite_zero_mul_ite_zero, mul_one,
-    ← Prod.mk.injEq, Prod.mk.eta, Finset.sum_add_distrib, Finset.sum_ite_eq]
-
-/-- **A rectangle with an integer side has `0`, `2` or `4` corners in `Z`.** What is used of the
-integer side is that the two ends of each of the two sides in that direction are together in `Z`
-or together out of it. -/
-theorem even_sum_cornerCount_of_sides (S : Rectangle) {Z : Finset (ℝ × ℝ)}
-    (h : (((S.x₀, S.y₀) ∈ Z ↔ (S.x₁, S.y₀) ∈ Z) ∧ ((S.x₀, S.y₁) ∈ Z ↔ (S.x₁, S.y₁) ∈ Z)) ∨
-      (((S.x₀, S.y₀) ∈ Z ↔ (S.x₀, S.y₁) ∈ Z) ∧ ((S.x₁, S.y₀) ∈ Z ↔ (S.x₁, S.y₁) ∈ Z))) :
-    Even (∑ z ∈ Z, cornerCount S z.1 z.2) := by
-  rw [sum_cornerCount_eq]
-  obtain ⟨h₁, h₂⟩ | ⟨h₁, h₂⟩ := h <;> simp only [h₁, h₂] <;> split_ifs <;> decide
 
 /-- **The double count.** Let `T` tile `R` and let `Z` be a finite set of points such that every
 tile has an even number of corners in `Z`. Then so has `R`.
