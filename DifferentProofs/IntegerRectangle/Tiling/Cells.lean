@@ -279,6 +279,15 @@ theorem IsTiling.eq_of_mem_cell (hT : IsTiling R T) {sx sy : Bool} {x y : ℝ} {
 one. -/
 def prune (T : ι → Rectangle) (i : {i : ι // (T i).Nondegenerate}) : Rectangle := T i.1
 
+/-- Pruning a family does not change the sum of a quantity that degenerate rectangles do not
+carry, such as their area. -/
+lemma sum_prune {M : Type*} [AddCommMonoid M] (T : ι → Rectangle) {f : Rectangle → M}
+    (hf : ∀ S : Rectangle, ¬ S.Nondegenerate → f S = 0) :
+    ∑ i, f (prune T i) = ∑ i, f (T i) := by
+  classical
+  exact (Finset.sum_subtype _ (fun _ ↦ by simp) fun i ↦ f (T i)).symm.trans
+    (Finset.sum_filter_of_ne fun i _ hi ↦ by_contra fun h ↦ hi (hf _ h))
+
 /-- **Recognising a tiling after pruning.** Cutting up or moving the tiles of a tiling can leave
 degenerate rectangles behind. A family of rectangles inside a nondegenerate `R` whose half-open
 cells are pairwise disjoint and cover the half-open cell of `R` still has its nondegenerate members

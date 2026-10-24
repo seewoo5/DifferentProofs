@@ -28,7 +28,8 @@ tiling only partitions the rectangle up to null sets; deleting each tile's left 
 * `IsTiling.pairwiseDisjoint_toSetIoc` and `IsTiling.iUnion_toSetIoc` — the half-open cells of a
   tiling partition the half-open cell of the tiled rectangle.
 * `IsTiling.measure_toSetIoc` — consequently *every* measure on the plane, not just Lebesgue, is
-  additive over a tiling.
+  additive over a tiling; for Lebesgue measure this is the additivity of area,
+  `IsTiling.sum_area`.
 
 The integrals of the first three proofs are taken over the closed tiles instead, and are handled
 in `DifferentProofs.IntegerRectangle.Tiling.Integral`.
@@ -81,6 +82,20 @@ noncomputable instance : DecidablePred Nondegenerate :=
 
 /-- A rectangle's width is nonnegative. -/
 lemma width_nonneg (R : Rectangle) : 0 ≤ R.width := sub_nonneg.mpr R.hx
+
+/-- A rectangle's height is nonnegative. -/
+lemma height_nonneg (R : Rectangle) : 0 ≤ R.height := sub_nonneg.mpr R.hy
+
+/-- The area of a rectangle. -/
+def area (R : Rectangle) : ℝ := R.width * R.height
+
+/-- A rectangle's area is nonnegative. -/
+lemma area_nonneg (R : Rectangle) : 0 ≤ R.area := mul_nonneg R.width_nonneg R.height_nonneg
+
+/-- A degenerate rectangle has no area. -/
+lemma area_eq_zero_of_not_nondegenerate {R : Rectangle} (h : ¬ R.Nondegenerate) : R.area = 0 :=
+  mul_eq_zero.mpr <| (not_and_or.mp h).imp (fun h ↦ sub_eq_zero.mpr (R.hx.antisymm' (not_lt.mp h)))
+    fun h ↦ sub_eq_zero.mpr (R.hy.antisymm' (not_lt.mp h))
 
 /-- A rectangle is an **H-tile**, in Wagon's terms, when its width, its horizontal side, is an
 integer. -/
@@ -220,6 +235,17 @@ theorem IsTiling.measure_toSetIoc (hT : IsTiling R T) (μ : Measure (ℝ × ℝ)
   rw [← hT.iUnion_toSetIoc,
     measure_iUnion hT.pairwiseDisjoint_toSetIoc fun i ↦ (T i).measurableSet_toSetIoc,
     tsum_fintype]
+
+/-- The half-open cell of a rectangle has Lebesgue measure its area. -/
+lemma Rectangle.volume_toSetIoc (S : Rectangle) : volume S.toSetIoc = ENNReal.ofReal S.area := by
+  simp only [Measure.volume_eq_prod, Rectangle.toSetIoc, Measure.prod_prod, Real.volume_Ioc,
+    ← ENNReal.ofReal_mul (sub_nonneg.mpr S.hx), Rectangle.area, Rectangle.width, Rectangle.height]
+
+/-- **Area is additive over a tiling**: Lebesgue measure is. -/
+theorem IsTiling.sum_area (hT : IsTiling R T) : ∑ i, (T i).area = R.area := by
+  simpa only [eq_comm, Rectangle.volume_toSetIoc, Finset.mem_univ, Rectangle.area_nonneg, imp_self,
+    implies_true, ← ENNReal.ofReal_sum_of_nonneg, Finset.sum_nonneg, ENNReal.ofReal_eq_ofReal_iff]
+    using hT.measure_toSetIoc volume
 
 end Partition
 

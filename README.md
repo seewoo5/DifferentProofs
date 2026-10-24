@@ -80,8 +80,9 @@ formalized.
 - Proof 13: [Step functions (Hochster–Maté)](DifferentProofs/IntegerRectangle/StepFunction.lean)
 - Proof 14: [Sperner's lemma (Schmerl)](DifferentProofs/IntegerRectangle/Sperner.lean)
 
-What several of the proofs share — half-open cells, the grid of a tiling and the fg-area summed
-over it, walks from tile to tile, and the corners of the tiles at a point — is in
+What several of the proofs share — half-open cells and the additivity of area, the grid of a
+tiling and the fg-area summed over it, auxiliary tilings obtained by moving its lines, walks
+from tile to tile, and the corners of the tiles at a point — is in
 [`DifferentProofs/IntegerRectangle/Tiling/`](DifferentProofs/IntegerRectangle/Tiling).
 
 ## Verifying that the proofs prove the same thing

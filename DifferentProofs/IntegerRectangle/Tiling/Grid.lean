@@ -20,6 +20,8 @@ something cell by cell: the fg-area is summed over it in
 `DifferentProofs.IntegerRectangle.Tiling.GridRefinement`, and the complete edges of Schmerl's
 Sperner argument are counted over its horizontal segments in
 `DifferentProofs.IntegerRectangle.Sperner`.
+The lines of the grid are also the lines that the auxiliary tilings of the fourth to sixth proofs
+move (`DifferentProofs.IntegerRectangle.Tiling.Image`).
 
 The sorting of the edge coordinates is handled by `Finset.sort`; the `nth` layer below turns the
 sorted list into a total function `ℕ → ℝ`, so that all sums range over `Finset.range` and
