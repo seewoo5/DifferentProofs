@@ -1,43 +1,50 @@
 module
 
-public import DifferentProofs.IntegerRectangle.Tiling.GridRefinement
+public import DifferentProofs.IntegerRectangle.Tiling.Cells
 public import Mathlib.Data.ZMod.Basic
 
 /-!
-# Counting the corners of the tiles of a tiling
+# The corners of the tiles at a point
 
 Two of Wagon's proofs — the Eulerian path of Paterson and its bipartite-graph variation — count
-incidences between the tiles of a tiling and points of the plane, each tile being joined to the
-points that are corners of it. This file is what they share: the corner count and its parity.
+incidences between the tiles of a tiling and the points of the plane, each tile being joined to
+the points that are corners of it. Both read the count at a point off the local picture of how
+the tiles fit together there: a corner of `R` is a corner of exactly one tile, and every other
+point is a corner of `2` or `4` tiles, or of none. That is `IsTiling.sum_cornerCount_eq`, which
+this file proves from the four quadrants at the point.
 
-The number of corners a rectangle has at a point, the four corners being counted with multiplicity
-so that degenerate rectangles need no separate treatment, is `cornerCount`. Wagon reads its
-behaviour off the local picture — a point other than a corner of `R` is a corner of `2` or `4`
-tiles — which is a statement about how tiles fit together around a point. Only the parity is ever
-used, and that is `IsTiling.sum_cornerCount_mod_two`:
+A tile containing a point *fills* one, two or four of the quadrants there: one if the point is a
+corner of the tile, two if it lies inside one of its edges, and four if it lies inside the tile
+(`card_quadrants_eq`, `cornerCount_eq_ite`). Each quadrant inside `R` is filled by exactly one
+tile (`IsTiling.existsUnique_cell`), so the numbers of quadrants the tiles fill add up to the
+number of quadrants inside `R` (`IsTiling.sum_card_quadrants`): four at a point inside `R`, two at
+a point inside one of its edges, and one at a corner. The tiles filling a single quadrant, which
+are the tiles having the point as a corner, are therefore at most as many as the quadrants inside
+`R`, and as many up to an even number.
 
-> at every point of the plane the tiles have, in total, as many corners as `R` does, mod `2`,
+The number of corners a rectangle has at a point, the four corners being counted with
+multiplicity so that degenerate rectangles need no separate treatment, is `cornerCount`, and the
+corners themselves are `Rectangle.corner`.
 
-which comes from additivity of the fg-area (`IsTiling.sum_fgArea`) applied to the indicator
-functions of the two coordinate lines through the point, with no local analysis at all. For those
-the fg-area of a rectangle is its corner count at the point with the left and bottom edges counted
-negatively (`cornerSign`), which is additive over a tiling for free and which mod `2` is the corner
-count itself.
-
-The seventh proof uses the corner parity point by point, the number of corners the tiles have at
-a point being its degree in Paterson's graph. The eighth sums it over a finite set `Z` of points, a
-lattice grid, in the double count `IsTiling.even_sum_cornerCount`: if every tile has an even number
-of corners in `Z`, then so has `R`.
+The bipartite-graph proof sums the parity of the count, `IsTiling.sum_cornerCount_mod_two`, over a
+finite set `Z` of points, a lattice grid, in the double count `IsTiling.even_sum_cornerCount`: if
+every tile has an even number of corners in `Z`, then so has `R`.
 -/
 
 @[expose] public section
+
+open Finset
 
 namespace IntegerRectangle
 
 /-! ### Counting corners at a point -/
 
-/-- The number of vertical edges of `S` on the line `x = u`: `0` or `1`, and `2` for a rectangle
-degenerate in the horizontal direction. -/
+/-- The corner of `S` named by `b`: on its right side if `b.1`, on its top side if `b.2`. -/
+def Rectangle.corner (S : Rectangle) (b : Bool × Bool) : ℝ × ℝ :=
+  (if b.1 then S.x₁ else S.x₀, if b.2 then S.y₁ else S.y₀)
+
+/-- The number of vertical edges of `S` on the line `x = u`: `0` or `1`, and `2` when `S` is
+degenerate in the horizontal direction and lies on that line. -/
 noncomputable def xCount (S : Rectangle) (u : ℝ) : ℕ :=
   (if S.x₀ = u then 1 else 0) + (if S.x₁ = u then 1 else 0)
 
@@ -49,41 +56,84 @@ noncomputable def yCount (S : Rectangle) (v : ℝ) : ℕ :=
 multiplicity: a degenerate rectangle has repeated corners. -/
 noncomputable def cornerCount (S : Rectangle) (u v : ℝ) : ℕ := xCount S u * yCount S v
 
-/-- The *signed* corner count of `S` at `(u, v)`: the fg-area of `S` for the indicator functions
-of the lines `x = u` and `y = v` (`fgArea_indicator`). Reversing the sign at the lower edges is
-what makes it additive over a tiling, and mod `2` it still counts the corners
-(`cornerSign_cast`). -/
-private noncomputable def cornerSign (S : Rectangle) (u v : ℝ) : ℤ :=
-  ((if S.x₁ = u then 1 else 0) - (if S.x₀ = u then 1 else 0)) *
-    ((if S.y₁ = v then 1 else 0) - (if S.y₀ = v then 1 else 0))
+open scoped Classical in
+/-- `cornerCount` counts the corners at a point. -/
+lemma card_corner_eq (S : Rectangle) (u v : ℝ) :
+    #{b | S.corner b = (u, v)} = cornerCount S u v := by
+  simp only [card_filter, Fintype.sum_prod_type, Fintype.sum_bool]
+  grind [Rectangle.corner, cornerCount, xCount, yCount]
 
-private lemma fgArea_indicator (S : Rectangle) (u v : ℝ) :
-    fgArea (fun x ↦ if x = u then 1 else 0) (fun y ↦ if y = v then 1 else 0) S
-      = (cornerSign S u v : ℝ) := by
-  simp [fgArea, cornerSign]
+/-! ### The quadrants at a point -/
 
-private lemma cornerSign_cast (S : Rectangle) (u v : ℝ) :
-    ((cornerSign S u v : ℤ) : ZMod 2) = (cornerCount S u v : ℕ) := by
-  simp only [cornerSign, cornerCount, xCount, yCount]
-  split_ifs <;> decide
+open scoped Classical in
+/-- The quadrants at `(u, v)` that `S` fills: those `b` for which `(u, v)` lies in the cell
+`S.cell b.1 b.2`, so that `S` reaches to the left of the point if `b.1` and to its right
+otherwise, below the point if `b.2` and above it otherwise. -/
+noncomputable def quadrants (S : Rectangle) (u v : ℝ) : Finset (Bool × Bool) :=
+  {b | ((u, v) : ℝ × ℝ) ∈ S.cell b.1 b.2}
 
-/-! ### Corner parity -/
+/-- The number of sides of `t` that the interval `[a, b]` reaches: both at an interior point, one
+at an endpoint, and none outside. -/
+noncomputable def sides (a b t : ℝ) : ℕ :=
+  (if a < t ∧ t ≤ b then 1 else 0) + (if a ≤ t ∧ t < b then 1 else 0)
+
+/-- A rectangle fills, at a point, as many quadrants as the product of the numbers of sides of the
+point its two coordinate intervals reach. -/
+lemma card_quadrants_eq (S : Rectangle) (u v : ℝ) :
+    #(quadrants S u v) = sides S.x₀ S.x₁ u * sides S.y₀ S.y₁ v := by
+  simp only [quadrants, card_filter, Fintype.sum_prod_type, Fintype.sum_bool]
+  grind [sides, Rectangle.cell]
+
+/-- **A tile fills one quadrant at each of its corners, and two or four at its other points.**
+For a nondegenerate rectangle, the quadrants it fills at a point number `0`, `1`, `2` or `4`, and
+the point is a corner of it exactly when they number one: along each axis the rectangle reaches
+both sides of an interior point, one side of an endpoint, and neither side of a point outside it. -/
+lemma cornerCount_eq_ite {S : Rectangle} (hS : S.Nondegenerate) (u v : ℝ) :
+    cornerCount S u v = (if #(quadrants S u v) = 1 then 1 else 0) ∧
+      (#(quadrants S u v) = 0 ∨ #(quadrants S u v) = 1 ∨ #(quadrants S u v) = 2 ∨
+        #(quadrants S u v) = 4) := by
+  grind [card_quadrants_eq, cornerCount, xCount, yCount, sides, Rectangle.Nondegenerate]
 
 variable {ι : Type} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
 
-/-- **Corner parity of a tiling.** At every point of the plane, the tiles of a tiling have in
-total a number of corners congruent mod `2` to the number of corners of the tiled rectangle
-there. Away from the corners of `R` it says that a point is a corner of evenly many tiles, which
-is Wagon's "`2` or `4` tiles"; at a corner of `R` the count is odd.
+/-- **The tiles fill the quadrants inside `R`, each exactly once.** Counted over the tiles, the
+quadrants filled at a point are as many as the quadrants at it inside `R`: a quadrant inside `R`
+is filled by exactly one tile, and a quadrant a tile fills is inside `R`. -/
+theorem IsTiling.sum_card_quadrants (hT : IsTiling R T) (u v : ℝ) :
+    ∑ i, #(quadrants (T i) u v) = #(quadrants R u v) := by
+  simp only [quadrants, card_filter]
+  refine Finset.sum_comm.trans (Finset.sum_congr rfl fun b _ ↦ ?_)
+  split_ifs with hb
+  · rw [← card_filter, ← Fintype.existsUnique_iff_card_one]; exact hT.existsUnique_cell _ _ hb
+  · exact Finset.sum_eq_zero fun i _ ↦ ite_eq_right fun h ↦ hb (hT.cell_subset _ _ i h)
 
-The signed corner count is the fg-area for the pair of indicator functions of the coordinate lines
-through the point, hence additive over the tiling; forgetting the signs is passing to `ZMod 2`. -/
+/-! ### The local picture -/
+
+/-- **The local picture at a point** (Wagon). At a corner of `R` the tiles have exactly one corner
+in all, and at any other point of the plane `0`, `2` or `4`.
+
+Counted over the tiles, the quadrants filled at the point are the quadrants inside `R`
+(`IsTiling.sum_card_quadrants`): four, two, one or none, according as the point lies inside `R`,
+inside one of its edges, at one of its corners, or outside it. A tile having the point as a
+corner fills one of them, and any other tile none, two or four (`cornerCount_eq_ite`), so the tiles
+having the point as a corner are at most as many as the quadrants inside `R`, and as many up to
+an even number. -/
+theorem IsTiling.sum_cornerCount_eq (hT : IsTiling R T) (u v : ℝ) :
+    ∑ i, cornerCount (T i) u v = cornerCount R u v ∨
+      cornerCount R u v = 0 ∧
+        (∑ i, cornerCount (T i) u v = 2 ∨ ∑ i, cornerCount (T i) u v = 4) := by
+  have hQ : ∑ i, cornerCount (T i) u v + 2 * ∑ i, #(quadrants (T i) u v) / 2 =
+      #(quadrants R u v) := by
+    rw [← hT.sum_card_quadrants, Finset.mul_sum, ← Finset.sum_add_distrib]
+    exact Finset.sum_congr rfl fun i _ ↦ by lia [cornerCount_eq_ite (hT.nondegenerate i) u v]
+  lia [cornerCount_eq_ite ⟨hT.x₀_lt_x₁, hT.y₀_lt_y₁⟩ u v]
+
+/-- **Corner parity.** At every point of the plane, the tiles have in total a number of corners
+congruent modulo `2` to the number of corners of `R` there: away from the corners of `R` it is
+even, which is Wagon's "`2` or `4` tiles", and at a corner of `R` it is one. -/
 theorem IsTiling.sum_cornerCount_mod_two (hT : IsTiling R T) (u v : ℝ) :
-    ((∑ i, cornerCount (T i) u v : ℕ) : ZMod 2) = (cornerCount R u v : ZMod 2) := by
-  have h := hT.sum_fgArea (fun x ↦ if x = u then 1 else 0) fun y ↦ if y = v then 1 else 0
-  simp only [fgArea_indicator] at h
-  have key : ∑ i, cornerSign (T i) u v = cornerSign R u v := by exact_mod_cast h
-  simpa [← cornerSign_cast] using congrArg (fun m : ℤ ↦ (m : ZMod 2)) key
+    ((∑ i, cornerCount (T i) u v : ℕ) : ZMod 2) = (cornerCount R u v : ZMod 2) :=
+  (ZMod.natCast_eq_natCast_iff' _ _ 2).mpr <| by lia [hT.sum_cornerCount_eq u v]
 
 /-! ### The double count -/
 

@@ -529,8 +529,8 @@ fidelity:
       partition of a tiling into half-open cells and the additivity of area, its grid
       and the additivity of the fg-area over it (`IsTiling.sum_fgArea`), the auxiliary
       tilings obtained by moving its lines in order (`IsTiling.image`, used by proofs
-      4, 5 and 6), walks from tile to tile (proofs 9 and 10), and the corners of the
-      tiles at a point (proofs 7 and 8).
+      4, 5 and 6), walks from tile to tile (proofs 9 and 10), and the local picture of
+      the corners at a point (proofs 7 and 8).
     - Proof 7 (Eulerian path, Paterson) builds Paterson's graph as a mathlib multigraph
       through its half-edges (`HalfEdgePairing`, in `DifferentProofsForMathlib`): a
       half-edge is a tile together with one of its corners and is labelled by that
@@ -541,9 +541,9 @@ fidelity:
       mathlib's multigraphs have no walks yet, so the handshake lemma stands in for the
       trail (`HalfEdgePairing.exists_ne_reflTransGen_of_odd`): a vertex of odd degree is
       joined by a chain of edges, the reflexive-transitive closure of adjacency, to
-      another vertex of odd degree. The parity of the degrees is not read off the local
-      picture of how tiles meet at a point, as in the paper, but from corner parity
-      (`IsTiling.sum_cornerCount_mod_two`), a consequence of fg-area additivity.
+      another vertex of odd degree. The degrees come from the local picture of how the
+      tiles meet at a point (`IsTiling.sum_cornerCount_eq`), shared with proof 8 and proved
+      by counting the quadrants at the point that each tile fills.
     - Proof 11 (minimal cut-set, Seymour) follows the paper on Seymour's graph itself,
       whose vertices are the horizontal segments (classes of points of horizontal
       edges) and whose edges are the tiles and the exterior edge. Mathlib has no
