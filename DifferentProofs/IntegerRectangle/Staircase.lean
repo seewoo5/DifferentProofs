@@ -2,7 +2,7 @@ module
 
 public import DifferentProofs.IntegerRectangle.Tiling.Walks
 public import DifferentProofsForMathlib.Algebra.Order.Floor.Ring
-public import DifferentProofs.IntegerRectangle.Tiling.GridRefinement
+public import DifferentProofs.IntegerRectangle.Tiling.Slice
 
 /-!
 # The integer-rectangle theorem by induction on the number of H-tiles

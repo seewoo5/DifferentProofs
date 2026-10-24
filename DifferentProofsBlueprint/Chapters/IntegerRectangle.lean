@@ -11,7 +11,7 @@ import DifferentProofs.IntegerRectangle.CountingSquares
 import DifferentProofs.IntegerRectangle.CutSet
 import DifferentProofs.IntegerRectangle.Defs
 import DifferentProofs.IntegerRectangle.EulerianPath
-import DifferentProofs.IntegerRectangle.Tiling.GridRefinement
+import DifferentProofs.IntegerRectangle.Tiling.Slice
 import DifferentProofs.IntegerRectangle.Polynomials
 import DifferentProofs.IntegerRectangle.Primes
 import DifferentProofs.IntegerRectangle.RealIntegral
@@ -406,6 +406,34 @@ four tiles {uses "lem:int-rect-local-picture"}[], so this one is another corner 
 on the lattice through the lower-left corner it is an integer width or height away from it.
 :::
 
+The two inductive proofs that follow treat as immediate the case of a tiling all of whose tiles
+have integer width, or all of whose tiles have integer height. It is settled by slicing the tiling
+along a line, the geometric ingredient of the twelfth proof below.
+
+:::lemma_ "lem:int-rect-slice" (parent := "grp:int-rect") (lean := "IntegerRectangle.widthSum_slice")
+Let $`T` tile $`R` and let $`t` be a height between the bottom and the top of $`R` avoiding every
+horizontal tile edge. Then the widths of the tiles crossed by the line $`y = t` add up to the width
+of $`R`.
+:::
+
+:::proof "lem:int-rect-slice"
+Because $`t` avoids the horizontal edges, a tile met by the line at all is crossed through its
+interior, and its trace on the line is the closed interval spanned by its width. The traces cover
+the full cross-section of $`R` at height $`t` because the tiles cover $`R`, and two distinct traces
+meet in a null set: an interior point of both traces would be an interior point of both tiles.
+Additivity of one-dimensional Lebesgue measure over this almost-disjoint cover gives the claim.
+:::
+
+:::lemma_ "lem:int-rect-all-h" (parent := "grp:int-rect") (lean := "IntegerRectangle.intWidth_of_forall")
+If every tile of a tiling of $`R` has integer width, then so has $`R`; and likewise for heights.
+:::
+
+:::proof "lem:int-rect-all-h"
+A horizontal line through $`R` avoiding the finitely many heights of horizontal tile edges crosses
+tiles whose widths add up to the width of $`R` {uses "lem:int-rect-slice"}[], and these widths are
+integers. For heights, transpose the tiling.
+:::
+
 Ninth proof: induction (Raphael Robinson). Call a tile an *H-tile* if it is designated by its
 integer width and a *V-tile* if it is designated by its integer height. Cutting every tile into
 unit pieces along its designated side normalizes the tiling: every H-tile is then exactly one unit
@@ -482,7 +510,8 @@ A rectangle tiled by rectangles each with an integer side has an integer side.
 
 :::proof "thm:int-rect-induction"
 Normalize the tiling {uses "lem:int-rect-normalize"}[] and induct on the number of its H-tiles.
-With no H-tile every tile has integer height, hence so does $`R`. Otherwise grow the staircase
+With no H-tile every tile has integer height, hence so does $`R`
+{uses "lem:int-rect-all-h"}[]. Otherwise grow the staircase
 from an H-tile {uses "lem:int-rect-staircase"}[]. If $`R` is narrower than two units then the
 H-tile leaves no room beside it and $`R` is exactly one unit wide. Otherwise cut the staircase out
 {uses "lem:int-rect-cut"}[]: heights never change, so V-tiles stay V-tiles, and an H-tile is
@@ -550,9 +579,8 @@ A rectangle tiled by rectangles each with an integer side has an integer side.
 :::
 
 :::proof "thm:int-rect-links"
-Induct on the number of tiles. If every tile has integer width the fg-area for the fractional part
-horizontally and the identity vertically vanishes on every tile, hence on $`R`, so $`R` has integer
-width; likewise if every tile has integer height. Otherwise some link is reducible
+Induct on the number of tiles. If every tile has integer width then so has $`R`, and if every tile
+has integer height then so has $`R` {uses "lem:int-rect-all-h"}[]. Otherwise some link is reducible
 {uses "lem:int-rect-link-exists"}[], say a V-link with only H-tiles on its right; take for $`w` the
 width of the narrowest of them and push {uses "lem:int-rect-link-push"}[]. Heights never change, so
 V-tiles stay V-tiles, and widths change by the integer $`w`, so H-tiles stay H-tiles; but the
@@ -671,21 +699,8 @@ otherwise the width is {uses "lem:int-rect-cut-path"}[].
 
 Twelfth proof: a sweep line (Bachman–Yannakakis). This one does not use the analytic engine above.
 Instead of an integral it propagates a conserved quantity upward through the tiling, and the only
-geometry it needs is what a horizontal cut of a tiling looks like — the slice lemma below.
-
-:::lemma_ "lem:int-rect-slice" (parent := "grp:int-rect") (lean := "IntegerRectangle.SweepLine.widthSum_slice")
-Let $`T` tile $`R` and let $`t` be a height between the bottom and the top of $`R` avoiding every
-horizontal tile edge. Then the widths of the tiles crossed by the line $`y = t` add up to the width
-of $`R`.
-:::
-
-:::proof "lem:int-rect-slice"
-Because $`t` avoids the horizontal edges, a tile met by the line at all is crossed through its
-interior, and its trace on the line is the closed interval spanned by its width. The traces cover
-the full cross-section of $`R` at height $`t` because the tiles cover $`R`, and two distinct traces
-meet in a null set: an interior point of both traces would be an interior point of both tiles.
-Additivity of one-dimensional Lebesgue measure over this almost-disjoint cover gives the claim.
-:::
+geometry it needs is what a horizontal cut of a tiling looks like — the slice lemma of the ninth
+and tenth proofs.
 
 :::lemma_ "lem:int-rect-conservation" (parent := "grp:int-rect") (lean := "IntegerRectangle.SweepLine.gain_eq_loss")
 At every height $`c` strictly between the bottom and the top of $`R`, the tiles whose bottom edge
@@ -741,39 +756,56 @@ fractional part of the width of $`R` equals the fractional part of $`f` below $`
 being the theorem — so $`f` is frozen at the top before taking fractional parts.)
 :::
 
-Thirteenth proof: step functions (Hochster–Maté). Like the first three this attaches a number to
-each rectangle and rides on additivity over the tiling, but the number comes from a *step function*
-instead of an integral, and the additivity is combinatorial rather than measure-theoretic: it holds
-for the fg-area built from an arbitrary function, with no regularity at all.
+Thirteenth proof: step functions (Hochster–Maté). Take the bottom and left edges of $`R` for the
+axes, which replaces the standard position, and let $`\Gamma` be the graph whose vertices are the
+points of the x-axis at which some tile has a vertical edge and the points of the y-axis at which
+some tile has a horizontal edge; two vertices on the x-axis are joined when an H-tile spans the
+interval between them, and two on the y-axis when a V-tile does. Number the connected components
+of $`\Gamma` by distinct numbers in an arbitrary way, and let $`f` be the step function whose value
+on the interval between consecutive vertices $`x_i < x_{i+1}` of the x-axis is the number of the
+component of $`x_{i+1}` less that of $`x_i`, and $`g` its counterpart on the y-axis. The
+formalization builds $`\Gamma` as a mathlib simple graph.
 
-:::lemma_ "lem:int-rect-fgarea" (parent := "grp:int-rect") (lean := "IntegerRectangle.IsTiling.sum_fgArea")
-For functions $`f, g : \mathbb{R} \to \mathbb{R}` define the *fg-area* of a rectangle
-$`[x_0, x_1] \times [y_0, y_1]` as $`(f(x_1) - f(x_0)) \cdot (g(y_1) - g(y_0))`. If $`T` tiles $`R`
-then the fg-areas of the tiles sum to the fg-area of $`R`, for arbitrary $`f` and $`g`.
+:::lemma_ "lem:int-rect-grid" (parent := "grp:int-rect") (lean := "IntegerRectangle.Grid.cellTile_eq_iff")
+Extend the edges of the tiles of a tiling across $`R` to a grid. Every open grid cell lies in exactly
+one tile, and the cells in a tile form the product of two intervals of grid indices.
+:::
+
+:::proof "lem:int-rect-grid"
+No grid coordinate lies strictly inside an open grid cell, so a tile covering the centre of a cell
+has all four edges clear of it and contains the whole cell; by disjointness of interiors this tile
+is unique. Conversely the cells assigned to a tile fill out a full product subdivision of it,
+because the tile's own edges are grid lines.
+:::
+
+:::lemma_ "lem:int-rect-fgarea" (parent := "grp:int-rect") (lean := "IntegerRectangle.StepFunction.sum_fgArea")
+For functions $`F, G : \mathbb{R} \to \mathbb{R}` define the *fg-area* of a rectangle
+$`[x_0, x_1] \times [y_0, y_1]` as $`(F(x_1) - F(x_0)) \cdot (G(y_1) - G(y_0))`. If $`T` tiles $`R`
+then the fg-areas of the tiles sum to the fg-area of $`R`, for arbitrary $`F` and $`G`.
 :::
 
 :::proof "lem:int-rect-fgarea"
-The tile edges form a graph; extending its edges across $`R` cuts $`R` into a grid, whose vertical
-lines carry the finitely many x-coordinates of vertical tile edges and whose horizontal lines carry
-the y-coordinates of horizontal ones. No grid coordinate lies strictly inside an open grid cell, so
-a tile covering the centre of a cell has all four edges clear of it and contains the whole cell; by
-disjointness of interiors this tile is unique. Conversely the cells assigned to a tile fill out a
-full product subdivision of it, because the tile's own edges are grid lines. Summing fg-areas of
-cells therefore counts every cell exactly once, tile by tile; over a product subdivision the sum
-telescopes in both coordinates to the tile's fg-area, and over the whole grid it telescopes to the
-fg-area of $`R`.
+Refine the tiling into its grid {uses "lem:int-rect-grid"}[]. Summing the fg-areas of the grid
+cells counts every cell exactly once, tile by tile; over the cells of a tile, a product of index
+intervals, the sum telescopes in both coordinates to the fg-area of the tile, and over the whole
+grid to the fg-area of $`R`.
 :::
 
-:::lemma_ "lem:int-rect-step-engine" (parent := "grp:int-rect") (lean := "IntegerRectangle.StepFunction.dichotomy")
-Let $`f, g : \mathbb{R} \to \mathbb{R}` be arbitrary. If $`T` tiles $`R` and every tile has a
-vanishing increment of $`f` across its width or of $`g` across its height, then the same dichotomy
-holds for $`R`.
+:::lemma_ "lem:int-rect-step-reach" (parent := "grp:int-rect") (lean := "IntegerRectangle.StepFunction.reachable")
+The lower-left corner of $`R` lies in the same component of $`\Gamma` as its lower-right corner or
+as its upper-left corner.
 :::
 
-:::proof "lem:int-rect-step-engine"
-The fg-area of every tile is a product with a vanishing factor, so by additivity of the fg-area
-{uses "lem:int-rect-fgarea"}[] the fg-area of $`R` vanishes, and a product of reals vanishes only if
-a factor does.
+:::proof "lem:int-rect-step-reach"
+Let $`F` give each vertex of the x-axis the number of its component, and $`G` likewise on the
+y-axis, so that the value of $`f` on the interval between two consecutive vertices is the increment
+of $`F` across it, and the value of $`f(x) g(y)` on a grid rectangle is its fg-area for $`F` and
+$`G`. Over the grid rectangles in a tile these values add up to the fg-area of the tile, which
+vanishes: the width of an H-tile spans an edge of $`\Gamma`, whose ends are in the same component,
+and so does the height of a V-tile. By the grid refinement {uses "lem:int-rect-fgarea"}[] the
+fg-area of $`R`, the product of the increments of $`F` across its width and of $`G` across its
+height, vanishes too, and the numbers of distinct components being distinct, the corner of $`R` is
+in the same component as one of the other two.
 :::
 
 :::theorem "thm:int-rect-step" (parent := "grp:int-rect") (lean := "IntegerRectangleTheorem_StepFunction") (proofColor := "#fbcfe8")
@@ -781,15 +813,9 @@ A rectangle tiled by rectangles each with an integer side has an integer side.
 :::
 
 :::proof "thm:int-rect-step"
-Take $`f = g = \{\cdot\}`, the sawtooth $`\{x\} = x - \lfloor x\rfloor` — the identity minus a
-step function. Its increment $`\{b\} - \{a\}` vanishes if and only if $`b - a \in \mathbb{Z}`, so a
-tile with an integer side satisfies the hypothesis of the engine
-{uses "lem:int-rect-step-engine"}[], which returns a vanishing sawtooth increment for $`R` in one
-of the two directions — an integer side. The criterion is an exact "integer difference" statement,
-so unlike the checkerboard proof, whose triangle wave is symmetric about the half-integers, this
-argument needs no standard-position hypothesis. (The sawtooth increment is also the signed mass of
-$`(a, b]` under Lebesgue measure minus the counting measure of the integers, giving an alternative
-measure-theoretic route to the additivity.)
+Every edge of $`\Gamma` spans a side of a tile of integer length, so two vertices in the same
+component are an integer apart, and by {uses "lem:int-rect-step-reach"}[] the width or the height
+of $`R` is an integer.
 :::
 
 Fourteenth proof: Sperner's lemma (Schmerl). Cut every tile in two along a diagonal and label each
@@ -861,7 +887,7 @@ the number along the bottom and top edges of $`R`.
 The diagonal of a tile is a side of both of its triangles, so it is counted twice and cancels, and
 its vertical sides carry no complete edge {uses "lem:int-rect-sperner-side"}[]; what is left of a
 tile is the complete edges on its bottom and top edges. Refine the tiling to its grid: every open
-grid cell lies in a unique tile {uses "lem:int-rect-fgarea"}[], so along a fixed column of cells a
+grid cell lies in a unique tile {uses "lem:int-rect-grid"}[], so along a fixed column of cells a
 horizontal grid segment strictly inside $`R` either has the same tile above and below it, and is
 interior to that tile and counted by neither of its triangles, or has different tiles, and is then
 the top edge of the lower and the bottom edge of the upper and counted exactly twice. Everything

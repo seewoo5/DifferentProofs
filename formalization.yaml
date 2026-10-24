@@ -524,10 +524,13 @@ fidelity:
       tiling is recorded as `IsTiling` (finite cover with pairwise-disjoint
       interiors). Where Wagon says "place the rectangle in standard position", the
       formalization instead bases the integrand, lattice, or grid at the tiled
-      rectangle's own corner, which avoids translating the tiling; and several of
-      his per-proof local arguments are factored into shared lemmas
-      (`IsTiling.sum_fgArea`, `Grid`, `CornerCount`, `Cells`, `Walks`) reused across
-      proofs.
+      rectangle's own corner, which avoids translating the tiling. What several
+      proofs share is factored into the files of `IntegerRectangle/Tiling/`: the
+      exact partition of a tiling into half-open cells and the additivity of area,
+      its grid, the auxiliary tilings obtained by moving its lines in order
+      (`IsTiling.image`, used by proofs 4, 5 and 6), horizontal slices (proofs 9, 10
+      and 12), walks from tile to tile (proofs 9 and 10), and the local picture of
+      the corners at a point (proofs 7 and 8).
     - Proof 7 (Eulerian path, Paterson) builds Paterson's graph as a mathlib multigraph
       through its half-edges (`HalfEdgePairing`, in `DifferentProofsForMathlib`): a
       half-edge is a tile together with one of its corners and is labelled by that
@@ -734,7 +737,10 @@ alignment:
       lean: "IntegerRectangleTheorem_StepFunction"
       module: "DifferentProofs.IntegerRectangle.StepFunction"
       status: "proved"
-      note: ""
+      note: >-
+        Hochster and Mate's graph is built as a mathlib `SimpleGraph` on the points of the
+        bottom and left edges of the tiled rectangle, and its components are numbered by an
+        arbitrary injection into the natural numbers.
     - source: "Wagon, Proof 14 (Sperner's lemma, Schmerl)"
       lean: "IntegerRectangleTheorem_Sperner"
       module: "DifferentProofs.IntegerRectangle.Sperner"

@@ -16,10 +16,11 @@ out a product of two index intervals (`cellTile_eq_iff`), because the tile's own
 lines.
 
 This is the common combinatorial refinement of a tiling, shared by the proofs that need to count
-something cell by cell: the fg-area is summed over it in
-`DifferentProofs.IntegerRectangle.Tiling.GridRefinement`, and the complete edges of Schmerl's
-Sperner argument are counted over its horizontal segments in
-`DifferentProofs.IntegerRectangle.Sperner`.
+something cell by cell: Wagon refines the tiling into this grid in the step-function proof
+(`DifferentProofs.IntegerRectangle.StepFunction`), and the complete edges of Schmerl's Sperner
+argument are counted over its horizontal segments (`DifferentProofs.IntegerRectangle.Sperner`).
+The lines of the grid are also the lines that the auxiliary tilings of the fourth to sixth proofs
+move (`DifferentProofs.IntegerRectangle.Tiling.Image`).
 
 The sorting of the edge coordinates is handled by `Finset.sort`; the `nth` layer below turns the
 sorted list into a total function `ℕ → ℝ`, so that all sums range over `Finset.range` and
