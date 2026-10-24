@@ -27,9 +27,9 @@ each other share a side, which is a double edge of `Γ`. Its vertices are all th
 plane, those that are not corners of tiles being isolated.
 
 The degree of a vertex is the number of darts at it, which is the number of corners the tiles have
-there (`card_darts_eq`), and only its parity is used. That is the corner parity of `CornerCount`,
-which replaces Wagon's local picture: the vertices of odd degree are exactly the corners of `R`
-(`odd_card_darts_iff`), each of which lies on exactly one tile.
+there (`card_darts_eq`). Wagon's local picture, `IsTiling.sum_cornerCount_eq`, makes it `1` at a
+corner of `R` and `0`, `2` or `4` elsewhere; only its parity is used, so the vertices of odd
+degree are exactly the corners of `R` (`odd_card_darts_iff`).
 
 Paterson walks a trail from a corner of `R` until it gets stuck. Mathlib's multigraphs have no
 walks yet, so the handshake lemma stands in for the trail: a vertex of odd degree is joined by a
