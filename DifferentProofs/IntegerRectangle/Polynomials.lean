@@ -1,6 +1,7 @@
 module
 
 public import DifferentProofs.IntegerRectangle.Tiling.Image
+public import Mathlib.Algebra.Order.Field.Pi
 public import Mathlib.Algebra.Polynomial.Roots
 
 /-!
@@ -20,11 +21,12 @@ quadratic representation of the area.
 The lattice is the one through the lower-left corner of `R` instead of the integer lattice, which
 replaces the standard position, and the translation is `perturb a t`, which moves `x` by `t` when
 `x - a` is not an integer. While `t` is smaller than the least gap between the lines of the
-tiling, the translation keeps their order (`exists_monotoneOn_perturb`), so the translated tiles
+tiling, the translation keeps their order (`exists_strictMonoOn_perturb`), so the translated tiles
 tile `R'` (`IsTiling.image`) and their areas add up to that of `R'` (`IsTiling.sum_area_image`).
-The area of a translated rectangle is the value at `t` of the polynomial `areaPoly`, whose
-quadratic coefficient vanishes for a tile with an integer side (`areaPoly_coeff_two`), and two
-polynomials agreeing on an interval are equal.
+The area of a translated rectangle is the value at `t` of the polynomial `areaPoly`
+(`eval_areaPoly`), whose quadratic coefficient vanishes for a tile with an integer side
+(`areaPoly_coeff_two_eq_zero`), and two polynomials agreeing on an interval are equal
+(`sum_areaPoly`).
 
 ## Main result
 
@@ -41,54 +43,28 @@ namespace IntegerRectangle.Polynomials
 /-! ### Translating the lines of the tiling -/
 
 /-- The indicator of the coordinates off the translate `a + ℤ` of the integer lattice. -/
-noncomputable def nonLatticeIndicator (a x : ℝ) : ℝ :=
-  if Int.fract (x - a) = 0 then 0 else 1
+noncomputable def nonLatticeIndicator (a x : ℝ) : ℝ := if Int.fract (x - a) = 0 then 0 else 1
 
 /-- The translation of the lines of the tiling by `t`: a coordinate off `a + ℤ` moves by `t`, and a
 coordinate on it stays put. -/
 noncomputable def perturb (a t x : ℝ) : ℝ := x + t * nonLatticeIndicator a x
 
-private lemma nonLatticeIndicator_mem (a x : ℝ) :
-    nonLatticeIndicator a x = 0 ∨ nonLatticeIndicator a x = 1 := by
-  unfold nonLatticeIndicator
-  split_ifs <;> simp
-
-private lemma nonLatticeIndicator_self (a : ℝ) : nonLatticeIndicator a a = 0 := by
-  simp [nonLatticeIndicator]
-
 /-- Integer-separated coordinates have the same status with respect to every translate of `ℤ`. -/
-private lemma nonLatticeIndicator_eq_of_sub_int (s : ℝ) {a b : ℝ} {n : ℤ}
-    (h : b - a = n) : nonLatticeIndicator s b = nonLatticeIndicator s a :=
+private lemma nonLatticeIndicator_eq_of_sub_int (s : ℝ) {a b : ℝ} {n : ℤ} (h : b - a = n) :
+    nonLatticeIndicator s b = nonLatticeIndicator s a :=
   congrArg (fun r ↦ if r = 0 then (0 : ℝ) else 1) (Int.fract_eq_fract.mpr ⟨n, by linarith⟩)
 
-/-- A finite set of reals has a least gap between distinct elements. -/
-private lemma exists_le_sub (s : Finset ℝ) : ∃ δ > 0, ∀ g ∈ s, ∀ g' ∈ s, g < g' → δ ≤ g' - g := by
-  classical
-  set D := ((s ×ˢ s).filter fun p ↦ p.1 < p.2).image fun p ↦ p.2 - p.1
-  have hD {g g' : ℝ} (hg : g ∈ s) (hg' : g' ∈ s) (h : g < g') : g' - g ∈ D :=
-    mem_image.mpr ⟨(g, g'), mem_filter.mpr ⟨mem_product.mpr ⟨hg, hg'⟩, h⟩, rfl⟩
-  rcases D.eq_empty_or_nonempty with he | hne
-  · exact ⟨1, one_pos, fun g hg g' hg' h ↦ absurd (hD hg hg' h) (he ▸ notMem_empty _)⟩
-  · refine ⟨D.min' hne, ?_, fun g hg g' hg' h ↦ D.min'_le _ (hD hg hg' h)⟩
-    obtain ⟨p, hp, hpe⟩ := mem_image.mp (D.min'_mem hne)
-    exact hpe ▸ sub_pos.mpr (mem_filter.mp hp).2
-
 /-- **Small translations keep the order of the lines.** Below the least gap between the
-coordinates of a finite set, translating some of them by `t` does not change their order. -/
-theorem exists_monotoneOn_perturb (s : Finset ℝ) (a : ℝ) :
-    ∃ δ > 0, ∀ t, 0 ≤ t → t < δ → MonotoneOn (perturb a t) s := by
-  obtain ⟨δ, hδ, hgap⟩ := exists_le_sub s
+coordinates of a finite set, translating some of them by `t` keeps them in strictly increasing
+order, so that no tile collapses — Wagon's tiling "with the same number of tiles as in `R`": the
+pairs `g < g'` of the set, finitely many, have a common `δ > 0` with `g + δ < g'`, and every
+coordinate moves right by `0` or by `t < δ`. -/
+theorem exists_strictMonoOn_perturb (s : Finset ℝ) (a : ℝ) :
+    ∃ δ > 0, ∀ t, 0 ≤ t → t < δ → StrictMonoOn (perturb a t) s := by
+  obtain ⟨δ, hδ, hgap⟩ := Pi.exists_forall_pos_add_lt fun p : {p : s × s // (p.1 : ℝ) < p.2} ↦ p.2
   refine ⟨δ, hδ, fun t ht₀ ht₁ g hg g' hg' h ↦ ?_⟩
-  rcases h.lt_or_eq with h | rfl
-  · have := hgap g hg g' hg' h
-    rcases nonLatticeIndicator_mem a g with e | e <;>
-      rcases nonLatticeIndicator_mem a g' with e' | e' <;> simp only [perturb, e, e'] <;> nlinarith
-  · exact le_rfl
-
-/-- The translation keeps the points to the right of the base point to its right. -/
-private lemma perturb_lt {a x t : ℝ} (h : a < x) (ht : 0 ≤ t) : perturb a t a < perturb a t x := by
-  rw [perturb, perturb, nonLatticeIndicator_self, mul_zero, add_zero]
-  rcases nonLatticeIndicator_mem a x with e | e <;> rw [e] <;> nlinarith
+  unfold perturb nonLatticeIndicator
+  split_ifs <;> linarith [hgap ⟨(⟨g, hg⟩, ⟨g', hg'⟩), h⟩]
 
 /-! ### The areas as polynomials -/
 
@@ -109,30 +85,19 @@ lemma eval_areaPoly (a b t : ℝ) (S : Rectangle) :
   ring
 
 /-- The quadratic coefficient of the area polynomial is the product of the increments of the
-indicators across the two sides. -/
+indicators across the two sides, the leading coefficients of its two linear factors. -/
 lemma areaPoly_coeff_two (a b : ℝ) (S : Rectangle) :
     (areaPoly a b S).coeff 2 = (nonLatticeIndicator a S.x₁ - nonLatticeIndicator a S.x₀) *
-      (nonLatticeIndicator b S.y₁ - nonLatticeIndicator b S.y₀) := by
-  have hexp : areaPoly a b S =
-      C ((nonLatticeIndicator a S.x₁ - nonLatticeIndicator a S.x₀) *
-          (nonLatticeIndicator b S.y₁ - nonLatticeIndicator b S.y₀)) * X ^ 2 +
-        (C ((nonLatticeIndicator a S.x₁ - nonLatticeIndicator a S.x₀) * (S.y₁ - S.y₀) +
-            (S.x₁ - S.x₀) * (nonLatticeIndicator b S.y₁ - nonLatticeIndicator b S.y₀)) * X +
-          C ((S.x₁ - S.x₀) * (S.y₁ - S.y₀))) := by
-    simp only [areaPoly, incPoly, map_mul, map_add, map_sub]
-    ring
-  rw [hexp]
-  simp only [coeff_add, coeff_C_mul_X_pow, coeff_C_mul_X, coeff_C]
-  norm_num
+      (nonLatticeIndicator b S.y₁ - nonLatticeIndicator b S.y₀) :=
+  (coeff_mul_add_eq_of_natDegree_le natDegree_linear_le natDegree_linear_le).trans <| by
+    simp only [coeff_add, coeff_mul_X, coeff_C_zero, coeff_C_succ, add_zero]
 
 /-- **A tile with an integer side has an area linear or constant in `t`**: the two ends of a side
 of integer length are translated together or not at all, so that side keeps its length. -/
 lemma areaPoly_coeff_two_eq_zero (a b : ℝ) {S : Rectangle} (h : S.HasIntegerSide) :
     (areaPoly a b S).coeff 2 = 0 := by
-  rw [areaPoly_coeff_two]
-  rcases h with ⟨n, hw⟩ | ⟨n, hh⟩
-  · rw [nonLatticeIndicator_eq_of_sub_int a (n := n) hw, sub_self, zero_mul]
-  · rw [nonLatticeIndicator_eq_of_sub_int b (n := n) hh, sub_self, mul_zero]
+  rcases h with ⟨_, h⟩ | ⟨_, h⟩ <;> simp only [areaPoly_coeff_two,
+    nonLatticeIndicator_eq_of_sub_int _ h, sub_self, zero_mul, mul_zero]
 
 variable {ι : Type} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
 
@@ -142,16 +107,14 @@ sum of theirs (`IsTiling.sum_area_image`), and two polynomials agreeing at infin
 are equal. -/
 theorem sum_areaPoly (hT : IsTiling R T) :
     ∑ i, areaPoly R.x₀ R.y₀ (T i) = areaPoly R.x₀ R.y₀ R := by
-  obtain ⟨δx, hδx, hmx⟩ := exists_monotoneOn_perturb (Grid.gridX R T) R.x₀
-  obtain ⟨δy, hδy, hmy⟩ := exists_monotoneOn_perturb (Grid.gridY R T) R.y₀
-  have hsub : Set.Ico 0 (min δx δy) ⊆
-      {t | (∑ i, areaPoly R.x₀ R.y₀ (T i)).eval t = (areaPoly R.x₀ R.y₀ R).eval t} := by
-    rintro t ⟨ht₀, ht₁⟩
-    simp only [Set.mem_ofPred_eq, eval_finsetSum, eval_areaPoly]
-    exact hT.sum_area_image (hmx t ht₀ (ht₁.trans_le (min_le_left _ _)))
-      (hmy t ht₀ (ht₁.trans_le (min_le_right _ _))) (perturb_lt hT.x₀_lt_x₁ ht₀)
-      (perturb_lt hT.y₀_lt_y₁ ht₀)
-  exact Polynomial.eq_of_infinite_eval_eq _ _ ((Set.Ico_infinite (lt_min hδx hδy)).mono hsub)
+  obtain ⟨δx, hδx, hmx⟩ := exists_strictMonoOn_perturb (Grid.gridX R T) R.x₀
+  obtain ⟨δy, hδy, hmy⟩ := exists_strictMonoOn_perturb (Grid.gridY R T) R.y₀
+  refine eq_of_infinite_eval_eq _ _ <| (Set.Ico_infinite (lt_min hδx hδy)).mono fun t ht ↦ ?_
+  have hx := hmx t ht.1 (lt_min_iff.1 ht.2).1
+  have hy := hmy t ht.1 (lt_min_iff.1 ht.2).2
+  simpa only [eval_finsetSum, eval_areaPoly, Set.mem_ofPred_eq] using hT.sum_area_image
+    hx.monotoneOn hy.monotoneOn (hx Grid.left_mem_gridX Grid.right_mem_gridX hT.x₀_lt_x₁)
+    (hy Grid.bot_mem_gridY Grid.top_mem_gridY hT.y₀_lt_y₁)
 
 end IntegerRectangle.Polynomials
 
@@ -162,13 +125,9 @@ integer side would have a genuinely quadratic one; comparing `X ^ 2` coefficient
 polynomial identity given by the additivity of area gives `0 = 1`. -/
 theorem IntegerRectangleTheorem_Polynomials : IntegerRectangleTheorem := by
   intro ι _ R T hT hsides
-  by_contra hcon
-  rw [Rectangle.HasIntegerSide, not_or] at hcon
-  have hx : Int.fract (R.x₁ - R.x₀) ≠ 0 := fun h ↦
-    hcon.1 ((Int.fract_eq_zero_iff.mp h).imp fun n hn ↦ hn.symm)
-  have hy : Int.fract (R.y₁ - R.y₀) ≠ 0 := fun h ↦
-    hcon.2 ((Int.fract_eq_zero_iff.mp h).imp fun n hn ↦ hn.symm)
-  have h2 := congrArg (coeff · 2) (sum_areaPoly hT)
-  simp only [finsetSum_coeff, areaPoly_coeff_two_eq_zero _ _ (hsides _), sum_const_zero,
-    areaPoly_coeff_two] at h2
-  simp [nonLatticeIndicator, hx, hy] at h2
+  by_contra h
+  simp only [Rectangle.HasIntegerSide, Rectangle.width, Rectangle.height, not_or, not_exists] at h
+  simpa only [finsetSum_coeff, areaPoly_coeff_two_eq_zero _ _ (hsides _), sum_const_zero,
+    areaPoly_coeff_two, nonLatticeIndicator, Int.fract_eq_iff, Std.le_refl, zero_lt_one, sub_zero,
+    h, exists_const, and_false, ↓reduceIte, sub_self, Int.fract_zero, mul_one, zero_ne_one] using
+    congrArg (coeff · 2) (sum_areaPoly hT)

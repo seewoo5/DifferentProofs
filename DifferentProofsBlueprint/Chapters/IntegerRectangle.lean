@@ -145,12 +145,14 @@ not collapse, the moved tiles that do not collapse to segments tile the moved $`
 :::
 
 :::proof "lem:int-rect-move-lines"
-By half-open cells {uses "lem:int-rect-partition"}[]. A point of the half-open cell of the moved
-$`R` lies between the images of two consecutive vertical lines of the tiling and of two consecutive
-horizontal ones; the tile containing the centre of the grid cell those lines bound reaches across
-the cell, so the half-open cell of its image contains the point. Two tiles whose images share a
-point of their half-open cells overlap in both directions, since the moves keep the order of their
-edges, so they share an interior point and are the same tile.
+By half-open cells {uses "lem:int-rect-partition"}[]. Pull a point $`z` back to the point whose
+abscissa is the leftmost vertical line of the tiling whose image is not to the left of $`z`, or a
+point beyond the tiling if there is none, and whose ordinate is the lowest horizontal line whose
+image is not below $`z`. Since the moves keep the order of the lines, this point lies in the
+half-open cell of a tile, or of $`R`, exactly when $`z` lies in that of its image. So the
+half-open cells of the moved tiles are pairwise disjoint and cover the half-open cell of the moved
+$`R`, because those of the tiling are and do; a tile collapsed to a segment has an empty half-open
+cell and is discarded.
 :::
 
 Fourth proof: counting squares (Ruzsa, Gilbert). Place $`R` in standard position and translate
@@ -417,11 +419,12 @@ of $`R`.
 :::
 
 :::proof "lem:int-rect-slice"
-Because $`t` avoids the horizontal edges, a tile met by the line at all is crossed through its
-interior, and its trace on the line is the closed interval spanned by its width. The traces cover
-the full cross-section of $`R` at height $`t` because the tiles cover $`R`, and two distinct traces
-meet in a null set: an interior point of both traces would be an interior point of both tiles.
-Additivity of one-dimensional Lebesgue measure over this almost-disjoint cover gives the claim.
+Length along the line $`y = t` is a measure on the plane, so it adds up over the half-open cells of
+the tiles, which partition that of $`R` {uses "lem:int-rect-partition"}[]. Because $`t` avoids the
+horizontal edges, the line meets the half-open cell of a tile, in an interval as long as the tile
+is wide, exactly when it crosses the tile; and it meets the half-open cell of $`R` in an interval
+of the full width, since it is not the bottom edge of $`R`: the tile containing the point of the
+left edge of $`R` at height $`t` reaches below it.
 :::
 
 :::lemma_ "lem:int-rect-all-h" (parent := "grp:int-rect") (lean := "IntegerRectangle.intWidth_of_forall")

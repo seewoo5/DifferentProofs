@@ -59,9 +59,8 @@ heights of `edgeSet`, and can only jump across them. -/
 closed, set, so around any `c` there is a radius inside which `c` itself is the only edge. -/
 private lemma exists_gap [Finite ι] (T : ι → Rectangle) (c : ℝ) :
     ∃ ε > 0, ∀ y ∈ edgeSet T, |y - c| < ε → y = c :=
-  have hfin : (edgeSet T).Finite := (Set.finite_range _).union (Set.finite_range _)
   let ⟨ε, hε, hsub⟩ := (nhds_basis_abs_sub_lt c).mem_iff.mp
-    ((hfin.sdiff (t := {c})).isClosed.compl_mem_nhds fun h ↦ h.2 rfl)
+    (((finite_edgeSet T).sdiff (t := {c})).isClosed.compl_mem_nhds fun h ↦ h.2 rfl)
   ⟨ε, hε, fun _ hy hyc ↦ not_not.1 fun hne ↦ hsub hyc ⟨hy, hne⟩⟩
 
 /-- Below `c`, the nearest tile edge is at distance at least `ε`. -/

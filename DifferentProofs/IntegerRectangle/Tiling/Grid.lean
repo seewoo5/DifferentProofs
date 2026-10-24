@@ -274,6 +274,14 @@ lemma nth_idxB (i : ι) : nth (gridY R T) (idxB R T i) = (T i).y₀ :=
 lemma nth_idxT (i : ι) : nth (gridY R T) (idxT R T i) = (T i).y₁ :=
   (exists_nth_eq (tile_y₁_mem_gridY i)).choose_spec.choose_spec
 
+/-- The left edge of a tile comes before its right edge among the grid abscissae. -/
+lemma idxL_le_idxR (i : ι) : idxL R T i ≤ idxR R T i :=
+  le_of_nth_le_nth (idxL_lt i) (nth_idxL i ▸ nth_idxR i ▸ (T i).hx)
+
+/-- The bottom edge of a tile comes before its top edge among the grid ordinates. -/
+lemma idxB_le_idxT (i : ι) : idxB R T i ≤ idxT R T i :=
+  le_of_nth_le_nth (idxB_lt i) (nth_idxB i ▸ nth_idxT i ▸ (T i).hy)
+
 /-- **The fiber of `cellTile` over a tile is the product of its two index intervals.** -/
 lemma cellTile_eq_iff (hT : IsTiling R T) {p : ℕ × ℕ} {i : ι}
     (h₁ : p.1 + 1 < (gridX R T).sort.length) (h₂ : p.2 + 1 < (gridY R T).sort.length) :

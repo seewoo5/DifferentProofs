@@ -285,9 +285,8 @@ lemma sum_prune {M : Type*} [AddCommMonoid M] (T : ι → Rectangle) {f : Rectan
     (hf : ∀ S : Rectangle, ¬ S.Nondegenerate → f S = 0) :
     ∑ i, f (prune T i) = ∑ i, f (T i) := by
   classical
-  change ∑ i : {i // (T i).Nondegenerate}, f (T i.1) = _
-  rw [← Finset.sum_subtype (Finset.univ.filter fun i ↦ (T i).Nondegenerate) (by simp)
-    (fun i ↦ f (T i)), Finset.sum_filter_of_ne fun i _ hi ↦ by_contra fun h ↦ hi (hf _ h)]
+  exact (Finset.sum_subtype _ (fun _ ↦ by simp) fun i ↦ f (T i)).symm.trans
+    (Finset.sum_filter_of_ne fun i _ hi ↦ by_contra fun h ↦ hi (hf _ h))
 
 /-- **Recognising a tiling after pruning.** Cutting up or moving the tiles of a tiling can leave
 degenerate rectangles behind. A family of rectangles inside a nondegenerate `R` whose half-open

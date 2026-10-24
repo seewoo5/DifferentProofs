@@ -89,14 +89,13 @@ lemma height_nonneg (R : Rectangle) : 0 ≤ R.height := sub_nonneg.mpr R.hy
 /-- The area of a rectangle. -/
 def area (R : Rectangle) : ℝ := R.width * R.height
 
+/-- A rectangle's area is nonnegative. -/
 lemma area_nonneg (R : Rectangle) : 0 ≤ R.area := mul_nonneg R.width_nonneg R.height_nonneg
 
 /-- A degenerate rectangle has no area. -/
-lemma area_eq_zero_of_not_nondegenerate {R : Rectangle} (h : ¬ R.Nondegenerate) : R.area = 0 := by
-  rw [Nondegenerate, not_and_or, not_lt, not_lt] at h
-  rcases h with h | h
-  · rw [area, width, le_antisymm R.hx h, sub_self, zero_mul]
-  · rw [area, height, le_antisymm R.hy h, sub_self, mul_zero]
+lemma area_eq_zero_of_not_nondegenerate {R : Rectangle} (h : ¬ R.Nondegenerate) : R.area = 0 :=
+  mul_eq_zero.mpr <| (not_and_or.mp h).imp (fun h ↦ sub_eq_zero.mpr (R.hx.antisymm' (not_lt.mp h)))
+    fun h ↦ sub_eq_zero.mpr (R.hy.antisymm' (not_lt.mp h))
 
 /-- A rectangle is an **H-tile**, in Wagon's terms, when its width, its horizontal side, is an
 integer. -/
@@ -239,17 +238,14 @@ theorem IsTiling.measure_toSetIoc (hT : IsTiling R T) (μ : Measure (ℝ × ℝ)
 
 /-- The half-open cell of a rectangle has Lebesgue measure its area. -/
 lemma Rectangle.volume_toSetIoc (S : Rectangle) : volume S.toSetIoc = ENNReal.ofReal S.area := by
-  rw [Rectangle.toSetIoc, Measure.volume_eq_prod, Measure.prod_prod, Real.volume_Ioc,
-    Real.volume_Ioc, ← ENNReal.ofReal_mul (sub_nonneg.mpr S.hx), Rectangle.area,
-    Rectangle.width, Rectangle.height]
+  simp only [Measure.volume_eq_prod, Rectangle.toSetIoc, Measure.prod_prod, Real.volume_Ioc,
+    ← ENNReal.ofReal_mul (sub_nonneg.mpr S.hx), Rectangle.area, Rectangle.width, Rectangle.height]
 
 /-- **Area is additive over a tiling**: Lebesgue measure is. -/
 theorem IsTiling.sum_area (hT : IsTiling R T) : ∑ i, (T i).area = R.area := by
-  have h := hT.measure_toSetIoc volume
-  simp only [Rectangle.volume_toSetIoc] at h
-  rw [← ENNReal.ofReal_sum_of_nonneg fun i _ ↦ (T i).area_nonneg] at h
-  exact ((ENNReal.ofReal_eq_ofReal_iff R.area_nonneg
-    (Finset.sum_nonneg fun i _ ↦ (T i).area_nonneg)).mp h).symm
+  simpa only [eq_comm, Rectangle.volume_toSetIoc, Finset.mem_univ, Rectangle.area_nonneg, imp_self,
+    implies_true, ← ENNReal.ofReal_sum_of_nonneg, Finset.sum_nonneg, ENNReal.ofReal_eq_ofReal_iff]
+    using hT.measure_toSetIoc volume
 
 end Partition
 
