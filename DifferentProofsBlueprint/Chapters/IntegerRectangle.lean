@@ -110,13 +110,56 @@ to the triangle wave $`\min(r, 1-r)`, with $`r` the fractional part of $`b - s`,
 unless $`b - s \in \mathbb{Z}`; hence $`R` has an integer side.
 :::
 
-Fourth proof: counting squares (Ruzsa, Gilbert). Wagon translates every grid line of the tiling
-that lies off the lattice through the corner of $`R` onto the nearest half-integer line, leaving
-lattice lines fixed; the tiling becomes a tiling of a translated rectangle all of whose
-coordinates sit on the half-unit grid, so every rectangle in it is a union of
-$`\tfrac12 \times \tfrac12` squares — the checkerboard cells of the third proof — and the argument
-is a parity count of those squares. As with the polynomial proof below, the fg-area supplies the
-count without the auxiliary tiling having to be built.
+The fourth, fifth and sixth proofs each build an auxiliary tiling by moving the lines of the
+given one without changing their order, and compare a count or an area over the two tilings. They
+rest on three facts about tilings.
+
+:::lemma_ "lem:int-rect-partition" (parent := "grp:int-rect") (lean := "IntegerRectangle.IsTiling.iUnion_toSetIoc")
+The half-open cells of the tiles of a tiling — each tile with its left and bottom edges removed —
+are pairwise disjoint, and their union is the half-open cell of the tiled rectangle.
+:::
+
+:::proof "lem:int-rect-partition"
+Disjointness: a point common to two half-open cells moves down-and-left — to the midpoint between
+the higher of the two lower-left corners and the point itself — into the interiors of both tiles,
+contradicting interior-disjointness. Covering: a point of the ambient half-open cell is approached
+from below-left; every such nudge stays in $`R`, hence in some tile, and since there are finitely
+many tiles one tile contains nudges arbitrarily close in. That tile is closed, so it contains the
+point, and the nudges witness the two strict inequalities of its half-open cell.
+:::
+
+:::lemma_ "lem:int-rect-area" (parent := "grp:int-rect") (lean := "IntegerRectangle.IsTiling.sum_area")
+The areas of the tiles of a tiling add up to the area of the tiled rectangle.
+:::
+
+:::proof "lem:int-rect-area"
+The area of a rectangle is the Lebesgue measure of its half-open cell, and the half-open cells of
+the tiles partition that of the tiled rectangle {uses "lem:int-rect-partition"}[].
+:::
+
+:::lemma_ "lem:int-rect-move-lines" (parent := "grp:int-rect") (lean := "IntegerRectangle.IsTiling.image")
+Let $`T` tile $`R`, and move every vertical line $`x = a` of the tiling to $`x = \varphi(a)` and
+every horizontal line $`y = b` to $`y = \psi(b)`, by maps $`\varphi` and $`\psi` keeping the order
+of the abscissae of the vertical lines and of the ordinates of the horizontal ones. If $`R` does
+not collapse, the moved tiles that do not collapse to segments tile the moved $`R`.
+:::
+
+:::proof "lem:int-rect-move-lines"
+By half-open cells {uses "lem:int-rect-partition"}[]. A point of the half-open cell of the moved
+$`R` lies between the images of two consecutive vertical lines of the tiling and of two consecutive
+horizontal ones; the tile containing the centre of the grid cell those lines bound reaches across
+the cell, so the half-open cell of its image contains the point. Two tiles whose images share a
+point of their half-open cells overlap in both directions, since the moves keep the order of their
+edges, so they share an interior point and are the same tile.
+:::
+
+Fourth proof: counting squares (Ruzsa, Gilbert). Place $`R` in standard position and translate
+every vertical line of the tiling with a noninteger abscissa $`a` to the half-integer line
+$`x = \lfloor a\rfloor + \tfrac12`, and likewise the horizontal lines, the integral lines staying
+put. Here the lattice is based at the lower-left corner of $`R`, which replaces the standard
+position. The translated tiles tile a translated rectangle all of whose coordinates lie on the
+half-unit grid, so every rectangle in it is a union of $`\tfrac12 \times \tfrac12` squares — the
+checkerboard cells of the third proof — and the argument is a parity count of those squares.
 
 :::lemma_ "lem:int-rect-cell-parity" (parent := "grp:int-rect") (lean := "IntegerRectangle.CountingSquares.even_cellIndex_iff")
 Measure a coordinate $`x` from a base point $`a` by the integer
@@ -130,15 +173,19 @@ $`2\lfloor x - a\rfloor` in the first case and $`2\lfloor x - a\rfloor + 1` in t
 :::
 
 :::lemma_ "lem:int-rect-cellcount" (parent := "grp:int-rect") (lean := "IntegerRectangle.CountingSquares.sum_cellCount")
-The number of half-unit squares covered by the translation of a rectangle — the product of the
-increments of the two grid coordinates across it — is additive over a tiling.
+The translated tiles contain, in all, as many half-unit squares as the translated rectangle, and a
+translated rectangle contains as many squares as the product of the increments of the two grid
+coordinates across it.
 :::
 
 :::proof "lem:int-rect-cellcount"
-That number is by definition the fg-area of the pair of grid coordinate functions, so this is
-fg-area additivity {uses "lem:int-rect-fgarea"}[], read back in the integers. It is what Wagon gets
-from the auxiliary tiling, here without having to check that the translated tiles tile the
-translated rectangle.
+The translation keeps the order of the lines, so the translated tiles tile the translated
+rectangle {uses "lem:int-rect-move-lines"}[]. Count the squares by their upper right corners: a
+square lies in a rectangle whose edges are grid lines exactly when its upper right corner lies in
+the half-open cell of the rectangle, so every square of the translated rectangle lies in exactly
+one translated tile {uses "lem:int-rect-partition"}[], and a rectangle whose edges are the grid
+lines $`c_0 \le c_1` and $`d_0 \le d_1` half-steps from the corner of $`R` contains
+$`(c_1 - c_0)(d_1 - d_0)` squares.
 :::
 
 :::theorem "thm:int-rect-counting" (parent := "grp:int-rect") (lean := "IntegerRectangleTheorem_CountingSquares") (proofColor := "#fbcfe8")
@@ -146,21 +193,32 @@ A rectangle tiled by rectangles each with an integer side has an integer side.
 :::
 
 :::proof "thm:int-rect-counting"
-Base the half-unit grid at the lower-left corner of $`R`. The endpoints of a side of integer
-length $`n` are $`n` apart, so the translation moves them equally and the increment of the grid
-coordinate across that side is $`2n`: every tile covers an even number of squares, and hence
-{uses "lem:int-rect-cellcount"}[] so does $`R`. The corner of $`R` has grid coordinate $`0`, so
-that count is the product of the grid coordinates of the far edges of $`R`, and one of the two
-factors is even — which says {uses "lem:int-rect-cell-parity"}[] that the corresponding side of
-$`R` has integer length. (Wagon phrases the last step as a contradiction: a translated rectangle
-with no integer side has both sides equal to half an odd integer, hence an odd number of squares.)
+The endpoints of a side of integer length $`n` are $`n` apart, so the translation moves them
+equally and the increment of the grid coordinate across that side is $`2n`: every translated tile
+contains an even number of squares, and hence {uses "lem:int-rect-cellcount"}[] so does the
+translated rectangle. The corner of $`R` has grid coordinate $`0`, so that count is the product of
+the grid coordinates of the far edges of $`R`, and one of the two factors is even — which says
+{uses "lem:int-rect-cell-parity"}[] that the corresponding side of $`R` has integer length.
+(Wagon phrases the last step as a contradiction: a translated rectangle with no integer side has
+both sides equal to half an odd integer, hence an odd number of squares.)
 :::
 
-Fifth proof: polynomials (Douady). Through the lower-left corner of $`R`, fix the two coordinate
-lattices and introduce a parameter $`t`. Move a vertical grid line by $`t` when its x-coordinate is
-off the x-lattice, and move a horizontal grid line by $`t` when its y-coordinate is off the
-y-lattice; leave lattice lines fixed. The perturbed areas become honest polynomials in $`t`; the
-fg-area formalizes them without separately constructing the auxiliary tiling.
+Fifth proof: polynomials (Douady). With the lattices again based at the lower-left corner of $`R`
+and a parameter $`t`, move a vertical line of the tiling by $`t` when its abscissa is off the
+lattice and a horizontal line by $`t` when its ordinate is, leaving the lattice lines fixed. For
+$`t` smaller than the least gap between the lines of the tiling the moved lines keep their order,
+and the areas of the moved rectangles are polynomials in $`t`.
+
+:::lemma_ "lem:int-rect-poly-sum" (parent := "grp:int-rect") (lean := "IntegerRectangle.Polynomials.sum_areaPoly")
+As a polynomial in $`t`, the area of the moved $`R` is the sum of the areas of the moved tiles.
+:::
+
+:::proof "lem:int-rect-poly-sum"
+For $`t` in an interval $`[0, \delta)` the moved lines keep their order, so the moved tiles tile
+the moved rectangle {uses "lem:int-rect-move-lines"}[] and the area of the moved rectangle is the
+sum of theirs {uses "lem:int-rect-area"}[]. The two polynomials therefore agree at infinitely many
+points, so they are equal.
+:::
 
 :::theorem "thm:int-rect-polynomials" (parent := "grp:int-rect") (lean := "IntegerRectangleTheorem_Polynomials") (proofColor := "#fbcfe8")
 A rectangle tiled by rectangles each with an integer side has an integer side.
@@ -168,55 +226,35 @@ A rectangle tiled by rectangles each with an integer side has an integer side.
 
 :::proof "thm:int-rect-polynomials"
 Let $`\varepsilon_x(u)` be $`0` when $`u - R_x \in \mathbb{Z}` and $`1` otherwise, and similarly
-define $`\varepsilon_y`; perturb the coordinates by $`\varphi_t(u) = u + t\varepsilon_x(u)` and
-$`\psi_t(v) = v + t\varepsilon_y(v)`. The perturbed area of a rectangle $`S` is then the value at
-$`t` of the polynomial $`P_S = (\Delta\varepsilon_x X + w)(\Delta\varepsilon_y X + h)`, with
-$`w, h` the sides of $`S` and $`\Delta\varepsilon` the indicator increments across them; its
-quadratic coefficient is the fg-area of the indicator pair. If a tile has an integer side, the two
-endpoints of that side have the same indicator, the corresponding factor is constant, and the
-quadratic coefficient vanishes: the tile's perturbed area is linear or constant in $`t`, as in
-Wagon's text. Additivity of the fg-area {uses "lem:int-rect-fgarea"}[] equates $`\sum_i P_{T_i}`
-with $`P_R` at every real $`t` — Wagon needs $`t` small so that the moved segments still bound a
-tiling, the algebraic identity does not — hence $`\sum_i P_{T_i} = P_R` as polynomials. If neither
-side of $`R` is an integer, each lower endpoint has indicator $`0` and each upper endpoint $`1`,
-so the quadratic coefficient of $`P_R` is $`1`; comparing $`X^2`-coefficients yields $`0 = 1`, a
-contradiction. (A polynomial-free variant of the same computation: each tile's term is affine in
-$`t`, so the second finite difference $`F(2) - 2F(1) + F(0)` of the identity vanishes tile by
-tile, while it equals $`2` on $`(w + t)(h + t)`.)
+define $`\varepsilon_y`, so that the lines move by $`\varphi_t(u) = u + t\varepsilon_x(u)` and
+$`\psi_t(v) = v + t\varepsilon_y(v)`. The area of a moved rectangle $`S` is the value at $`t` of
+the polynomial $`P_S = (\Delta\varepsilon_x X + w)(\Delta\varepsilon_y X + h)`, with $`w, h` the
+sides of $`S` and $`\Delta\varepsilon` the indicator increments across them. If a tile has an
+integer side, the two endpoints of that side have the same indicator, the corresponding factor is
+constant, and the quadratic coefficient vanishes: the area of the moved tile is linear or constant
+in $`t`, and hence {uses "lem:int-rect-poly-sum"}[] so is the area of the moved $`R`. If neither
+side of $`R` is an integer, each lower endpoint has indicator $`0` and each upper endpoint $`1`, so
+the moved $`R` is $`(w + t) \times (h + t)` and its area has quadratic coefficient $`1`, a
+contradiction.
 :::
 
-Sixth proof: prime numbers (Robinson). Wagon scales the tiling by a prime $`p` and rounds all tile
-corners to integers, which requires verifying that the rounded rectangles tile again. Instead we
-count lattice points: rounding is hidden inside a floor, and the re-tiling is replaced by the fact
-that the *half-open* cells of a tiling — each tile minus its left and bottom edges — genuinely
-partition the half-open cell of $`R`, with no null sets involved.
+Sixth proof: prime numbers (Robinson). For a prime $`p`, scale the tiling by $`p` and replace every
+tile corner $`(x, y)` of the scaled tiling by $`(\lfloor x\rfloor, \lfloor y\rfloor)`. This moves
+the vertical line $`x = a` to $`x = \lfloor pa\rfloor` and the horizontal line $`y = b` to
+$`y = \lfloor pb\rfloor`, keeping their order, so the rounded tiles tile the rounded rectangle, an
+integer-sided rectangle tiled by integer-sided rectangles; a tile narrower or lower than $`1/p` may
+collapse to a segment and drop out.
 
-:::lemma_ "lem:int-rect-partition" (parent := "grp:int-rect") (lean := "IntegerRectangle.IsTiling.iUnion_toSetIoc")
-The half-open cells of the tiles of a tiling are pairwise disjoint and their union is the half-open
-cell of the tiled rectangle.
+:::lemma_ "lem:int-rect-round" (parent := "grp:int-rect") (lean := "IntegerRectangle.Primes.dvd_area_round")
+If every tile has an integer side and the rounded rectangle does not collapse, its area is a
+multiple of $`p`.
 :::
 
-:::proof "lem:int-rect-partition"
-Disjointness: a point common to two half-open cells moves down-and-left — to the midpoint between
-the higher of the two lower-left corners and the point itself — into the interiors of both tiles,
-contradicting interior-disjointness. Covering: a point of the ambient half-open cell is approached
-from below-left; every such nudge stays in $`R`, hence in some tile, and since there are finitely
-many tiles one tile contains nudges arbitrarily close in. That tile is closed, so it contains the
-point, and the nudges witness the two strict inequalities of its half-open cell.
-:::
-
-:::lemma_ "lem:int-rect-count" (parent := "grp:int-rect") (lean := "IntegerRectangle.Primes.card_latticePoints_eq_sum")
-For $`p > 0`, the number of points of the lattice $`\tfrac1p\mathbb{Z} \times \tfrac1p\mathbb{Z}`
-in the half-open cell of $`R` is the sum of the numbers of such points in the half-open cells of
-the tiles. Moreover the count for a rectangle $`[x_0,x_1] \times [y_0,y_1]` is the product
-$`(\lfloor p x_1 \rfloor - \lfloor p x_0 \rfloor)(\lfloor p y_1 \rfloor - \lfloor p y_0 \rfloor)`.
-:::
-
-:::proof "lem:int-rect-count"
-A lattice point $`(a/p, b/p)` lies in the half-open cell iff $`\lfloor p x_0\rfloor < a \le
-\lfloor p x_1\rfloor` and likewise for $`b`, which gives the product formula; additivity is then
-exactly the exact-partition property {uses "lem:int-rect-partition"}[] of the half-open cells, read
-through this membership description.
+:::proof "lem:int-rect-round"
+A tile side of integer length $`n` rounds to one of length
+$`\lfloor p x_0 + pn\rfloor - \lfloor p x_0\rfloor = pn`, so the area of every rounded tile is a
+multiple of $`p`, and the area of the rounded rectangle is the sum of these areas
+{uses "lem:int-rect-move-lines"}[] {uses "lem:int-rect-area"}[].
 :::
 
 :::lemma_ "lem:int-rect-near" (parent := "grp:int-rect") (lean := "IntegerRectangle.Primes.exists_side_near_int")
@@ -225,10 +263,10 @@ within $`1/p` of an integer.
 :::
 
 :::proof "lem:int-rect-near"
-A tile side of integer length $`n` contributes the floor-difference factor
-$`\lfloor p x_0 + pn\rfloor - \lfloor p x_0\rfloor = pn`, so every tile's lattice count is
-divisible by $`p`, and by additivity {uses "lem:int-rect-count"}[] so is the count of $`R`, a
-product of two floor differences. Primality forces $`p` to divide one factor, say
+The sides of the rounded rectangle are integers that differ from those of the scaled-up rectangle
+by less than $`1`. If one of them is $`0`, the corresponding side of $`R` is shorter than $`1/p`.
+Otherwise the area of the rounded rectangle is a multiple of $`p` {uses "lem:int-rect-round"}[],
+and $`p` being prime, so is one of its sides, say
 $`\lfloor p x_1\rfloor - \lfloor p x_0\rfloor = pm`; then $`p(x_1 - x_0) - pm` is a difference of
 two floor remainders, each in $`[0,1)`, so $`|`width$` - m| < 1/p`.
 :::

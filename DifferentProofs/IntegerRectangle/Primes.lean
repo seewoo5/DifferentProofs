@@ -1,69 +1,38 @@
 module
 
-public import DifferentProofs.IntegerRectangle.Tiling.Basic
+public import DifferentProofs.IntegerRectangle.Tiling.Image
 public import Mathlib.Data.Nat.Prime.Int
 public import Mathlib.Data.Nat.Prime.Infinite
 
 /-!
 # The integer-rectangle theorem via prime numbers
 
-Wagon's sixth proof (Raphael Robinson). For a prime `p`, count the points of the lattice
-`(1/p)ℤ × (1/p)ℤ` inside the *half-open* cell of a rectangle: the count factors as
-`(⌊p·x₁⌋ - ⌊p·x₀⌋) · (⌊p·y₁⌋ - ⌊p·y₀⌋)`, one floor difference per side. Because the half-open
-cells of a tiling partition the half-open cell of the tiled rectangle exactly
-(`IsTiling.iUnion_toSetIoc`), the count is additive over the tiling — Wagon's "scale by `p` and
-round the corners" happens here inside the counting, with no auxiliary re-tiling to verify.
+Wagon's sixth proof (Raphael Robinson). For every prime `p`, the width or the height of `R` is
+within `1/p` of an integer; there are infinitely many primes, so one of the two is an integer. To
+prove the claim, scale the tiling up by `p` and replace every tile corner `(x, y)` of the scaled
+tiling by `(⌊x⌋, ⌊y⌋)`. This gives an integer-sided rectangle tiled by integer-sided rectangles,
+each with a side that is a multiple of `p`, since a side of integer length `n` becomes a side of
+length `p n`. So the area of the large rectangle is a multiple of `p`, and `p` being prime, so is
+one of its sides. The sides of the large rectangle differ from those of the scaled-up rectangle by
+less than `1`, so a side of `R` differs from an integer by less than `1/p`.
 
-A side of integer length `n` contributes the factor `⌊p·x₀ + p·n⌋ - ⌊p·x₀⌋ = p·n`, so each tile
-with an integer side has count divisible by `p`. Hence `p` divides the count of `R`, which is a
-product of two factors; primality forces `p` to divide one of them, and a side whose floor
-difference is `p·m` has length within `1/p` of `m`. So for every prime `p`, some side of `R` is
-within `1/p` of an integer; since there are infinitely many primes and a non-integer keeps a fixed
-positive distance from `ℤ`, one side of `R` must be an integer.
+The rounded tiling moves the lines of the given one in order, the line `x = a` to `x = ⌊p a⌋`
+(`scaleFloor`) and the line `y = a` to `y = ⌊p a⌋`, so it is a tiling by `IsTiling.image`, and
+its area is additive (`IsTiling.sum_area_image`). A tile, or even `R`, narrower than `1/p` may
+round to a segment; a tile then simply drops out of the rounded tiling, and a side of `R` that
+rounds to a point is within `1/p` of the integer `0`.
 -/
 
 @[expose] public section
 
-open Finset Set
-
 namespace IntegerRectangle.Primes
 
-/-- The points of the lattice `(1/p)ℤ × (1/p)ℤ` lying in the half-open cell of `S`, recorded by
-their integer numerators: the pair `(a, b)` stands for the lattice point `(a/p, b/p)`. -/
-noncomputable def latticePoints (p : ℕ) (S : Rectangle) : Finset (ℤ × ℤ) :=
-  Finset.Ioc ⌊S.x₀ * p⌋ ⌊S.x₁ * p⌋ ×ˢ Finset.Ioc ⌊S.y₀ * p⌋ ⌊S.y₁ * p⌋
+/-- Scaling by `p` and rounding down to the integer lattice. -/
+noncomputable def scaleFloor (p : ℕ) (a : ℝ) : ℝ := ⌊a * p⌋
 
-/-- Membership in `latticePoints` is membership of the lattice point in the half-open cell. -/
-private lemma mem_latticePoints {p : ℕ} (hp : 0 < p) {S : Rectangle} {ab : ℤ × ℤ} :
-    ab ∈ latticePoints p S ↔ ((ab.1 / p : ℝ), (ab.2 / p : ℝ)) ∈ S.toSetIoc := by
-  have hp' : (0 : ℝ) < p := by positivity
-  simp only [latticePoints, Finset.mem_product, Finset.mem_Ioc, Rectangle.mem_toSetIoc,
-    Int.floor_lt, Int.le_floor, lt_div_iff₀ hp', div_le_iff₀ hp']
-
-/-- The lattice count of a rectangle is the product of the floor differences of its sides. -/
-private lemma card_latticePoints (p : ℕ) (S : Rectangle) :
-    ((latticePoints p S).card : ℤ)
-      = (⌊S.x₁ * p⌋ - ⌊S.x₀ * p⌋) * (⌊S.y₁ * p⌋ - ⌊S.y₀ * p⌋) := by
-  have hx := Int.floor_mono (mul_le_mul_of_nonneg_right S.hx p.cast_nonneg)
-  have hy := Int.floor_mono (mul_le_mul_of_nonneg_right S.hy p.cast_nonneg)
-  simp [latticePoints, Int.card_Ioc, hx, hy]
-
-variable {ι : Type} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
-
-/-- **Additivity of the lattice count over a tiling.** The half-open cells of the tiles partition
-the half-open cell of `R` (`IsTiling.iUnion_toSetIoc`, `IsTiling.pairwiseDisjoint_toSetIoc`), and
-counting lattice points respects exact partitions. This is where Wagon's "scale by `p` and round
-all corners" is replaced by counting, with no auxiliary re-tiling. -/
-theorem card_latticePoints_eq_sum (hT : IsTiling R T) {p : ℕ} (hp : 0 < p) :
-    (latticePoints p R).card = ∑ i, (latticePoints p (T i)).card := by
-  classical
-  rw [show latticePoints p R = Finset.univ.biUnion (fun i ↦ latticePoints p (T i)) from
-      Finset.ext fun ab ↦ by
-        simp only [Finset.mem_biUnion, Finset.mem_univ, true_and, mem_latticePoints hp,
-          ← Set.mem_iUnion, hT.iUnion_toSetIoc],
-    Finset.card_biUnion fun i _ j _ hij ↦ Finset.disjoint_left.mpr fun ab hai haj ↦
-      Set.disjoint_left.mp (hT.pairwiseDisjoint_toSetIoc hij)
-        ((mem_latticePoints hp).mp hai) ((mem_latticePoints hp).mp haj)]
+/-- Rounding keeps the order of the lines of a tiling. -/
+lemma monotone_scaleFloor (p : ℕ) : Monotone (scaleFloor p) := fun _ _ h ↦
+  Int.cast_le.mpr (Int.floor_mono (mul_le_mul_of_nonneg_right h p.cast_nonneg))
 
 /-- The one-dimensional core: a side of integer length `n`, scaled by `p`, ends at an integer
 shift `n·p` of its start, and the shift passes through `⌊·⌋`, leaving floor difference `p·n`. -/
@@ -73,15 +42,6 @@ private lemma floor_sub_floor_of_int {p : ℕ} {a b : ℝ} {n : ℤ} (h : b - a 
     push_cast
     linear_combination (p : ℝ) * h
   rw [hb, Int.floor_add_intCast, add_sub_cancel_left]
-
-/-- A tile with an integer side has lattice count divisible by `p`: an integer side of length `n`
-contributes the floor-difference factor `⌊x·p + n·p⌋ - ⌊x·p⌋ = n·p`. -/
-private lemma dvd_card_latticePoints {p : ℕ} (S : Rectangle) (h : S.HasIntegerSide) :
-    (p : ℤ) ∣ ((latticePoints p S).card : ℤ) := by
-  rw [card_latticePoints]
-  obtain ⟨n, hn⟩ | ⟨n, hn⟩ := h
-  · exact Dvd.dvd.mul_right ⟨n, floor_sub_floor_of_int hn⟩ _
-  · exact Dvd.dvd.mul_left ⟨n, floor_sub_floor_of_int hn⟩ _
 
 /-- A side whose floor-difference factor is `p·m` has length within `1/p` of `m`: scaled by `p`,
 the difference is a difference of two floor remainders, each in `[0, 1)`. -/
@@ -94,19 +54,40 @@ private lemma abs_sub_lt_of_floor_sub_floor {x₀ x₁ : ℝ} {p : ℕ} (hp : 0 
     nlinarith [Int.floor_le (x₁ * (p : ℝ)), Int.lt_floor_add_one (x₁ * (p : ℝ)),
       Int.floor_le (x₀ * (p : ℝ)), Int.lt_floor_add_one (x₀ * (p : ℝ))]
 
+variable {ι : Type} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
+
+/-- **The area of the rounded rectangle is a multiple of `p`.** The rounded tiles tile the
+rounded rectangle, and each has a side whose length is a multiple of `p`, since a side of integer
+length `n` rounds to one of length `p n`. -/
+theorem dvd_area_round (hT : IsTiling R T) (hsides : ∀ i, (T i).HasIntegerSide) {p : ℕ}
+    (hx : ⌊R.x₀ * p⌋ < ⌊R.x₁ * p⌋) (hy : ⌊R.y₀ * p⌋ < ⌊R.y₁ * p⌋) :
+    (p : ℤ) ∣ (⌊R.x₁ * p⌋ - ⌊R.x₀ * p⌋) * (⌊R.y₁ * p⌋ - ⌊R.y₀ * p⌋) := by
+  have h := hT.sum_area_image ((monotone_scaleFloor p).monotoneOn _)
+    ((monotone_scaleFloor p).monotoneOn _)
+    (Int.cast_lt.mpr hx) (Int.cast_lt.mpr hy)
+  simp only [scaleFloor] at h
+  have h' : ∑ i, (⌊(T i).x₁ * p⌋ - ⌊(T i).x₀ * p⌋) * (⌊(T i).y₁ * p⌋ - ⌊(T i).y₀ * p⌋) =
+      (⌊R.x₁ * p⌋ - ⌊R.x₀ * p⌋) * (⌊R.y₁ * p⌋ - ⌊R.y₀ * p⌋) := by
+    exact_mod_cast h
+  rw [← h']
+  exact Finset.dvd_sum fun i _ ↦ (hsides i).elim
+    (fun ⟨n, hn⟩ ↦ Dvd.dvd.mul_right ⟨n, floor_sub_floor_of_int hn⟩ _)
+    fun ⟨n, hn⟩ ↦ Dvd.dvd.mul_left ⟨n, floor_sub_floor_of_int hn⟩ _
+
 /-- **Wagon's claim.** For every prime `p`, some side of the tiled rectangle is within `1/p` of an
-integer. -/
+integer: a side of the rounded rectangle is a multiple of `p` (`dvd_area_round`), or is `0`. -/
 theorem exists_side_near_int (hT : IsTiling R T) (hsides : ∀ i, (T i).HasIntegerSide) {p : ℕ}
     (hp : p.Prime) :
     (∃ n : ℤ, |R.width - n| < 1 / p) ∨ (∃ n : ℤ, |R.height - n| < 1 / p) := by
-  have hdvd : (p : ℤ) ∣ ((latticePoints p R).card : ℤ) := by
-    rw [card_latticePoints_eq_sum hT hp.pos]
-    push_cast
-    exact Finset.dvd_sum fun i _ ↦ dvd_card_latticePoints (T i) (hsides i)
-  rw [card_latticePoints] at hdvd
-  exact ((Nat.prime_iff_prime_int.mp hp).dvd_mul.mp hdvd).imp
-    (fun ⟨m, hm⟩ ↦ ⟨m, abs_sub_lt_of_floor_sub_floor hp.pos hm⟩)
-    fun ⟨m, hm⟩ ↦ ⟨m, abs_sub_lt_of_floor_sub_floor hp.pos hm⟩
+  have hle {a b : ℝ} (h : a ≤ b) : ⌊a * p⌋ ≤ ⌊b * p⌋ :=
+    Int.floor_mono (mul_le_mul_of_nonneg_right h p.cast_nonneg)
+  rcases (hle R.hx).lt_or_eq with hx | hx
+  · rcases (hle R.hy).lt_or_eq with hy | hy
+    · exact ((Nat.prime_iff_prime_int.mp hp).dvd_mul.mp (dvd_area_round hT hsides hx hy)).imp
+        (fun ⟨m, hm⟩ ↦ ⟨m, abs_sub_lt_of_floor_sub_floor hp.pos hm⟩)
+        fun ⟨m, hm⟩ ↦ ⟨m, abs_sub_lt_of_floor_sub_floor hp.pos hm⟩
+    · exact .inr ⟨0, abs_sub_lt_of_floor_sub_floor hp.pos (by rw [hy, sub_self, mul_zero])⟩
+  · exact .inl ⟨0, abs_sub_lt_of_floor_sub_floor hp.pos (by rw [hx, sub_self, mul_zero])⟩
 
 /-- A real number that is not an integer keeps a fixed positive distance from every integer. -/
 private lemma exists_forall_le_abs_sub {x : ℝ} (h : ¬∃ n : ℤ, x = n) :
