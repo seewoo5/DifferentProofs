@@ -1,119 +1,160 @@
 module
 
 public import DifferentProofs.IntegerRectangle.Tiling.CornerCount
-public import DifferentProofsForMathlib.Algebra.BigOperators.Ring.Finset
+public import DifferentProofsForMathlib.Combinatorics.Graph.Bipartite
 
 /-!
 # The integer-rectangle theorem via a bipartite graph
 
 Wagon's eighth proof, his variation on Paterson's Eulerian-path proof. Place `R` in standard
-position and form the bipartite graph joining each lattice point of `ℤ × ℤ` to the tiles having it
-as a corner. Counting the edges from the tile side, a tile with an integer side has `0`, `2` or `4`
-lattice corners, so their total is even. Counting from the lattice side, the origin is a corner of
-exactly one tile, while a lattice point that is not a corner of `R` is a corner of `2` or `4` tiles
-— so a further corner of `R` must be a lattice point too, and that is an integer side.
+position, let `S` be the set of corners of tiles having both coordinates integers, and let `T` be
+the set of tiles. Form a bipartite graph on `S ∪ T` by joining each point of `S` to all the tiles
+of which it is a corner. There is an even number of edges, since a tile with an integer side has
+`0`, `2` or `4` corners in `S`. But each point of `S` that is not a corner of `R` lies on `2` or `4`
+tiles, while the lower-left corner of `R`, which is in `S`, lies on only one; so another point of
+`S` lies on an odd number of tiles. That can only be another corner of `R`, and then the width or
+the height of `R` is an integer.
 
-Here `R` is not put in standard position; instead the lattice used is the one through the
-lower-left corner of `R`, and rather than the tile corners we sum over *all* its points in `R`
-(`latticeIcc`), which changes nothing since a non-corner contributes `0` on both sides.
+The graph is `bipartiteGraph`, a mathlib multigraph. Its vertices are the points of `S`, as
+`Sum.inl`, and the tiles, as `Sum.inr`, and its edges are the incidences of the tiles with their
+corners: the edge `(i, b)` joins the tile `T i` to its corner `b`, and is an edge of the graph when
+that corner is in `S`. The edges at a vertex form its incidence set, and the count of all the
+edges from either side is `Graph.IsBipartiteWith.sum_ncard_incidenceSet_eq`. That a point lies on
+exactly one tile at a corner of `R`, and on none, two or four tiles anywhere else, is the local
+picture of `IsTiling.sum_cornerCount_eq`.
 
-The double count itself is `IsTiling.even_sum_cornerCount`, which sums over the grid `X ×ˢ Y` the
-corner parity that the seventh proof uses point by point.
+Instead of moving `R` into standard position, `S` is cut out by the lattice through the lower-left
+corner of `R` (`OnLattice`).
+
+## Main result
+
+- `IntegerRectangleTheorem_BipartiteGraph`: the bipartite-graph proof of the integer-rectangle
+  theorem.
 -/
 
 @[expose] public section
 
+open Finset
+
 namespace IntegerRectangle.BipartiteGraph
-
-/-! ### The corners of a rectangle on a grid -/
-
-private lemma sum_xCount (S : Rectangle) (X : Finset ℝ) :
-    ∑ u ∈ X, xCount S u = (if S.x₀ ∈ X then 1 else 0) + (if S.x₁ ∈ X then 1 else 0) := by
-  simp [xCount, Finset.sum_add_distrib]
-
-private lemma sum_yCount (S : Rectangle) (Y : Finset ℝ) :
-    ∑ v ∈ Y, yCount S v = (if S.y₀ ∈ Y then 1 else 0) + (if S.y₁ ∈ Y then 1 else 0) := by
-  simp [yCount, Finset.sum_add_distrib]
-
-/-- Two equivalent conditions contribute an even number of edges. -/
-private lemma even_ite_add_ite {p q : Prop} [Decidable p] [Decidable q] (h : p ↔ q) :
-    Even ((if p then 1 else 0) + (if q then 1 else 0) : ℕ) := by
-  simp only [h]; exact ⟨_, rfl⟩
-
-/-- **The degree of a rectangle in the incidence graph.** The number of corners of `S` lying on
-the grid `X × Y` is the number of its vertical edges over `X` times the number of its horizontal
-edges over `Y`. -/
-private lemma sum_cornerCount_product (S : Rectangle) (X Y : Finset ℝ) :
-    ∑ z ∈ X ×ˢ Y, cornerCount S z.1 z.2 =
-      ((if S.x₀ ∈ X then 1 else 0) + (if S.x₁ ∈ X then 1 else 0)) *
-        ((if S.y₀ ∈ Y then 1 else 0) + (if S.y₁ ∈ Y then 1 else 0)) := by
-  simp only [cornerCount, Finset.sum_product_mul, sum_xCount, sum_yCount]
 
 variable {ι : Type} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
 
-/-- **Counting the edges of the bipartite graph.** Let `X` and `Y` be finite sets of abscissae
-and ordinates, and suppose each tile has either both or neither of its vertical edges over `X`,
-or both or neither of its horizontal edges over `Y`. Then the tiled rectangle has an even number
-of corners on the grid `X × Y`.
+/-! ### The bipartite graph -/
 
-Each tile contributes an even number of edges to the graph joining the grid points to the tiles
-having them as a corner, so the double count (`IsTiling.even_sum_cornerCount`) applies. -/
-theorem even_sum_cornerCount (hT : IsTiling R T) {X Y : Finset ℝ}
-    (h : ∀ i, ((T i).x₀ ∈ X ↔ (T i).x₁ ∈ X) ∨ ((T i).y₀ ∈ Y ↔ (T i).y₁ ∈ Y)) :
-    Even (∑ z ∈ X ×ˢ Y, cornerCount R z.1 z.2) :=
-  hT.even_sum_cornerCount fun i ↦ by
-    rw [sum_cornerCount_product]
-    exact (h i).elim (fun hi ↦ (even_ite_add_ite hi).mul_right _)
-      fun hi ↦ (even_ite_add_ite hi).mul_left _
+/-- A point is *on the lattice* of `R` when both of its coordinates differ from those of the
+lower-left corner of `R` by integers. Measuring from that corner replaces Wagon's "place `R` in
+standard position". -/
+def OnLattice (R : Rectangle) (z : ℝ × ℝ) : Prop :=
+  (∃ m : ℤ, z.1 - R.x₀ = m) ∧ ∃ n : ℤ, z.2 - R.y₀ = n
 
-/-! ### The lattice through a corner of the tiled rectangle -/
+/-- Being on the lattice is decided classically, so that `S` can be cut out by a filter. -/
+noncomputable instance : DecidablePred (OnLattice R) := Classical.decPred _
 
-/-- The points of the lattice `a + ℤ` lying in `[a, b]`. -/
-noncomputable def latticeIcc (a b : ℝ) : Finset ℝ := (Finset.Icc 0 ⌊b - a⌋).image fun n : ℤ ↦ a + n
+/-- Wagon's set `S`: the corners of the tiles lying on the lattice. -/
+noncomputable def latticeCorners (R : Rectangle) (T : ι → Rectangle) : Finset (ℝ × ℝ) :=
+  {z ∈ univ.image fun d : ι × Bool × Bool ↦ (T d.1).corner d.2 | OnLattice R z}
 
-/-- A point of `[a, b]` belongs to `latticeIcc a b` exactly when it sits on the lattice `a + ℤ`. -/
-private lemma mem_latticeIcc {a b u : ℝ} (h₀ : a ≤ u) (h₁ : u ≤ b) :
-    u ∈ latticeIcc a b ↔ ∃ n : ℤ, u - a = n := by
-  simp only [latticeIcc, Finset.mem_image, Finset.mem_Icc]
-  refine ⟨fun ⟨n, _, hn⟩ ↦ ⟨n, by rw [← hn]; ring⟩, fun ⟨n, hn⟩ ↦ ⟨n, ⟨?_, ?_⟩, by linarith⟩⟩
-  · exact_mod_cast hn ▸ sub_nonneg.mpr h₀
-  · exact Int.le_floor.mpr (by rw [← hn]; linarith)
+/-- The points of `S` are on the lattice. -/
+lemma onLattice_of_mem {z : ℝ × ℝ} (hz : z ∈ latticeCorners R T) : OnLattice R z :=
+  (mem_filter.mp hz).2
 
-/-- Two points of `[a, b]` an integer apart lie on the lattice `a + ℤ` together. -/
-private lemma mem_latticeIcc_iff_mem_latticeIcc {a b u w : ℝ} (hu : u ∈ Set.Icc a b)
-    (hw : w ∈ Set.Icc a b) {n : ℤ} (hn : w - u = n) :
-    u ∈ latticeIcc a b ↔ w ∈ latticeIcc a b := by
-  rw [mem_latticeIcc hu.1 hu.2, mem_latticeIcc hw.1 hw.2]
-  exact ⟨fun ⟨m, hm⟩ ↦ ⟨m + n, by push_cast; linarith⟩,
-    fun ⟨m, hm⟩ ↦ ⟨m - n, by push_cast; linarith⟩⟩
+/-- A corner of a tile on the lattice is in `S`. -/
+lemma corner_mem_latticeCorners {d : ι × Bool × Bool} (h : OnLattice R ((T d.1).corner d.2)) :
+    (T d.1).corner d.2 ∈ latticeCorners R T :=
+  mem_filter.mpr ⟨mem_image_of_mem _ (mem_univ d), h⟩
+
+/-- **Wagon's bipartite graph** on `S ∪ T`. The edge `(i, b)` joins the corner `b` of the tile
+`T i` to the tile, when that corner is on the lattice. -/
+def bipartiteGraph (R : Rectangle) (T : ι → Rectangle) :
+    Graph ((ℝ × ℝ) ⊕ ι) (ι × Bool × Bool) where
+  vertexSet := Sum.inl '' ↑(latticeCorners R T) ∪ Set.range Sum.inr
+  IsLink d x y := OnLattice R ((T d.1).corner d.2) ∧
+    (x = .inl ((T d.1).corner d.2) ∧ y = .inr d.1 ∨ x = .inr d.1 ∧ y = .inl ((T d.1).corner d.2))
+  isLink_symm _ _ := ⟨by grind⟩
+  eq_or_eq_of_isLink_of_isLink := by grind
+  left_mem_of_isLink _ _ _ := by
+    rintro ⟨h, ⟨rfl, -⟩ | ⟨rfl, -⟩⟩
+    exacts [.inl ⟨_, corner_mem_latticeCorners h, rfl⟩, .inr ⟨_, rfl⟩]
+
+/-- The bipartite graph is bipartite, with the points of `S` on one side and the tiles on the
+other. -/
+lemma bipartiteGraph_isBipartiteWith : (bipartiteGraph R T).IsBipartiteWith
+    ↑((latticeCorners R T).map (.inl (β := ι))) ↑(univ.map (.inr (α := ℝ × ℝ) (β := ι))) :=
+  ⟨disjoint_coe.mpr (disjoint_map_inl_map_inr _ _), fun _ _ _ ⟨h, hxy⟩ ↦ by
+    rcases hxy with ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩
+    exacts [.inl ⟨mem_map_of_mem _ (corner_mem_latticeCorners h), mem_map_of_mem _ (mem_univ _)⟩,
+      .inr ⟨mem_map_of_mem _ (mem_univ _), mem_map_of_mem _ (corner_mem_latticeCorners h)⟩]⟩
+
+/-! ### Counting the edges at a tile -/
+
+/-- The edges at a tile are its corners on the lattice. -/
+lemma ncard_incidenceSet_inr (i : ι) :
+    ((bipartiteGraph R T).incidenceSet (.inr i)).ncard = #{b | OnLattice R ((T i).corner b)} := by
+  have : (bipartiteGraph R T).incidenceSet (.inr i) =
+      Prod.mk i '' {b | OnLattice R ((T i).corner b)} := by
+    ext d
+    simp only [Graph.incidenceSet, Graph.Inc, bipartiteGraph, Set.mem_ofPred_eq]
+    grind
+  rw [this, Set.ncard_image_of_injective _ (Prod.mk_right_injective i),
+    Set.ncard_eq_toFinset_card', Set.toFinset_ofPred]
+
+/-- **A tile with an integer side has `0`, `2` or `4` corners on the lattice**, so evenly many
+edges: the two ends of a side of integer length have coordinates with the same fractional parts,
+so they are on the lattice together or not at all. -/
+theorem even_ncard_incidenceSet_inr {i : ι} (h : (T i).HasIntegerSide) :
+    Even ((bipartiteGraph R T).incidenceSet (.inr i)).ncard := by
+  rcases h with h | h <;> simp only [ncard_incidenceSet_inr, OnLattice, Rectangle.corner,
+    ← Int.fract_eq_fract, card_filter, Fintype.sum_prod_type, Fintype.sum_bool, ↓reduceIte,
+    Bool.false_eq_true, Int.fract_eq_fract.mpr h, Nat.even_add]
+
+/-! ### Counting the edges at a point -/
+
+/-- The edges at a point of `S` are the incidences of the tiles with it, so their number is the
+number of corners the tiles have there. -/
+theorem ncard_incidenceSet_inl {z : ℝ × ℝ} (hz : z ∈ latticeCorners R T) :
+    ((bipartiteGraph R T).incidenceSet (.inl z)).ncard = ∑ i, cornerCount (T i) z.1 z.2 := by
+  have : (bipartiteGraph R T).incidenceSet (.inl z) = {d | (T d.1).corner d.2 = z} := by
+    ext d
+    simp only [Graph.incidenceSet, Graph.Inc, bipartiteGraph, Set.mem_ofPred_eq]
+    grind [onLattice_of_mem hz]
+  simp only [this, Set.ncard_eq_toFinset_card', Set.toFinset_ofPred, card_filter,
+    Fintype.sum_prod_type, ← card_corner_eq, Prod.mk.eta]
+
+/-- **The lower-left corner of `R` lies on exactly one tile**, and is therefore in `S`. -/
+theorem corner_mem (hT : IsTiling R T) :
+    (R.x₀, R.y₀) ∈ latticeCorners R T ∧ ∑ i, cornerCount (T i) R.x₀ R.y₀ = 1 := by
+  have hsum : ∑ i, cornerCount (T i) R.x₀ R.y₀ = 1 := by
+    grind [hT.sum_cornerCount_eq R.x₀ R.y₀, cornerCount, xCount, yCount, hT.x₀_lt_x₁, hT.y₀_lt_y₁]
+  obtain ⟨i, -, hi⟩ := exists_ne_zero_of_sum_ne_zero (hsum.trans_ne one_ne_zero)
+  obtain ⟨b, -, hb⟩ := filter_nonempty_iff.mp (card_ne_zero.mp ((card_corner_eq _ _ _).trans_ne hi))
+  exact ⟨hb ▸ corner_mem_latticeCorners (d := (i, b))
+    (hb ▸ by simp only [OnLattice, ← Int.fract_eq_fract, and_self]), hsum⟩
 
 /-! ### The proof -/
+
+/-- **Another point of `S` lies on an odd number of tiles.** Counted from the side of the tiles,
+the edges of the bipartite graph are evenly many. Counted from the side of `S` they are the
+numbers of tiles the points of `S` lie on, and the lower-left corner of `R` lies on only one. -/
+theorem exists_odd (hT : IsTiling R T) (hsides : ∀ i, (T i).HasIntegerSide) :
+    ∃ z ∈ latticeCorners R T, z ≠ (R.x₀, R.y₀) ∧ Odd (∑ i, cornerCount (T i) z.1 z.2) := by
+  obtain ⟨hmem, hone⟩ := corner_mem hT
+  have h := bipartiteGraph_isBipartiteWith.sum_ncard_incidenceSet_eq
+    (Set.toFinite (bipartiteGraph R T).edgeSet)
+  simp only [sum_map, Function.Embedding.inl_apply, Function.Embedding.inr_apply] at h
+  rw [sum_congr rfl fun z hz ↦ ncard_incidenceSet_inl hz, ← sum_erase_add _ _ hmem, hone] at h
+  by_contra! h'
+  exact Nat.even_add_one.mp (h ▸ even_sum _ fun i _ ↦ even_ncard_incidenceSet_inr (hsides i))
+    (even_sum _ fun z hz ↦ by grind)
 
 end IntegerRectangle.BipartiteGraph
 
 open IntegerRectangle IntegerRectangle.BipartiteGraph in
 /-- **Bipartite-graph proof** (Wagon's variation on Paterson's Eulerian-path proof) of the
-integer-rectangle tiling theorem. Take for `X` and `Y` the lattices through the lower-left corner
-of `R`, so that a tile with an integer side has both or neither of its edges in that direction on
-the lattice, and the double count (`even_sum_cornerCount`) applies: `R` has an even number of
-corners on the lattice. Its lower-left corner is one of them, so if neither side of `R` were an
-integer it would be the only one. -/
-theorem IntegerRectangleTheorem_BipartiteGraph : IntegerRectangleTheorem := by
-  intro ι _ R T hT hsides
-  by_contra hcon
-  rw [Rectangle.HasIntegerSide, not_or] at hcon
-  have hlat : ∀ i, ((T i).x₀ ∈ latticeIcc R.x₀ R.x₁ ↔ (T i).x₁ ∈ latticeIcc R.x₀ R.x₁) ∨
-      ((T i).y₀ ∈ latticeIcc R.y₀ R.y₁ ↔ (T i).y₁ ∈ latticeIcc R.y₀ R.y₁) :=
-    fun i ↦ (hsides i).imp
-      (fun ⟨n, hn⟩ ↦ mem_latticeIcc_iff_mem_latticeIcc
-        ⟨hT.le_tile_x₀ i, (T i).hx.trans (hT.tile_x₁_le i)⟩
-        ⟨(hT.le_tile_x₀ i).trans (T i).hx, hT.tile_x₁_le i⟩ hn)
-      fun ⟨n, hn⟩ ↦ mem_latticeIcc_iff_mem_latticeIcc
-        ⟨hT.le_tile_y₀ i, (T i).hy.trans (hT.tile_y₁_le i)⟩
-        ⟨(hT.le_tile_y₀ i).trans (T i).hy, hT.tile_y₁_le i⟩ hn
-  have key := even_sum_cornerCount hT hlat
-  rw [sum_cornerCount_product, ite_eq_left ((mem_latticeIcc le_rfl R.hx).mpr ⟨0, by simp⟩),
-    ite_eq_right fun hx ↦ hcon.1 ((mem_latticeIcc R.hx le_rfl).mp hx),
-    ite_eq_left ((mem_latticeIcc le_rfl R.hy).mpr ⟨0, by simp⟩),
-    ite_eq_right fun hy ↦ hcon.2 ((mem_latticeIcc R.hy le_rfl).mp hy)] at key
-  simp at key
+integer-rectangle tiling theorem. Another point of `S` lies on an odd number of tiles
+(`exists_odd`); a point that is not a corner of `R` lies on none, two or four, so it is another
+corner of `R`, and being on the lattice it makes a side of `R` an integer. -/
+theorem IntegerRectangleTheorem_BipartiteGraph : IntegerRectangleTheorem := fun _ _ hT hsides ↦ by
+  obtain ⟨z, hz, h⟩ := exists_odd hT hsides
+  grind [onLattice_of_mem hz, OnLattice, hT.sum_cornerCount_eq z.1 z.2, cornerCount, xCount,
+    yCount, Rectangle.HasIntegerSide, Rectangle.width, Rectangle.height]
