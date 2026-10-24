@@ -706,7 +706,11 @@ alignment:
       lean: "IntegerRectangleTheorem_BipartiteGraph"
       module: "DifferentProofs.IntegerRectangle.BipartiteGraph"
       status: "proved"
-      note: ""
+      note: >-
+        Wagon's bipartite graph is built as a mathlib multigraph, its edges being the
+        incidences of the tiles with their corners on the lattice, and its edges are counted
+        from both sides (`Graph.IsBipartiteWith.sum_ncard_incidenceSet_eq`, in
+        `DifferentProofsForMathlib`).
     - source: "Wagon, Proof 9 (induction on the number of H-tiles, Robinson)"
       lean: "IntegerRectangleTheorem_Staircase"
       module: "DifferentProofs.IntegerRectangle.Staircase"

@@ -25,10 +25,6 @@ are the tiles having the point as a corner, are therefore at most as many as the
 The number of corners a rectangle has at a point, the four corners being counted with
 multiplicity so that degenerate rectangles need no separate treatment, is `cornerCount`, and the
 corners themselves are `Rectangle.corner`.
-
-The bipartite-graph proof sums the parity of the count, `IsTiling.sum_cornerCount_mod_two`, over a
-finite set `Z` of points, a lattice grid, in the double count `IsTiling.even_sum_cornerCount`: if
-every tile has an even number of corners in `Z`, then so has `R`.
 -/
 
 @[expose] public section
@@ -134,25 +130,5 @@ even, which is Wagon's "`2` or `4` tiles", and at a corner of `R` it is one. -/
 theorem IsTiling.sum_cornerCount_mod_two (hT : IsTiling R T) (u v : ℝ) :
     ((∑ i, cornerCount (T i) u v : ℕ) : ZMod 2) = (cornerCount R u v : ZMod 2) :=
   (ZMod.natCast_eq_natCast_iff' _ _ 2).mpr <| by lia [hT.sum_cornerCount_eq u v]
-
-/-! ### The double count -/
-
-/-- **The double count.** Let `T` tile `R` and let `Z` be a finite set of points such that every
-tile has an even number of corners in `Z`. Then so has `R`.
-
-Count the incidences between the points of `Z` and the tiles having them as a corner: tile by tile
-the total is even by hypothesis, and point by point the corner parity
-(`IsTiling.sum_cornerCount_mod_two`) replaces each count by the corresponding count for `R`. -/
-theorem IsTiling.even_sum_cornerCount (hT : IsTiling R T) {Z : Finset (ℝ × ℝ)}
-    (h : ∀ i, Even (∑ z ∈ Z, cornerCount (T i) z.1 z.2)) :
-    Even (∑ z ∈ Z, cornerCount R z.1 z.2) := by
-  rw [← ZMod.natCast_eq_zero_iff_even]
-  push_cast
-  calc ∑ z ∈ Z, (cornerCount R z.1 z.2 : ZMod 2)
-      = ∑ z ∈ Z, ((∑ i, cornerCount (T i) z.1 z.2 : ℕ) : ZMod 2) :=
-        Finset.sum_congr rfl fun z _ ↦ (hT.sum_cornerCount_mod_two z.1 z.2).symm
-    _ = ∑ i, ((∑ z ∈ Z, cornerCount (T i) z.1 z.2 : ℕ) : ZMod 2) := by
-        push_cast; exact Finset.sum_comm
-    _ = 0 := Finset.sum_eq_zero fun i _ ↦ ZMod.natCast_eq_zero_iff_even.mpr (h i)
 
 end IntegerRectangle
