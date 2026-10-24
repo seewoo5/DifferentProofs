@@ -1,7 +1,7 @@
 module
 
-public import DifferentProofs.IntegerRectangle.Walks
-public import DifferentProofs.IntegerRectangle.GridRefinement
+public import DifferentProofs.IntegerRectangle.Tiling.Walks
+public import DifferentProofs.IntegerRectangle.Tiling.GridRefinement
 
 /-!
 # The integer-rectangle theorem by induction on reducible links

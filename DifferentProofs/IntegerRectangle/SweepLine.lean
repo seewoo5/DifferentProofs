@@ -1,6 +1,7 @@
 module
 
-public import DifferentProofs.IntegerRectangle.Basic
+public import DifferentProofs.IntegerRectangle.Tiling.Basic
+public import DifferentProofsForMathlib.MeasureTheory.Measure.Typeclasses.NoAtoms
 public import Mathlib.Topology.LocallyConstant.Basic
 
 /-!

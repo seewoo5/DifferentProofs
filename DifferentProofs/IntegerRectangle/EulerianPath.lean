@@ -1,6 +1,6 @@
 module
 
-public import DifferentProofs.IntegerRectangle.CornerCount
+public import DifferentProofs.IntegerRectangle.Tiling.CornerCount
 public import DifferentProofsForMathlib.Algebra.Order.Floor.Ring
 public import DifferentProofsForMathlib.Combinatorics.Graph.HalfEdgePairing
 
