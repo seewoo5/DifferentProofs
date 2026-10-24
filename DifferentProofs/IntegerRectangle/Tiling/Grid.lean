@@ -16,10 +16,9 @@ out a product of two index intervals (`cellTile_eq_iff`), because the tile's own
 lines.
 
 This is the common combinatorial refinement of a tiling, shared by the proofs that need to count
-something cell by cell: the fg-area is summed over it in
-`DifferentProofs.IntegerRectangle.Tiling.GridRefinement`, and the complete edges of Schmerl's
-Sperner argument are counted over its horizontal segments in
-`DifferentProofs.IntegerRectangle.Sperner`.
+something cell by cell: Wagon refines the tiling into this grid in the step-function proof
+(`DifferentProofs.IntegerRectangle.StepFunction`), and the complete edges of Schmerl's Sperner
+argument are counted over its horizontal segments (`DifferentProofs.IntegerRectangle.Sperner`).
 The lines of the grid are also the lines that the auxiliary tilings of the fourth to sixth proofs
 move (`DifferentProofs.IntegerRectangle.Tiling.Image`).
 
@@ -274,6 +273,14 @@ lemma nth_idxB (i : ι) : nth (gridY R T) (idxB R T i) = (T i).y₀ :=
 
 lemma nth_idxT (i : ι) : nth (gridY R T) (idxT R T i) = (T i).y₁ :=
   (exists_nth_eq (tile_y₁_mem_gridY i)).choose_spec.choose_spec
+
+/-- The left edge of a tile comes before its right edge among the grid abscissae. -/
+lemma idxL_le_idxR (i : ι) : idxL R T i ≤ idxR R T i :=
+  le_of_nth_le_nth (idxL_lt i) (nth_idxL i ▸ nth_idxR i ▸ (T i).hx)
+
+/-- The bottom edge of a tile comes before its top edge among the grid ordinates. -/
+lemma idxB_le_idxT (i : ι) : idxB R T i ≤ idxT R T i :=
+  le_of_nth_le_nth (idxB_lt i) (nth_idxB i ▸ nth_idxT i ▸ (T i).hy)
 
 /-- **The fiber of `cellTile` over a tile is the product of its two index intervals.** -/
 lemma cellTile_eq_iff (hT : IsTiling R T) {p : ℕ × ℕ} {i : ι}
