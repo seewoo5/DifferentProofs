@@ -12,7 +12,6 @@ import DifferentProofs.IntegerRectangle.CountingSquares
 import DifferentProofs.IntegerRectangle.CutSet
 import DifferentProofs.IntegerRectangle.Defs
 import DifferentProofs.IntegerRectangle.EulerianPath
-import DifferentProofs.IntegerRectangle.Tiling.GridRefinement
 import DifferentProofs.IntegerRectangle.Tiling.Slice
 import DifferentProofs.IntegerRectangle.Polynomials
 import DifferentProofs.IntegerRectangle.Primes
@@ -761,39 +760,76 @@ fractional part of the width of $`R` equals the fractional part of $`f` below $`
 being the theorem — so $`f` is frozen at the top before taking fractional parts.)
 :::
 
-Thirteenth proof: step functions (Hochster–Maté). Like the first three this attaches a number to
-each rectangle and rides on additivity over the tiling, but the number comes from a *step function*
-instead of an integral, and the additivity is combinatorial rather than measure-theoretic: it holds
-for the fg-area built from an arbitrary function, with no regularity at all.
+Thirteenth proof: step functions (Hochster–Máté). Take the bottom and left edges of $`R` for the
+axes, which replaces the standard position, and let $`\Gamma` be the graph whose vertices are the
+points of the x-axis at which some tile has a vertical edge and the points of the y-axis at which
+some tile has a horizontal edge; two vertices on the x-axis are joined when an H-tile spans the
+interval between them, and two on the y-axis when a V-tile does. Number the connected components
+of $`\Gamma` by distinct numbers in an arbitrary way, and let $`f` be the step function whose value
+on the interval between consecutive vertices $`x_i < x_{i+1}` of the x-axis is the number of the
+component of $`x_{i+1}` less that of $`x_i`, and $`g` its counterpart on the y-axis. The
+formalization builds $`\Gamma` as a mathlib simple graph, and reads the value of $`f(x) g(y)` on a
+grid rectangle at its centre.
 
-:::lemma_ "lem:int-rect-fgarea" (parent := "grp:int-rect") (lean := "IntegerRectangle.IsTiling.sum_fgArea")
-For functions $`f, g : \mathbb{R} \to \mathbb{R}` define the *fg-area* of a rectangle
-$`[x_0, x_1] \times [y_0, y_1]` as $`(f(x_1) - f(x_0)) \cdot (g(y_1) - g(y_0))`. If $`T` tiles $`R`
-then the fg-areas of the tiles sum to the fg-area of $`R`, for arbitrary $`f` and $`g`.
+:::lemma_ "lem:int-rect-step-edge" (parent := "grp:int-rect") (lean := "IntegerRectangle.StepFunction.sum_stepX_eq_zero, IntegerRectangle.StepFunction.sum_stepY_eq_zero")
+The values of $`f` on the intervals between the two ends of the width of an H-tile add up to
+$`0`, and so do the values of $`g` on the intervals between the two ends of the height of a V-tile.
 :::
 
-:::proof "lem:int-rect-fgarea"
-The tile edges form a graph; extending its edges across $`R` cuts $`R` into a grid, whose vertical
-lines carry the finitely many x-coordinates of vertical tile edges and whose horizontal lines carry
-the y-coordinates of horizontal ones. No grid coordinate lies strictly inside an open grid cell, so
-a tile covering the centre of a cell has all four edges clear of it and contains the whole cell; by
-disjointness of interiors this tile is unique. Conversely the cells assigned to a tile fill out a
-full product subdivision of it, because the tile's own edges are grid lines. Summing fg-areas of
-cells therefore counts every cell exactly once, tile by tile; over a product subdivision the sum
-telescopes in both coordinates to the tile's fg-area, and over the whole grid it telescopes to the
-fg-area of $`R`.
+:::proof "lem:int-rect-step-edge"
+The sum telescopes to the number of the component of one end less that of the other, and the two
+ends are joined by an edge of $`\Gamma`.
 :::
 
-:::lemma_ "lem:int-rect-step-engine" (parent := "grp:int-rect") (lean := "IntegerRectangle.StepFunction.dichotomy")
-Let $`f, g : \mathbb{R} \to \mathbb{R}` be arbitrary. If $`T` tiles $`R` and every tile has a
-vanishing increment of $`f` across its width or of $`g` across its height, then the same dichotomy
-holds for $`R`.
+:::lemma_ "lem:int-rect-grid" (parent := "grp:int-rect") (lean := "IntegerRectangle.Grid.cellTile_eq_iff")
+Extend the edges of the tiles of a tiling across $`R` to a grid. Every open grid cell lies in exactly
+one tile, and the cells in a tile form the product of two intervals of grid indices.
 :::
 
-:::proof "lem:int-rect-step-engine"
-The fg-area of every tile is a product with a vanishing factor, so by additivity of the fg-area
-{uses "lem:int-rect-fgarea"}[] the fg-area of $`R` vanishes, and a product of reals vanishes only if
-a factor does.
+:::proof "lem:int-rect-grid"
+No grid coordinate lies strictly inside an open grid cell, so a tile covering the centre of a cell
+has all four edges clear of it and contains the whole cell; by disjointness of interiors this tile
+is unique. Conversely the cells assigned to a tile fill out a full product subdivision of it,
+because the tile's own edges are grid lines.
+:::
+
+:::lemma_ "lem:int-rect-grid-sum" (parent := "grp:int-rect") (lean := "IntegerRectangle.StepFunction.sum_grid_eq_sum_tiles")
+Refine a tiling into its grid. A sum over the grid rectangles is the sum, over the tiles, of the
+sums over the grid rectangles in each tile.
+:::
+
+:::proof "lem:int-rect-grid-sum"
+Every grid rectangle lies in exactly one tile, and those in a tile form the product of two
+intervals of grid indices {uses "lem:int-rect-grid"}[].
+:::
+
+:::lemma_ "lem:int-rect-step-tile" (parent := "grp:int-rect") (lean := "IntegerRectangle.StepFunction.step_of_mem_Ioo, IntegerRectangle.StepFunction.sum_tile_eq_zero")
+The function $`f(x) g(y)` is constant on each grid rectangle, and its values on the grid
+rectangles in one tile add up to $`0`.
+:::
+
+:::proof "lem:int-rect-step-tile"
+By construction $`f` is constant on each interval between consecutive vertices of the x-axis, and
+$`g` on each interval of the y-axis. The grid rectangles in a tile form the product of two
+intervals of grid indices {uses "lem:int-rect-grid"}[], so the sum of the values of $`f(x) g(y)`
+over them is the product of the sums of the values of $`f` along the width of the tile and of
+$`g` along its height, and one of these vanishes {uses "lem:int-rect-step-edge"}[], the tile being
+an H-tile or a V-tile.
+:::
+
+:::lemma_ "lem:int-rect-step-reach" (parent := "grp:int-rect") (lean := "IntegerRectangle.StepFunction.reachable")
+The lower-left corner of $`R` lies in the same component of $`\Gamma` as its lower-right corner or
+as its upper-left corner.
+:::
+
+:::proof "lem:int-rect-step-reach"
+By the grid refinement {uses "lem:int-rect-grid-sum"}[] the sum of the values of $`f(x) g(y)` over
+all the grid rectangles is the sum of its sums over the tiles, each of which is $`0`
+{uses "lem:int-rect-step-tile"}[]. But it is the product of the sum of the values of $`f` over all
+the intervals of the x-axis, which telescopes to the number of the component of the lower-right
+corner of $`R` less that of its lower-left corner, with the corresponding sum of $`g`. So one of
+these vanishes, and the numbers of distinct components being distinct, the corner of $`R` is in
+the same component as one of the other two.
 :::
 
 :::theorem "thm:int-rect-step" (parent := "grp:int-rect") (lean := "IntegerRectangleTheorem_StepFunction") (proofColor := "#fbcfe8")
@@ -801,15 +837,9 @@ A rectangle tiled by rectangles each with an integer side has an integer side.
 :::
 
 :::proof "thm:int-rect-step"
-Take $`f = g = \{\cdot\}`, the sawtooth $`\{x\} = x - \lfloor x\rfloor` — the identity minus a
-step function. Its increment $`\{b\} - \{a\}` vanishes if and only if $`b - a \in \mathbb{Z}`, so a
-tile with an integer side satisfies the hypothesis of the engine
-{uses "lem:int-rect-step-engine"}[], which returns a vanishing sawtooth increment for $`R` in one
-of the two directions — an integer side. The criterion is an exact "integer difference" statement,
-so unlike the checkerboard proof, whose triangle wave is symmetric about the half-integers, this
-argument needs no standard-position hypothesis. (The sawtooth increment is also the signed mass of
-$`(a, b]` under Lebesgue measure minus the counting measure of the integers, giving an alternative
-measure-theoretic route to the additivity.)
+Every edge of $`\Gamma` spans a side of a tile of integer length, so two vertices in the same
+component are an integer apart, and by {uses "lem:int-rect-step-reach"}[] the width or the height
+of $`R` is an integer.
 :::
 
 Fourteenth proof: Sperner's lemma (Schmerl). Cut every tile in two along a diagonal and label each
@@ -881,7 +911,7 @@ the number along the bottom and top edges of $`R`.
 The diagonal of a tile is a side of both of its triangles, so it is counted twice and cancels, and
 its vertical sides carry no complete edge {uses "lem:int-rect-sperner-side"}[]; what is left of a
 tile is the complete edges on its bottom and top edges. Refine the tiling to its grid: every open
-grid cell lies in a unique tile {uses "lem:int-rect-fgarea"}[], so along a fixed column of cells a
+grid cell lies in a unique tile {uses "lem:int-rect-grid"}[], so along a fixed column of cells a
 horizontal grid segment strictly inside $`R` either has the same tile above and below it, and is
 interior to that tile and counted by neither of its triangles, or has different tiles, and is then
 the top edge of the lower and the bottom edge of the upper and counted exactly twice. Everything

@@ -354,10 +354,8 @@ theorem sum_sideCount (i : ι) :
     ∑ b, sideCount (corner R) (T i) b =
       ∑ j ∈ Ico (idxL R T i) (idxR R T i),
         (segComplete R T j (idxB R T i) + segComplete R T j (idxT R T i)) := by
-  have hle : idxL R T i ≤ idxR R T i :=
-    le_of_nth_le_nth (idxL_lt i) (((nth_idxL i).le.trans (T i).hx).trans (nth_idxR i).ge)
-  rw [Finset.sum_add_distrib, sum_segComplete R T hle, sum_segComplete R T hle, nth_idxL,
-    nth_idxR, nth_idxB, nth_idxT, Fintype.sum_bool]
+  rw [Finset.sum_add_distrib, sum_segComplete R T (idxL_le_idxR i),
+    sum_segComplete R T (idxL_le_idxR i), nth_idxL, nth_idxR, nth_idxB, nth_idxT, Fintype.sum_bool]
   simp only [sideCount, triangle, completeEdge_label_vertical, add_zero, zero_add]
   rw [add_add_add_comm, CharTwo.add_self_eq_zero, add_zero, add_comm]
 
@@ -382,8 +380,7 @@ theorem sum_column (hT : IsTiling R T) {j N : ℕ} (hj : j + 1 < (gridX R T).sor
     rw [← Finset.sum_filter]
     by_cases hP : idxL R T i ≤ j ∧ j < idxR R T i
     · have := idxT_lt (R := R) (T := T) i
-      rw [ite_eq_left hP, ← sum_Ico_add_succ (le_of_nth_le_nth (idxB_lt i)
-        (((nth_idxB i).le.trans (T i).hy).trans (nth_idxT i).ge)) fun k ↦ segComplete R T j k]
+      rw [ite_eq_left hP, ← sum_Ico_add_succ (idxB_le_idxT i) fun k ↦ segComplete R T j k]
       refine Finset.sum_congr (Finset.ext fun k ↦ ?_) fun _ _ ↦ rfl
       simp only [Finset.mem_Ico, Finset.mem_filter, Finset.mem_range, hP, true_and]
       lia
