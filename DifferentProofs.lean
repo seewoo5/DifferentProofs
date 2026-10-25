@@ -48,6 +48,7 @@ public import DifferentProofs.IntegerRectangle.Tiling.Grid
 public import DifferentProofs.IntegerRectangle.Tiling.GridRefinement
 public import DifferentProofs.IntegerRectangle.Tiling.Image
 public import DifferentProofs.IntegerRectangle.Tiling.Integral
+public import DifferentProofs.IntegerRectangle.Tiling.Slice
 public import DifferentProofs.IntegerRectangle.Tiling.Walks
 public import DifferentProofs.IrrationalSqrtTwo.Basic
 public import DifferentProofs.IrrationalSqrtTwo.Defs
