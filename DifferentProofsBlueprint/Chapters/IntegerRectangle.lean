@@ -428,7 +428,7 @@ of the full width, since it is not the bottom edge of $`R`: the tile containing 
 left edge of $`R` at height $`t` reaches below it.
 :::
 
-:::lemma_ "lem:int-rect-all-h" (parent := "grp:int-rect") (lean := "IntegerRectangle.intWidth_of_forall")
+:::lemma_ "lem:int-rect-all-h" (parent := "grp:int-rect") (lean := "IntegerRectangle.intWidth_of_forall, IntegerRectangle.intHeight_of_forall")
 If every tile of a tiling of $`R` has integer width, then so has $`R`; and likewise for heights.
 :::
 
