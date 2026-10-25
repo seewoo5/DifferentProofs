@@ -96,6 +96,11 @@ beyond `propext`, `Quot.sound`, and `Classical.choice`, and that the proof term
 is accepted by a fresh run of the Lean kernel. Each `comparator/<Topic>.json`
 lists the theorems to check for one topic.
 
+Each challenge file imports only Mathlib, so a statement and the project's
+definitions behind it can be read in one file. The definitions are copied from
+`DifferentProofs/<Topic>/Defs.lean`, and Comparator checks that the proofs use
+identical ones.
+
 Running it locally is optional — CI runs it on every pull request. Check
 Comparator out *outside* this repository, since the directory name `comparator`
 is taken here by the configs. It has to be built against the same Lean version

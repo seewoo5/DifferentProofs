@@ -1,6 +1,8 @@
 module
 
-public import DifferentProofs.InfinitudeOfPrimes.Defs
+public import Mathlib.Basic.Finite.Defs
+public import Mathlib.Data.Nat.Prime.Defs
+public import Mathlib.Data.ZMod.Defs
 
 /-!
 # Comparator challenge: infinitude of primes
@@ -8,9 +10,18 @@ public import DifferentProofs.InfinitudeOfPrimes.Defs
 Each theorem below records the statement that the correspondingly named declaration in
 `DifferentProofs.InfinitudeOfPrimes.*` is required to prove. See `README.md` for what the Comparator
 check guarantees and how to run it.
+
+This file imports only Mathlib, so that it can be read on its own: the definitions below are
+restated from `DifferentProofs.InfinitudeOfPrimes.Defs`, and Comparator checks that the proofs use
+identical ones.
 -/
 
 @[expose] public section
+
+def InfinitudeOfPrimes : Prop := {p : ℕ | p.Prime}.Infinite
+
+/-- Infinitely many primes in a congruence class -/
+def InfinitudeOfPrimes_cong (a b : ℕ) : Prop := {p : ℕ | p.Prime ∧ p ≡ a [MOD b]}.Infinite
 
 theorem InfinitudeOfPrimes_Euclid : InfinitudeOfPrimes := sorry
 

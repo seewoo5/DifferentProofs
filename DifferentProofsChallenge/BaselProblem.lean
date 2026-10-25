@@ -1,6 +1,7 @@
 module
 
-public import DifferentProofs.BaselProblem.Defs
+public import Mathlib.Topology.Algebra.InfiniteSum.Defs
+public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 
 /-!
 # Comparator challenge: the Basel problem
@@ -8,9 +9,18 @@ public import DifferentProofs.BaselProblem.Defs
 Each theorem below records the statement that the correspondingly named declaration in
 `DifferentProofs.BaselProblem.*` is required to prove. See `README.md` for what the Comparator check
 guarantees and how to run it.
+
+This file imports only Mathlib, so that it can be read on its own: the definition below is restated
+from `DifferentProofs.BaselProblem.Defs`, and Comparator checks that the proofs use an identical
+one.
 -/
 
 @[expose] public section
+
+open Real
+
+/-- The **Basel problem**: `∑ 1/n² = π²/6`, where the `n = 0` term is `1 / 0 = 0` by convention. -/
+def BaselProblem : Prop := ∑' n : ℕ, (1 : ℝ) / n ^ 2 = π ^ 2 / 6
 
 theorem BaselProblem_Cauchy : BaselProblem := sorry
 

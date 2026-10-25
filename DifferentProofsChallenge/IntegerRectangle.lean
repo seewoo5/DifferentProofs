@@ -1,6 +1,8 @@
 module
 
-public import DifferentProofs.IntegerRectangle.Defs
+public import Mathlib.Topology.MetricSpace.Pseudo.Defs
+public import Mathlib.Topology.Constructions
+public import Mathlib.Data.Set.Prod
 
 /-!
 # Comparator challenge: tiling a rectangle
@@ -9,11 +11,93 @@ Each theorem below records the statement that the correspondingly named declarat
 `DifferentProofs.IntegerRectangle.*` is required to prove. See `README.md` for what the Comparator
 check guarantees and how to run it.
 
-Listed in the order of Stan Wagon's *Fourteen Proofs of a Result About Tiling a Rectangle*,
-keeping its numbering. All fourteen are formalized.
+This file imports only Mathlib, so that it can be read on its own: the definitions below are
+restated from `DifferentProofs.IntegerRectangle.Defs`, and Comparator checks that the proofs use
+identical ones.
+
+The statement is the result proved in Stan Wagon, *Fourteen Proofs of a Result About Tiling a
+Rectangle* (Amer. Math. Monthly **94** (1987), 601–617):
+
+> Whenever a rectangle is tiled by rectangles each of which has at least one integer side, then
+> the tiled rectangle has at least one integer side.
+
+Following Wagon, a *tiling* of a rectangle is a covering by finitely many axis-parallel
+rectangles with pairwise-disjoint interiors. We model an axis-parallel rectangle by its
+lower-left and upper-right corners (`Rectangle`), read off its planar point set (`Rectangle.toSet`),
+and record the tiling hypothesis in `IsTiling`. A `Rectangle` may be degenerate, a segment or a
+point, but the tiles of a tiling are genuine rectangles, of positive width and height
+(`Rectangle.Nondegenerate`). The theorem to be proved is `IntegerRectangleTheorem`.
+
+The theorems are listed in the order of Wagon's paper, keeping its numbering. All fourteen are
+formalized.
 -/
 
 @[expose] public section
+
+namespace IntegerRectangle
+
+/-- An axis-parallel closed rectangle `[x₀, x₁] × [y₀, y₁]` in the plane, encoded by its
+lower-left corner `(x₀, y₀)` and upper-right corner `(x₁, y₁)`. -/
+structure Rectangle where
+  /-- Left edge. -/
+  x₀ : ℝ
+  /-- Right edge. -/
+  x₁ : ℝ
+  /-- Bottom edge. -/
+  y₀ : ℝ
+  /-- Top edge. -/
+  y₁ : ℝ
+  /-- The left edge is not to the right of the right edge. -/
+  hx : x₀ ≤ x₁
+  /-- The bottom edge is not above the top edge. -/
+  hy : y₀ ≤ y₁
+
+namespace Rectangle
+
+/-- The set of points of the plane covered by the rectangle. -/
+def toSet (R : Rectangle) : Set (ℝ × ℝ) := Set.Icc R.x₀ R.x₁ ×ˢ Set.Icc R.y₀ R.y₁
+
+/-- The horizontal dimension of the rectangle. -/
+def width (R : Rectangle) : ℝ := R.x₁ - R.x₀
+
+/-- The vertical dimension of the rectangle. -/
+def height (R : Rectangle) : ℝ := R.y₁ - R.y₀
+
+/-- A rectangle *has an integer side* when its width or its height is an integer. -/
+def HasIntegerSide (R : Rectangle) : Prop :=
+  (∃ n : ℤ, R.width = n) ∨ (∃ n : ℤ, R.height = n)
+
+/-- A rectangle is *nondegenerate* when it has positive width and positive height — equivalently,
+when its interior is nonempty. -/
+def Nondegenerate (R : Rectangle) : Prop := R.x₀ < R.x₁ ∧ R.y₀ < R.y₁
+
+end Rectangle
+
+/-- `IsTiling R T` says that the finite family of rectangles `T` tiles the rectangle `R`: the
+tiles cover `R`, have pairwise-disjoint interiors, and are nondegenerate. This is Wagon's notion of
+a tiling, "a covering with interior pairwise-disjoint sets", by genuine rectangles: a degenerate
+tile, a segment or a point, has empty interior, so it could lie anywhere in `R`.
+
+The index type intentionally lives in `Type`: every finite family can be reindexed by `Fin n`, and
+fixing its universe prevents independent tile-index universes from appearing across the proofs. -/
+structure IsTiling {ι : Type} [Fintype ι] (R : Rectangle) (T : ι → Rectangle) : Prop where
+  /-- The tiles cover the ambient rectangle exactly. -/
+  cover : R.toSet = ⋃ i, (T i).toSet
+  /-- Distinct tiles have disjoint interiors. -/
+  interiorDisjoint :
+    Pairwise fun i j ↦ Disjoint (interior (T i).toSet) (interior (T j).toSet)
+  /-- Every tile has positive width and height. -/
+  nondegenerate : ∀ i, (T i).Nondegenerate
+
+end IntegerRectangle
+
+open IntegerRectangle in
+/-- **The integer-rectangle tiling theorem** (Wagon). If a rectangle is tiled by finitely many
+rectangles, each having at least one integer side, then the tiled rectangle has at least one
+integer side. -/
+def IntegerRectangleTheorem : Prop :=
+  ∀ {ι : Type} [Fintype ι] (R : Rectangle) (T : ι → Rectangle),
+    IsTiling R T → (∀ i, (T i).HasIntegerSide) → R.HasIntegerSide
 
 /-- Proof 1. -/
 theorem IntegerRectangleTheorem_ComplexIntegral : IntegerRectangleTheorem := sorry
