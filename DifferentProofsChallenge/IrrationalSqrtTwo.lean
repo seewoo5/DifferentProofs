@@ -1,6 +1,6 @@
 module
 
-public import DifferentProofs.IrrationalSqrtTwo.Defs
+public import Mathlib.NumberTheory.Real.Irrational
 
 /-!
 # Comparator challenge: irrationality of `√2`
@@ -11,6 +11,10 @@ check guarantees and how to run it.
 -/
 
 @[expose] public section
+
+def IrrationalSqrtTwo : Prop := Irrational (Real.sqrt 2)
+
+def IrrationalSqrtTwoNat : Prop := ∀ p q : ℕ, p ^ 2 = 2 * q ^ 2 → q = 0
 
 theorem IrrationalSqrtTwo_Descent : IrrationalSqrtTwo := sorry
 

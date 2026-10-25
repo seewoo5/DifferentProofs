@@ -29,6 +29,14 @@ check guarantees and how to run it locally. Every headline theorem in the
 project is listed, so a new one should be too; a proof that still contains a
 `sorry` cannot be, since Comparator rejects `sorryAx`.
 
+The challenge files import only Mathlib, so that each statement can be read
+without the rest of the project. A challenge file therefore restates the
+definitions from `DifferentProofs/<Topic>/Defs.lean` that its statements use,
+copied verbatim under the same Mathlib imports, since Comparator rejects the
+proofs unless the two copies elaborate to the same terms. A change to one of
+these definitions has to be made in both files, and a new theorem family needs
+a challenge file that restates its definitions.
+
 ## Namespaces
 
 Namespacing follows the directory layout, with one exception for the headline
@@ -205,8 +213,8 @@ lake build
 For changes that affect the blueprint, also check that the blueprint still
 builds and renders correctly.
 
-If you added or restated a theorem, check that the challenge statements still
-elaborate:
+If you added or restated a theorem, or changed a definition that a challenge
+restates, check that the challenge statements still elaborate:
 
 ```sh
 lake build DifferentProofsChallenge

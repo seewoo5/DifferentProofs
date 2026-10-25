@@ -1,6 +1,7 @@
 module
 
-public import DifferentProofs.FermatLittleTheorem.Defs
+public import Mathlib.Data.Int.ModEq
+public import Mathlib.Data.Nat.Prime.Defs
 
 /-!
 # Comparator challenge: Fermat's little theorem
@@ -11,6 +12,8 @@ Comparator check guarantees and how to run it.
 -/
 
 @[expose] public section
+
+def FermatLittleTheorem : Prop := ∀ p : ℕ, ∀ a : ℤ, p.Prime → a ^ p ≡ a [ZMOD p]
 
 theorem FermatLittleTheorem_Binomial : FermatLittleTheorem := sorry
 

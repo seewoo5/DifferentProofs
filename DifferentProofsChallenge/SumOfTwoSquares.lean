@@ -1,6 +1,6 @@
 module
 
-public import DifferentProofs.SumOfTwoSquares.Defs
+public import Mathlib.Data.Nat.Prime.Defs
 
 /-!
 # Comparator challenge: Fermat's theorem on sums of two squares
@@ -11,6 +11,11 @@ check guarantees and how to run it.
 -/
 
 @[expose] public section
+
+/-- **Fermat's theorem on sums of two squares**: Every prime `p` congruent to `1` modulo `4`
+is a sum of two squares of natural numbers. -/
+def FermatSumOfTwoSquares : Prop :=
+  ∀ p : ℕ, p.Prime → p % 4 = 1 → ∃ a b : ℕ, a ^ 2 + b ^ 2 = p
 
 theorem FermatSumOfTwoSquares_QuadraticReciprocity : FermatSumOfTwoSquares := sorry
 

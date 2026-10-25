@@ -1,6 +1,8 @@
 module
 
-public import DifferentProofs.InfinitudeOfPrimes.Defs
+public import Mathlib.Basic.Finite.Defs
+public import Mathlib.Data.Nat.Prime.Defs
+public import Mathlib.Data.ZMod.Defs
 
 /-!
 # Comparator challenge: infinitude of primes
@@ -11,6 +13,11 @@ check guarantees and how to run it.
 -/
 
 @[expose] public section
+
+def InfinitudeOfPrimes : Prop := {p : ℕ | p.Prime}.Infinite
+
+/-- Infinitely many primes in a congruence class -/
+def InfinitudeOfPrimes_cong (a b : ℕ) : Prop := {p : ℕ | p.Prime ∧ p ≡ a [MOD b]}.Infinite
 
 theorem InfinitudeOfPrimes_Euclid : InfinitudeOfPrimes := sorry
 
