@@ -34,15 +34,13 @@ Every edge of `Γ` spans a side of integer length, so that is an integer side of
   `(R.x₀, y)` for `x` an abscissa and `y` an ordinate of the grid of the tiling (`Grid.gridX`,
   `Grid.gridY`), and `Γ` (`graph`) is a mathlib `SimpleGraph` on them. A tile with both sides
   integral is both an H-tile and a V-tile and gives an edge on both axes, which changes nothing.
-* The components are numbered by an arbitrary injection into `ℕ` (`num`). The function `stepX`
-  gives each vertex on the bottom edge the number of its component, so that the value of Wagon's
-  `f` on the interval between two consecutive vertices is the increment of `stepX` across it, and
-  a sum of values of `f` on consecutive intervals telescopes to an increment of `stepX`; likewise
-  `stepY` for `g`.
-* The grid refinement is `sum_fgArea`: the products of the increments of `stepX` and
-  `stepY` across the grid rectangles, the values of `f(x) g(y)` there, add up tile by tile to the
-  products of the increments across the tiles, and over the whole grid to the product of the
-  increments across `R`.
+* The components are numbered by an arbitrary injection into `ℕ` (`num`); `numX` gives each vertex
+  on the bottom edge the number of its component, and `numY` each vertex on the left edge. Wagon's
+  `f` is `stepX`, a combination of indicators of the intervals between consecutive vertices whose
+  value on each is the increment of `numX` across it (`step_of_mem_Ioo`), and `g` is `stepY`.
+* The value of `f(x) g(y)` on a grid rectangle is read at its centre (`mid`), and the grid
+  refinement (`sum_grid_eq_sum_tiles`) regroups a sum over the grid rectangles tile by tile, each
+  grid rectangle lying in exactly one tile (`Grid.cellTile_eq_iff`).
 
 ## Main result
 
@@ -57,48 +55,6 @@ namespace IntegerRectangle.StepFunction
 open Finset Grid
 
 variable {ι : Type} [Fintype ι] {R : Rectangle} {T : ι → Rectangle}
-
-/-! ### The grid refinement
-
-Wagon's refinement of the tiling into a grid, stated for an arbitrary pair of functions
-`f, g : ℝ → ℝ` with no regularity whatsoever. Call
-
-```
-fgArea f g S = (f S.x₁ - f S.x₀) · (g S.y₁ - g S.y₀)
-```
-
-the *fg-area* of a rectangle; for a grid rectangle and the primitives `stepX`, `stepY` of Wagon's
-step functions it is the value of `f(x) g(y)` there. Every open grid cell lies in a unique tile
-(`Grid.cellTile`), and the cells of a tile fill out a product of index intervals
-(`Grid.cellTile_eq_iff`). Summing the fg-area of the cells therefore counts every cell exactly
-once, tile by tile, and over a product of index intervals the sum telescopes in both coordinates,
-giving the fg-area of the tile, and over the whole grid that of `R` (`sum_fgArea`). -/
-
-/-- The *fg-area* of a rectangle: the increment of `f` across its width times the increment of
-`g` across its height. -/
-def fgArea (f g : ℝ → ℝ) (S : Rectangle) : ℝ :=
-  (f S.x₁ - f S.x₀) * (g S.y₁ - g S.y₀)
-
-/-- Double telescoping: summing the product of consecutive differences over a product of index
-intervals gives the product of the end differences. -/
-private lemma sum_product_sub (F G : ℕ → ℝ) {a b c d : ℕ} (hab : a ≤ b) (hcd : c ≤ d) :
-    ∑ p ∈ Ico a b ×ˢ Ico c d, (F (p.1 + 1) - F p.1) * (G (p.2 + 1) - G p.2) =
-      (F b - F a) * (G d - G c) := by
-  rw [sum_product, ← sum_Ico_sub _ hab, ← sum_Ico_sub _ hcd, sum_mul_sum]
-
-/-- **The grid refinement** (Wagon, after Hochster and Máté), for arbitrary `f, g : ℝ → ℝ`:
-summing `(f x₁ - f x₀) · (g y₁ - g y₀)` over the tiles of a tiling gives the same quantity for the
-tiled rectangle. The tile edges span a grid; every open grid cell lies in exactly one tile, the
-cells of a tile fill a product of index intervals, and the sum telescopes in both coordinates. -/
-theorem sum_fgArea (hT : IsTiling R T) (f g : ℝ → ℝ) :
-    ∑ i, fgArea f g (T i) = fgArea f g R := by
-  classical
-  have h := @sum_product_sub (fun j ↦ f (nth (gridX R T) j)) (fun k ↦ g (nth (gridY R T) k))
-  rw [fgArea, ← nth_gridX_zero hT, ← nth_gridX_last hT, ← nth_gridY_zero hT, ← nth_gridY_last hT,
-    ← h zero_le zero_le, ← range_eq_Ico, ← range_eq_Ico, ← sum_fiberwise _ (cellTile hT)]
-  refine sum_congr rfl fun i _ ↦ ?_
-  rw [filter_cellTile_eq hT i, h (idxL_le_idxR i) (idxB_le_idxT i), nth_idxL, nth_idxR, nth_idxB,
-    nth_idxT, fgArea]
 
 /-! ### Hochster and Máté's graph -/
 
@@ -146,7 +102,13 @@ lemma fract_eq_of_reachable {p q : vertices R T} (h : (graph R T).Reachable p q)
   ((SimpleGraph.reachable_iff_reflTransGen p q).mp h).rec ⟨rfl, rfl⟩ fun _ hbc ih ↦
     ⟨ih.1.trans (fract_eq_of_adj hbc).1, ih.2.trans (fract_eq_of_adj hbc).2⟩
 
-/-! ### The step functions -/
+/-! ### The step functions
+
+Wagon's `f` takes, on the interval between two consecutive vertices of the x-axis, the number of
+the component of the right one less that of the left one. It is an instance of `step s F`, the
+step function on the gaps of a finite set `s` of reals whose value on the gap between two
+consecutive elements is the increment of `F` across it; the values of `step s F` on consecutive
+gaps add up to the increment of `F` across all of them (`sum_step`). -/
 
 /-- **An arbitrary numbering of the components of `Γ` by distinct numbers.** -/
 noncomputable def num (R : Rectangle) (T : ι → Rectangle) : (graph R T).ConnectedComponent → ℕ :=
@@ -156,50 +118,129 @@ noncomputable def num (R : Rectangle) (T : ι → Rectangle) : (graph R T).Conne
 private lemma num_injective : Function.Injective (num R T) :=
   (Countable.exists_injective_nat _).choose_spec
 
-/-- The number of the component of the vertex below `x`, for `x` an abscissa of the grid. Its
-increment across the interval between two consecutive abscissae is the value there of Wagon's
-step function `f`, so that sums of values of `f` along consecutive intervals telescope to
-increments of `stepX`. -/
-noncomputable def stepX (R : Rectangle) (T : ι → Rectangle) (x : ℝ) : ℝ :=
+/-- The number of the component of the vertex below `x`, for `x` an abscissa of the grid. -/
+noncomputable def numX (R : Rectangle) (T : ι → Rectangle) (x : ℝ) : ℝ :=
   if hx : x ∈ gridX R T then num R T ((graph R T).connectedComponentMk (bot hx)) else 0
 
-/-- The number of the component of the vertex level with `y`, for `y` an ordinate of the grid,
-the counterpart of `stepX` for Wagon's step function `g`. -/
-noncomputable def stepY (R : Rectangle) (T : ι → Rectangle) (y : ℝ) : ℝ :=
+/-- The number of the component of the vertex level with `y`, for `y` an ordinate of the grid. -/
+noncomputable def numY (R : Rectangle) (T : ι → Rectangle) (y : ℝ) : ℝ :=
   if hy : y ∈ gridY R T then num R T ((graph R T).connectedComponentMk (left hy)) else 0
 
-/-- Two abscissae of the grid have the same value of `stepX` exactly when their vertices are in the
-same component of `Γ`. -/
-private lemma stepX_eq_stepX_iff {x x' : ℝ} (hx : x ∈ gridX R T) (hx' : x' ∈ gridX R T) :
-    stepX R T x = stepX R T x' ↔ (graph R T).Reachable (bot hx) (bot hx') := by
-  rw [stepX, stepX, dite_eq_left hx, dite_eq_left hx', Nat.cast_inj, num_injective.eq_iff,
+/-- Two abscissae of the grid have the same number exactly when their vertices are in the same
+component of `Γ`. -/
+private lemma numX_eq_numX_iff {x x' : ℝ} (hx : x ∈ gridX R T) (hx' : x' ∈ gridX R T) :
+    numX R T x = numX R T x' ↔ (graph R T).Reachable (bot hx) (bot hx') := by
+  rw [numX, numX, dite_eq_left hx, dite_eq_left hx', Nat.cast_inj, num_injective.eq_iff,
     SimpleGraph.ConnectedComponent.eq]
 
-/-- Two ordinates of the grid have the same value of `stepY` exactly when their vertices are in the
-same component of `Γ`. -/
-private lemma stepY_eq_stepY_iff {y y' : ℝ} (hy : y ∈ gridY R T) (hy' : y' ∈ gridY R T) :
-    stepY R T y = stepY R T y' ↔ (graph R T).Reachable (left hy) (left hy') := by
-  rw [stepY, stepY, dite_eq_left hy, dite_eq_left hy', Nat.cast_inj, num_injective.eq_iff,
+/-- Two ordinates of the grid have the same number exactly when their vertices are in the same
+component of `Γ`. -/
+private lemma numY_eq_numY_iff {y y' : ℝ} (hy : y ∈ gridY R T) (hy' : y' ∈ gridY R T) :
+    numY R T y = numY R T y' ↔ (graph R T).Reachable (left hy) (left hy') := by
+  rw [numY, numY, dite_eq_left hy, dite_eq_left hy', Nat.cast_inj, num_injective.eq_iff,
     SimpleGraph.ConnectedComponent.eq]
 
-/-- **Over the grid rectangles in a tile, `f(x) g(y)` sums to `0`.** That sum is the product of
-the increments of `stepX` across the width of the tile and of `stepY` across its height, and the
-width of an H-tile is an edge of `Γ`, as is the height of a V-tile. -/
-lemma fgArea_eq_zero (hT : IsTiling R T) (hsides : ∀ i, (T i).HasIntegerSide) (i : ι) :
-    fgArea (stepX R T) (stepY R T) (T i) = 0 := by
-  rw [fgArea, mul_eq_zero, sub_eq_zero, sub_eq_zero]
-  exact (hsides i).imp (fun h ↦ (stepX_eq_stepX_iff _ _).mpr (adj_bot hT h).symm.reachable)
-    fun h ↦ (stepY_eq_stepY_iff _ _).mpr (adj_left hT h).symm.reachable
+/-- The step function on the gaps of a finite set `s` of reals whose value on the open gap between
+consecutive elements `s_j < s_{j+1}` is `F s_{j+1} - F s_j`, and `0` off the gaps. -/
+noncomputable def step (s : Finset ℝ) (F : ℝ → ℝ) (x : ℝ) : ℝ :=
+  ∑ j ∈ range (s.sort.length - 1),
+    (Set.Ioo (nth s j) (nth s (j + 1))).indicator (fun _ ↦ F (nth s (j + 1)) - F (nth s j)) x
+
+/-- The step function is constant on each gap of `s`. -/
+lemma step_of_mem_Ioo {s : Finset ℝ} (F : ℝ → ℝ) {j : ℕ} (hj : j + 1 < s.sort.length) {x : ℝ}
+    (hx : x ∈ Set.Ioo (nth s j) (nth s (j + 1))) :
+    step s F x = F (nth s (j + 1)) - F (nth s j) := by
+  rw [step, sum_eq_single_of_mem j (mem_range.mpr (by lia)) fun k hk hkj ↦ ?_,
+    Set.indicator_of_mem hx]
+  refine Set.indicator_of_notMem ?_ _
+  rintro ⟨h₀, h₁⟩
+  rcases hkj.lt_or_gt with h | h
+  · exact (hx.1.trans h₁).not_ge (nth_le_nth h (Nat.lt_of_succ_lt hj))
+  · exact (h₀.trans hx.2).not_ge (nth_le_nth h (by have := mem_range.mp hk; lia))
+
+/-- The midpoint of the `j`-th gap of `s`. -/
+noncomputable def mid (s : Finset ℝ) (j : ℕ) : ℝ := (nth s j + nth s (j + 1)) / 2
+
+/-- The midpoint of a gap of `s` lies in it. -/
+lemma mid_mem_Ioo {s : Finset ℝ} {j : ℕ} (hj : j + 1 < s.sort.length) :
+    mid s j ∈ Set.Ioo (nth s j) (nth s (j + 1)) :=
+  have h := nth_lt_nth (Nat.lt_succ_self j) hj
+  ⟨left_lt_add_div_two.mpr h, add_div_two_lt_right.mpr h⟩
+
+/-- **The values of the step function on consecutive gaps add up to the increment of `F` across
+them.** -/
+lemma sum_step {s : Finset ℝ} (F : ℝ → ℝ) {a b : ℕ} (hab : a ≤ b) (hb : b ≤ s.sort.length - 1) :
+    ∑ j ∈ Ico a b, step s F (mid s j) = F (nth s b) - F (nth s a) :=
+  (sum_congr rfl fun j hj ↦
+    have h : j + 1 < s.sort.length := by have := (mem_Ico.mp hj).2; lia
+    step_of_mem_Ioo F h (mid_mem_Ioo h)).trans (sum_Ico_sub (fun j ↦ F (nth s j)) hab)
+
+/-- **Wagon's step function `f`** on the bottom edge of `R`: its value on the interval between
+consecutive abscissae `x_j < x_{j+1}` of the grid is the number of the component of `x_{j+1}` less
+that of `x_j`. -/
+noncomputable def stepX (R : Rectangle) (T : ι → Rectangle) : ℝ → ℝ :=
+  step (gridX R T) (numX R T)
+
+/-- **Wagon's step function `g`** on the left edge of `R`, the counterpart of `f`. -/
+noncomputable def stepY (R : Rectangle) (T : ι → Rectangle) : ℝ → ℝ :=
+  step (gridY R T) (numY R T)
+
+/-- **The values of `f` on the intervals spanned by an H-tile add up to `0`.** The sum telescopes
+to the number of the component of the right end of the tile less that of its left end, and the two
+ends are joined by an edge of `Γ`. -/
+lemma sum_stepX_eq_zero (hT : IsTiling R T) {i : ι} (h : (T i).IsHTile) :
+    ∑ j ∈ Ico (idxL R T i) (idxR R T i), stepX R T (mid (gridX R T) j) = 0 := by
+  rw [stepX, sum_step _ (idxL_le_idxR i) (Nat.le_sub_one_of_lt (idxR_lt i)), nth_idxR, nth_idxL,
+    sub_eq_zero]
+  exact (numX_eq_numX_iff _ _).mpr (adj_bot hT h).symm.reachable
+
+/-- **The values of `g` on the intervals spanned by a V-tile add up to `0`.** -/
+lemma sum_stepY_eq_zero (hT : IsTiling R T) {i : ι} (h : (T i).IsVTile) :
+    ∑ k ∈ Ico (idxB R T i) (idxT R T i), stepY R T (mid (gridY R T) k) = 0 := by
+  rw [stepY, sum_step _ (idxB_le_idxT i) (Nat.le_sub_one_of_lt (idxT_lt i)), nth_idxT, nth_idxB,
+    sub_eq_zero]
+  exact (numY_eq_numY_iff _ _).mpr (adj_left hT h).symm.reachable
+
+/-! ### The grid refinement
+
+Refine the tiling into its grid. A sum over the grid rectangles regroups tile by tile
+(`sum_grid_eq_sum_tiles`), and the values of `f(x) g(y)` on the grid rectangles in a tile add up to
+`0` (`sum_tile_eq_zero`). So their sum over all the grid rectangles is `0`, and it is the product
+of the sums of `f` and of `g` along the two sides of `R` (`reachable`). -/
+
+/-- **The grid refinement.** Every grid rectangle lies in exactly one tile, and the grid rectangles
+in a tile form the product of its two index intervals (`Grid.filter_cellTile_eq`), so a sum over
+the grid rectangles is the sum, over the tiles, of the sums over the grid rectangles in each. -/
+theorem sum_grid_eq_sum_tiles (hT : IsTiling R T) (v : ℕ × ℕ → ℝ) :
+    ∑ p ∈ range ((gridX R T).sort.length - 1) ×ˢ range ((gridY R T).sort.length - 1), v p =
+      ∑ i, ∑ p ∈ Ico (idxL R T i) (idxR R T i) ×ˢ Ico (idxB R T i) (idxT R T i), v p := by
+  classical
+  rw [← sum_fiberwise _ (cellTile hT)]
+  exact sum_congr rfl fun i _ ↦ by rw [filter_cellTile_eq hT i]
+
+/-- **Over the grid rectangles in a tile, the values of `f(x) g(y)` add up to `0`**, being the
+product of the sums of the values of `f` along the width of the tile and of `g` along its height,
+one of which vanishes. -/
+lemma sum_tile_eq_zero (hT : IsTiling R T) (hsides : ∀ i, (T i).HasIntegerSide) (i : ι) :
+    ∑ p ∈ Ico (idxL R T i) (idxR R T i) ×ˢ Ico (idxB R T i) (idxT R T i),
+      stepX R T (mid (gridX R T) p.1) * stepY R T (mid (gridY R T) p.2) = 0 := by
+  simp only [sum_product, ← sum_mul_sum]
+  exact mul_eq_zero.mpr ((hsides i).imp (sum_stepX_eq_zero hT) (sum_stepY_eq_zero hT))
 
 /-- **The corner of `R` lies in the same component of `Γ` as one of its two neighbours.** Over the
-whole grid `f(x) g(y)` sums to `0`, tile by tile, and that sum is the product of the increments of
-`stepX` across the width of `R` and of `stepY` across its height (`sum_fgArea`). -/
+whole grid the values of `f(x) g(y)` add up to `0`, tile by tile, and their sum is the product of
+the sum of the values of `f` along the bottom edge of `R`, the number of the component of its
+lower-right corner less that of its lower-left one, with the corresponding sum of `g`. -/
 theorem reachable (hT : IsTiling R T) (hsides : ∀ i, (T i).HasIntegerSide) :
     (graph R T).Reachable (bot left_mem_gridX) (bot right_mem_gridX) ∨
-      (graph R T).Reachable (left bot_mem_gridY) (left top_mem_gridY) :=
-  (mul_eq_zero.mp <| (sum_fgArea hT _ _).symm.trans <| Fintype.sum_eq_zero _ <|
-    fgArea_eq_zero hT hsides).imp (fun h ↦ (stepX_eq_stepX_iff _ _).mp (sub_eq_zero.mp h).symm)
-    fun h ↦ (stepY_eq_stepY_iff _ _).mp (sub_eq_zero.mp h).symm
+      (graph R T).Reachable (left bot_mem_gridY) (left top_mem_gridY) := by
+  have h := (sum_grid_eq_sum_tiles hT fun p ↦
+    stepX R T (mid (gridX R T) p.1) * stepY R T (mid (gridY R T) p.2)).trans <|
+      Fintype.sum_eq_zero _ (sum_tile_eq_zero hT hsides)
+  simp only [sum_product, ← sum_mul_sum, range_eq_Ico, stepX, stepY, sum_step _ zero_le le_rfl,
+    nth_gridX_zero hT, nth_gridX_last hT, nth_gridY_zero hT, nth_gridY_last hT] at h
+  exact (mul_eq_zero.mp h).imp (fun h ↦ (numX_eq_numX_iff _ _).mp (sub_eq_zero.mp h).symm)
+    fun h ↦ (numY_eq_numY_iff _ _).mp (sub_eq_zero.mp h).symm
 
 end IntegerRectangle.StepFunction
 

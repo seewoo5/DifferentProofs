@@ -768,7 +768,18 @@ interval between them, and two on the y-axis when a V-tile does. Number the conn
 of $`\Gamma` by distinct numbers in an arbitrary way, and let $`f` be the step function whose value
 on the interval between consecutive vertices $`x_i < x_{i+1}` of the x-axis is the number of the
 component of $`x_{i+1}` less that of $`x_i`, and $`g` its counterpart on the y-axis. The
-formalization builds $`\Gamma` as a mathlib simple graph.
+formalization builds $`\Gamma` as a mathlib simple graph, and reads the value of $`f(x) g(y)` on a
+grid rectangle at its centre.
+
+:::lemma_ "lem:int-rect-step-edge" (parent := "grp:int-rect") (lean := "IntegerRectangle.StepFunction.sum_stepX_eq_zero, IntegerRectangle.StepFunction.sum_stepY_eq_zero")
+The values of $`f` on the intervals between the two ends of the width of an H-tile add up to
+$`0`, and so do the values of $`g` on the intervals between the two ends of the height of a V-tile.
+:::
+
+:::proof "lem:int-rect-step-edge"
+The sum telescopes to the number of the component of one end less that of the other, and the two
+ends are joined by an edge of $`\Gamma`.
+:::
 
 :::lemma_ "lem:int-rect-grid" (parent := "grp:int-rect") (lean := "IntegerRectangle.Grid.cellTile_eq_iff")
 Extend the edges of the tiles of a tiling across $`R` to a grid. Every open grid cell lies in exactly
@@ -782,17 +793,28 @@ is unique. Conversely the cells assigned to a tile fill out a full product subdi
 because the tile's own edges are grid lines.
 :::
 
-:::lemma_ "lem:int-rect-fgarea" (parent := "grp:int-rect") (lean := "IntegerRectangle.StepFunction.sum_fgArea")
-For functions $`F, G : \mathbb{R} \to \mathbb{R}` define the *fg-area* of a rectangle
-$`[x_0, x_1] \times [y_0, y_1]` as $`(F(x_1) - F(x_0)) \cdot (G(y_1) - G(y_0))`. If $`T` tiles $`R`
-then the fg-areas of the tiles sum to the fg-area of $`R`, for arbitrary $`F` and $`G`.
+:::lemma_ "lem:int-rect-grid-sum" (parent := "grp:int-rect") (lean := "IntegerRectangle.StepFunction.sum_grid_eq_sum_tiles")
+Refine a tiling into its grid. A sum over the grid rectangles is the sum, over the tiles, of the
+sums over the grid rectangles in each tile.
 :::
 
-:::proof "lem:int-rect-fgarea"
-Refine the tiling into its grid {uses "lem:int-rect-grid"}[]. Summing the fg-areas of the grid
-cells counts every cell exactly once, tile by tile; over the cells of a tile, a product of index
-intervals, the sum telescopes in both coordinates to the fg-area of the tile, and over the whole
-grid to the fg-area of $`R`.
+:::proof "lem:int-rect-grid-sum"
+Every grid rectangle lies in exactly one tile, and those in a tile form the product of two
+intervals of grid indices {uses "lem:int-rect-grid"}[].
+:::
+
+:::lemma_ "lem:int-rect-step-tile" (parent := "grp:int-rect") (lean := "IntegerRectangle.StepFunction.step_of_mem_Ioo, IntegerRectangle.StepFunction.sum_tile_eq_zero")
+The function $`f(x) g(y)` is constant on each grid rectangle, and its values on the grid
+rectangles in one tile add up to $`0`.
+:::
+
+:::proof "lem:int-rect-step-tile"
+By construction $`f` is constant on each interval between consecutive vertices of the x-axis, and
+$`g` on each interval of the y-axis. The grid rectangles in a tile form the product of two
+intervals of grid indices {uses "lem:int-rect-grid"}[], so the sum of the values of $`f(x) g(y)`
+over them is the product of the sums of the values of $`f` along the width of the tile and of
+$`g` along its height, and one of these vanishes {uses "lem:int-rect-step-edge"}[], the tile being
+an H-tile or a V-tile.
 :::
 
 :::lemma_ "lem:int-rect-step-reach" (parent := "grp:int-rect") (lean := "IntegerRectangle.StepFunction.reachable")
@@ -801,15 +823,13 @@ as its upper-left corner.
 :::
 
 :::proof "lem:int-rect-step-reach"
-Let $`F` give each vertex of the x-axis the number of its component, and $`G` likewise on the
-y-axis, so that the value of $`f` on the interval between two consecutive vertices is the increment
-of $`F` across it, and the value of $`f(x) g(y)` on a grid rectangle is its fg-area for $`F` and
-$`G`. Over the grid rectangles in a tile these values add up to the fg-area of the tile, which
-vanishes: the width of an H-tile spans an edge of $`\Gamma`, whose ends are in the same component,
-and so does the height of a V-tile. By the grid refinement {uses "lem:int-rect-fgarea"}[] the
-fg-area of $`R`, the product of the increments of $`F` across its width and of $`G` across its
-height, vanishes too, and the numbers of distinct components being distinct, the corner of $`R` is
-in the same component as one of the other two.
+By the grid refinement {uses "lem:int-rect-grid-sum"}[] the sum of the values of $`f(x) g(y)` over
+all the grid rectangles is the sum of its sums over the tiles, each of which is $`0`
+{uses "lem:int-rect-step-tile"}[]. But it is the product of the sum of the values of $`f` over all
+the intervals of the x-axis, which telescopes to the number of the component of the lower-right
+corner of $`R` less that of its lower-left corner, with the corresponding sum of $`g`. So one of
+these vanishes, and the numbers of distinct components being distinct, the corner of $`R` is in
+the same component as one of the other two.
 :::
 
 :::theorem "thm:int-rect-step" (parent := "grp:int-rect") (lean := "IntegerRectangleTheorem_StepFunction") (proofColor := "#fbcfe8")
