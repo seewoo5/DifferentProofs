@@ -8,10 +8,6 @@ public import Mathlib.Data.Nat.Prime.Defs
 Each theorem below records the statement that the correspondingly named declaration in
 `DifferentProofs.SumOfTwoSquares.*` is required to prove. See `README.md` for what the Comparator
 check guarantees and how to run it.
-
-This file imports only Mathlib, so that it can be read on its own: the definition below is restated
-from `DifferentProofs.SumOfTwoSquares.Defs`, and Comparator checks that the proofs use an identical
-one.
 -/
 
 @[expose] public section

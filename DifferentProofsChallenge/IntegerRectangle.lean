@@ -11,10 +11,6 @@ Each theorem below records the statement that the correspondingly named declarat
 `DifferentProofs.IntegerRectangle.*` is required to prove. See `README.md` for what the Comparator
 check guarantees and how to run it.
 
-This file imports only Mathlib, so that it can be read on its own: the definitions below are
-restated from `DifferentProofs.IntegerRectangle.Defs`, and Comparator checks that the proofs use
-identical ones.
-
 The statement is the result proved in Stan Wagon, *Fourteen Proofs of a Result About Tiling a
 Rectangle* (Amer. Math. Monthly **94** (1987), 601–617):
 

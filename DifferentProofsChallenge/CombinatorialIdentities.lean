@@ -8,10 +8,6 @@ public import Mathlib.Data.Nat.Choose.Sum
 Each theorem below records the statement that the correspondingly named declaration in
 `DifferentProofs.CombinatorialIdentities.*` is required to prove. See `README.md` for what the
 Comparator check guarantees and how to run it.
-
-This file imports only Mathlib, so that it can be read on its own: the definitions below are
-restated from `DifferentProofs.CombinatorialIdentities.Defs`, and Comparator checks that the proofs
-use identical ones.
 -/
 
 @[expose] public section
