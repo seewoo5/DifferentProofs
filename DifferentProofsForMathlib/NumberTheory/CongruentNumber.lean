@@ -25,14 +25,14 @@ Conrad's notes *The congruent number problem*
 * Writing the sides of a rational right triangle of area `1` as `a / d`, `b / d` and `c / d`
   gives natural numbers with `a ^ 2 + b ^ 2 = c ^ 2` and `a * b = 2 * d ^ 2`, where `d ≠ 0`.
 * The greatest common divisor `g` of `a` and `b` also divides `c` and `d`, and dividing by it
-  gives a solution with `a` and `b` coprime (`no_solution`).
+  gives a solution with `a` and `b` coprime.
 * Then one of `a` and `b` is even, say `a = 2 * k ^ 2` and `b = l ^ 2` with `l` odd. The
   coprime numbers `(c + b) / 2` and `(c - b) / 2` multiply to `k ^ 4`, so they are `r ^ 4` and
   `s ^ 4`, and `l ^ 2 = r ^ 4 - s ^ 4 = (r ^ 2 + s ^ 2) * (r ^ 2 - s ^ 2)` with coprime factors.
   So `r ^ 2 + s ^ 2 = t ^ 2` and `r ^ 2 - s ^ 2 = u ^ 2`, where `u` is odd, and modulo `4` this
   forces `r` to be odd and `s` to be even. Now `((t + u) / 2, (t - u) / 2, r, s / 2)` is another
-  coprime solution, and `r < c`. By strong induction on `c` there is no coprime solution
-  (`descent`).
+  coprime solution, and `r < c`. By strong induction on `c` there is no coprime solution, and
+  hence no solution at all (`no_solution`).
 
 Natural-number subtraction truncates, so the formalization names the differences instead:
 `c = b + 2 * m`, `r ^ 2 = s ^ 2 + w` and `t = u + 2 * b'`. Conrad gives a separate reason for each
@@ -63,15 +63,28 @@ private lemma dvd_of_sq_dvd_two_mul_sq {g d : ℕ} (hd : d ≠ 0) (h : g ^ 2 ∣
   rw [mul_pow, mul_pow, ← mul_assoc, Nat.mul_dvd_mul_iff_right (by positivity)] at h
   exact mul_dvd_mul_right (Nat.squarefree_two g (sq g ▸ (hco.pow 2 2).dvd_of_dvd_mul_right h)).dvd e
 
-/-- **Fermat's descent**: there are no natural numbers `a, b, c, d` with `d ≠ 0`, `a` and `b`
-coprime, `a ^ 2 + b ^ 2 = c ^ 2` and `a * b = 2 * d ^ 2`. From such a solution the proof builds
-another one with a smaller `c`. -/
-private theorem descent {a b c d : ℕ} (hd : d ≠ 0) (hab : a.Coprime b)
-    (h₁ : a ^ 2 + b ^ 2 = c ^ 2) (h₂ : a * b = 2 * d ^ 2) : False := by
+/-- **Fermat's descent**: there are no natural numbers `a, b, c, d` with `d ≠ 0`,
+`a ^ 2 + b ^ 2 = c ^ 2` and `a * b = 2 * d ^ 2`. The greatest common divisor of `a` and `b` divides
+`c` and `d`, and dividing by it gives such a solution with `a` and `b` coprime. From a coprime
+solution the proof builds another one with a smaller `c`. -/
+private theorem no_solution {a b c d : ℕ} (hd : d ≠ 0) (h₁ : a ^ 2 + b ^ 2 = c ^ 2)
+    (h₂ : a * b = 2 * d ^ 2) : False := by
+  -- dividing by `g = gcd a b` makes `a` and `b` coprime
+  have ha : a ≠ 0 := left_ne_zero_of_mul (by rw [h₂]; positivity)
+  obtain ⟨g, a, b, hg, hab, rfl, rfl⟩ := Nat.exists_coprime' (by positivity : 0 < Nat.gcd a b)
+  obtain ⟨c, rfl⟩ : g ∣ c := (Nat.pow_dvd_pow_iff two_ne_zero).mp ⟨a ^ 2 + b ^ 2, h₁ ▸ by ring⟩
+  obtain ⟨d, rfl⟩ : g ∣ d := dvd_of_sq_dvd_two_mul_sq hd ⟨a * b, h₂ ▸ by ring⟩
+  replace hd := right_ne_zero_of_mul hd
+  replace h₁ : a ^ 2 + b ^ 2 = c ^ 2 :=
+    Nat.eq_of_mul_eq_mul_left (pow_pos hg 2) (by linear_combination h₁)
+  replace h₂ : a * b = 2 * d ^ 2 :=
+    Nat.eq_of_mul_eq_mul_left (pow_pos hg 2) (by linear_combination h₂)
+  clear ha
+  -- the descent: strong induction on `c` over coprime solutions
   induction c using Nat.strong_induction_on generalizing a b d with | _ c ih => ?_
   -- one of `a` and `b` is even, say `a`
   wlog ha : 2 ∣ a generalizing a b with H
-  · exact H hab.symm (by rwa [add_comm]) (by rwa [mul_comm])
+  · exact H b a hab.symm (by rwa [add_comm]) (by rwa [mul_comm])
       ((Nat.prime_two.dvd_mul.mp ⟨_, h₂⟩).resolve_left ha)
   have ha0 : a ≠ 0 := left_ne_zero_of_mul (by rw [h₂]; positivity)
   have hlc : b < c := lt_of_pow_lt_pow_left₀ 2 c.zero_le (h₁ ▸ lt_add_of_pos_left _ (by positivity))
@@ -104,22 +117,9 @@ private theorem descent {a b c d : ℕ} (hd : d ≠ 0) (hab : a.Coprime b)
   -- the smaller solution `((t + u) / 2, (t - u) / 2, r, s / 2)`, coprime as `u` and `s` are
   obtain ⟨b', rfl⟩ : ∃ b', t = u + 2 * b' := ⟨(t - u) / 2, by lia⟩
   obtain ⟨d', rfl⟩ : ∃ d', s = 2 * d' := ⟨s / 2, by lia⟩
-  exact ih r hrc (a := u + b') (b := b') (d := d') (by lia) (Nat.coprime_add_self_left.mpr
+  exact ih r hrc (u + b') b' (Nat.coprime_add_self_left.mpr
     ((hsw.coprime_dvd_left ⟨4 * (u + b'), by linarith⟩).coprime_dvd_right
-      (dvd_pow_self u two_ne_zero)).symm) (by linarith) (by linarith)
-
-/-- There are no natural numbers `a, b, c, d` with `d ≠ 0`, `a ^ 2 + b ^ 2 = c ^ 2` and
-`a * b = 2 * d ^ 2`: the greatest common divisor of `a` and `b` divides `c` and `d`, and dividing
-by it gives such a solution with `a` and `b` coprime, which `descent` rules out. -/
-private theorem no_solution {a b c d : ℕ} (hd : d ≠ 0) (h₁ : a ^ 2 + b ^ 2 = c ^ 2)
-    (h₂ : a * b = 2 * d ^ 2) : False := by
-  have ha : a ≠ 0 := left_ne_zero_of_mul (by rw [h₂]; positivity)
-  obtain ⟨g, a, b, hg, hab, rfl, rfl⟩ := Nat.exists_coprime' (by positivity : 0 < Nat.gcd a b)
-  obtain ⟨c, rfl⟩ : g ∣ c := (Nat.pow_dvd_pow_iff two_ne_zero).mp ⟨a ^ 2 + b ^ 2, h₁ ▸ by ring⟩
-  obtain ⟨d, rfl⟩ : g ∣ d := dvd_of_sq_dvd_two_mul_sq hd ⟨a * b, h₂ ▸ by ring⟩
-  exact descent (c := c) (right_ne_zero_of_mul hd) hab
-    (Nat.eq_of_mul_eq_mul_left (pow_pos hg 2) (by linear_combination h₁))
-    (Nat.eq_of_mul_eq_mul_left (pow_pos hg 2) (by linear_combination h₂))
+      (dvd_pow_self u two_ne_zero)).symm) d' (by lia) (by linarith) (by linarith)
 
 /-- A nonnegative rational number times a multiple of its denominator is a natural number. -/
 private lemma exists_natCast_eq_mul {x : ℚ} (hx : 0 ≤ x) {n : ℕ} (h : x.den ∣ n) :
