@@ -7,6 +7,22 @@ public import Mathlib.Data.Set.Finite.Basic
 public import Mathlib.FieldTheory.Finite.Basic
 public import Mathlib.GroupTheory.OrderOfElement
 
+/-!
+# Infinitude of primes via Mersenne numbers
+
+The proof follows the answer by user9413 at
+<https://math.stackexchange.com/a/50020/350772>, which attributes it to Aigner and Ziegler,
+*Proofs from the Book*; see also Ribenboim, *The Little Book of Bigger Primes*.
+
+Suppose that `p` is the largest prime and consider the Mersenne number `2 ^ p - 1`. It has a
+prime divisor `q`, and `q ∣ 2 ^ p - 1` gives `2 ^ p = 1` in `ZMod q`. Since `2 ≠ 1` in `ZMod q`,
+the multiplicative order of `2` is `p`. The unit group of `ZMod q` has `q - 1` elements, so by
+Lagrange's theorem `p ∣ q - 1`, hence `p < q`. This contradicts the maximality of `p`.
+
+`lt_of_prime_dvd_mersenne` proves the key step, and `InfinitudeOfPrimes_Mersenne` derives the
+infinitude of the primes from it.
+-/
+
 @[expose] public section
 
 namespace InfinitudeOfPrimes.Mersenne
