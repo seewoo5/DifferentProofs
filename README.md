@@ -24,7 +24,6 @@ This project contains formalizations of different proofs of the same mathematica
 - [Using the irrationality of π² and the Euler product for ζ(2)](DifferentProofs/InfinitudeOfPrimes/Zeta.lean)
 - [Erdős' proof](DifferentProofs/InfinitudeOfPrimes/Erdos.lean)
 - [Using Mersenne numbers](DifferentProofs/InfinitudeOfPrimes/Mersenne.lean)
-  (a folklore proof, as presented in Aigner and Ziegler's *Proofs from THE BOOK*)
 
 ### Irrationality of √2
 
