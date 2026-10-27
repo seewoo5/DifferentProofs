@@ -23,6 +23,7 @@ This project contains formalizations of different proofs of the same mathematica
 - [Infinitely many primes in certain congruence classes](DifferentProofs/InfinitudeOfPrimes/Dirichlet.lean)
 - [Using the irrationality of π² and the Euler product for ζ(2)](DifferentProofs/InfinitudeOfPrimes/Zeta.lean)
 - [Erdős' proof](DifferentProofs/InfinitudeOfPrimes/Erdos.lean)
+- [Mersenne's proof](DifferentProofs/InfinitudeOfPrimes/Mersenne.lean)
 
 ### Irrationality of √2
 

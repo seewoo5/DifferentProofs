@@ -24,6 +24,7 @@ public import DifferentProofs.InfinitudeOfPrimes.Erdos
 public import DifferentProofs.InfinitudeOfPrimes.Euclid
 public import DifferentProofs.InfinitudeOfPrimes.Euler
 public import DifferentProofs.InfinitudeOfPrimes.Goldbach
+public import DifferentProofs.InfinitudeOfPrimes.Mersenne
 public import DifferentProofs.InfinitudeOfPrimes.Saidak
 public import DifferentProofs.InfinitudeOfPrimes.Wunderlich
 public import DifferentProofs.InfinitudeOfPrimes.Zeta

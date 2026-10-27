@@ -146,6 +146,15 @@ sources:                       # [required] list of sources or an original proof
     license: ""
     author_endorsement: "not-contacted"
 
+  - title: "Proof of the infinitude of primes via Mersenne numbers"
+    authors: ["user9413"]
+    id: "https://math.stackexchange.com/a/50020"
+    type: "web post"
+    location: "the answer"
+    relationship: "formalizes"
+    license: ""
+    author_endorsement: "not-contacted"
+
   - title: "Proofs of Fermat's little theorem (Wikipedia)"
     authors: []                # collectively authored
     id: "https://en.wikipedia.org/wiki/Proofs_of_Fermat%27s_little_theorem"
@@ -333,6 +342,10 @@ status:
       axioms: *standard_axioms
     - declaration: "InfinitudeOfPrimes_Erdos"
       file: "DifferentProofs/InfinitudeOfPrimes/Erdos.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "InfinitudeOfPrimes_Mersenne"
+      file: "DifferentProofs/InfinitudeOfPrimes/Mersenne.lean"
       sorry_count: 0
       axioms: *standard_axioms
     - declaration: "InfinitudeOfPrimes_from_one_four"
@@ -555,6 +568,23 @@ automation:                    # [required]
         Initial proof drafts, then refactored to project style with Claude Code (Fermat's
         theorem moved to `DifferentProofsForMathlib/`; for Erdős' proof, the chain of
         injections replaced by one counting map) and human-reviewed before merge.
+
+    - method: "agent"
+      models: ["DeepSeek v4.1"]
+      framework: "Lemex CLI"
+      tool_setup: >-
+        The Lemex CLI proof assistant with the Lean MCP server (goal and diagnostic
+        inspection, local and remote mathlib search via Loogle/LeanSearch/LeanFinder,
+        tactic trials, axiom checks) and `lake` shell access, on Lean 4 v4.35.0 with
+        mathlib v4.35.0.
+      cost:
+        wall_time: ""
+        spend_usd: ""
+        hardware: "API-only (hosted)"
+      prompting_notes: >-
+        Worked from the linked Math.SE answer to formalize the Mersenne-number proof
+        of the infinitude of primes (`DifferentProofs/InfinitudeOfPrimes/Mersenne.lean`),
+        then in follow-up sessions cleaned up the proof.
 
   spend_usd: "subscription-based usage"
   notes: >-
