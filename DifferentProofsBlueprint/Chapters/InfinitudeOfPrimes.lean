@@ -8,6 +8,7 @@ import DifferentProofs.InfinitudeOfPrimes.Dirichlet
 import DifferentProofs.InfinitudeOfPrimes.Euclid
 import DifferentProofs.InfinitudeOfPrimes.Euler
 import DifferentProofs.InfinitudeOfPrimes.Goldbach
+import DifferentProofs.InfinitudeOfPrimes.Mersenne
 import DifferentProofs.InfinitudeOfPrimes.Saidak
 import DifferentProofs.InfinitudeOfPrimes.Wunderlich
 import DifferentProofs.InfinitudeOfPrimes.Zeta
@@ -242,7 +243,31 @@ distinct prime factors {uses "lem:fib-37-factorization"}[], contradicting the
 finite counting bound.
 :::
 
-The sixth set of proofs shows a stronger result: there are infinitely many primes in certain congruence classes.
+The sixth proof uses Mersenne numbers: a prime divisor of $`2^p - 1` is larger than $`p`.
+
+:::lemma_ "lem:prime-dvd-mersenne" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes.Mersenne.lt_of_prime_dvd_mersenne")
+If $`q` is prime and divides $`2^p - 1` for a prime $`p`, then $`p < q`.
+:::
+
+:::proof "lem:prime-dvd-mersenne"
+The number $`2^p - 1` is odd, so $`q` is odd and $`2` is invertible modulo
+$`q`. From the divisibility, $`2^p = 1` in $`\mathbb{Z}/q\mathbb{Z}`, and since
+$`2 \ne 1`, the order of $`2` is $`p`. Lagrange's theorem in the multiplicative
+group of $`\mathbb{Z}/q\mathbb{Z}` then gives $`p \mid q - 1`, hence $`p < q`.
+:::
+
+:::theorem "thm:inf-primes-mersenne" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_Mersenne") (proofColor := "#fed7aa")
+There are infinitely many prime numbers.
+:::
+
+:::proof "thm:inf-primes-mersenne"
+Assume that $`p` is the largest prime. The Mersenne number $`2^p - 1` is greater
+than $`1`, so it has a prime divisor $`q`. By
+{uses "lem:prime-dvd-mersenne"}[], $`p < q`, contradicting the maximality of
+$`p`.
+:::
+
+The seventh set of proofs shows a stronger result: there are infinitely many primes in certain congruence classes.
 
 :::theorem "thm:inf-primes-cong-one-four" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_cong_one_four")
 There are infinitely many primes congruent to $`1` modulo $`4`.
@@ -290,7 +315,7 @@ There are infinitely many prime numbers.
 This follows from {uses "thm:inf-primes-cong-three-four"}[].
 :::
 
-The seventh proof combines the Euler product for $`\zeta(2)` with the irrationality of $`\pi^2`.
+The eighth proof combines the Euler product for $`\zeta(2)` with the irrationality of $`\pi^2`.
 
 :::theorem "thm:irrational-pi-sq" (parent := "grp:inf-primes") (lean := "irrational_pi_sq")
 Niven's theorem: $`\pi^2` is irrational.

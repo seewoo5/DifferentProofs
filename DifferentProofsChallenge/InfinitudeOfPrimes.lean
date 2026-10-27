@@ -31,6 +31,8 @@ theorem InfinitudeOfPrimes_Saidak : InfinitudeOfPrimes := sorry
 
 theorem InfinitudeOfPrimes_Wunderlich : InfinitudeOfPrimes := sorry
 
+theorem InfinitudeOfPrimes_Mersenne : InfinitudeOfPrimes := sorry
+
 theorem InfinitudeOfPrimes_cong_one_four : InfinitudeOfPrimes_cong 1 4 := sorry
 
 theorem InfinitudeOfPrimes_from_one_four : InfinitudeOfPrimes := sorry
