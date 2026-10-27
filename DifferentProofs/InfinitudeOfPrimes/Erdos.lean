@@ -43,13 +43,14 @@ theorem le_two_pow_primeCounting_mul_sqrt (n : ℕ) : n ≤ 2 ^ π n * n.sqrt :=
     (s := (primesLE n).powerset ×ˢ Icc 1 n.sqrt) (t := Icc 1 n) fun m hm ↦ ?_
   · simpa only [ge_iff_le, card_Icc, add_tsub_cancel_right, card_product, card_powerset,
       primesLE_card_eq_primeCounting] using this
-  obtain ⟨hm, hmn⟩ := mem_Icc.1 hm
-  obtain ⟨a, b, ha, hb, rfl, hsq⟩ := sq_mul_squarefree_of_pos hm
-  exact ⟨(a.primeFactors, b), mem_product.2 ⟨mem_powerset.2 fun p hp ↦ mem_primesLE.2
-    ⟨(Nat.le_of_dvd hm ((dvd_of_mem_primeFactors hp).mul_left _)).trans hmn,
-      prime_of_mem_primeFactors hp⟩,
-    mem_Icc.2 ⟨hb, le_sqrt'.2 ((Nat.le_mul_of_pos_right _ ha).trans hmn)⟩⟩,
-    congrArg (b ^ 2 * ·) (prod_primeFactors_of_squarefree hsq)⟩
+  obtain ⟨hm_pos, hmn⟩ := mem_Icc.1 hm
+  obtain ⟨a, b, ha, hb, rfl, hsq⟩ := sq_mul_squarefree_of_pos hm_pos
+  have ha_le : a ≤ n := (Nat.le_mul_of_pos_left a (pow_pos hb 2)).trans hmn
+  have hs : a.primeFactors ⊆ primesLE n := fun p hp ↦
+    mem_primesLE.2 ⟨(le_of_mem_primeFactors hp).trans ha_le, prime_of_mem_primeFactors hp⟩
+  have hb_le : b ≤ n.sqrt := le_sqrt'.2 ((Nat.le_mul_of_pos_right _ ha).trans hmn)
+  refine ⟨(a.primeFactors, b), mem_product.2 ⟨mem_powerset.2 hs, mem_Icc.2 ⟨hb, hb_le⟩⟩, ?_⟩
+  simp only [prod_primeFactors_of_squarefree hsq]
 
 /-- The lower bound `π(n) ≥ log₂(n) / 2`, in the form `n ≤ 4 ^ π(n)`. -/
 theorem le_four_pow_primeCounting (n : ℕ) : n ≤ 4 ^ π n := by
@@ -60,7 +61,11 @@ end InfinitudeOfPrimes.Erdos
 
 open InfinitudeOfPrimes.Erdos in
 /-- **The infinitude of primes**, since `π(n) ≥ log₂(n) / 2` is unbounded. -/
-theorem InfinitudeOfPrimes_Erdos : InfinitudeOfPrimes := fun hfin ↦
-  (le_four_pow_primeCounting (4 ^ #hfin.toFinset + 1)).not_gt <| Nat.lt_add_one_of_le <|
-    Nat.pow_le_pow_right four_pos <| primesLE_card_eq_primeCounting _ ▸
-      card_le_card fun _ hp ↦ hfin.mem_toFinset.2 (prime_of_mem_primesLE hp)
+theorem InfinitudeOfPrimes_Erdos : InfinitudeOfPrimes := fun hfin ↦ by
+  set k := #hfin.toFinset
+  have hπ (n : ℕ) : π n ≤ k := by
+    rw [← primesLE_card_eq_primeCounting]
+    exact card_le_card fun p hp ↦ hfin.mem_toFinset.2 (prime_of_mem_primesLE hp)
+  have hlower := le_four_pow_primeCounting (4 ^ k + 1)
+  have hupper := Nat.pow_le_pow_right four_pos (hπ (4 ^ k + 1))
+  lia

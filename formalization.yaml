@@ -553,8 +553,8 @@ automation:                    # [required]
         hardware: "API-only (hosted)"
       prompting_notes: >-
         Initial proof drafts, then refactored to project style with Claude Code (Fermat's
-        theorem moved to `DifferentProofsForMathlib/`; Erdős' proof golfed from 204 to 66
-        lines) and human-reviewed before merge.
+        theorem moved to `DifferentProofsForMathlib/`; for Erdős' proof, the chain of
+        injections replaced by one counting map) and human-reviewed before merge.
 
   spend_usd: "subscription-based usage"
   notes: >-
