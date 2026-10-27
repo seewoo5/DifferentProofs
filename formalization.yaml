@@ -158,6 +158,26 @@ sources:                       # [required] list of sources or an original proof
     license: ""
     author_endorsement: "n/a"
 
+  - title: "The congruent number problem"
+    authors: ["Keith Conrad"]
+    id: "https://kconrad.math.uconn.edu/blurbs/ugradnumthy/congnumber.pdf"
+    type: "lecture notes"
+    location: >-
+      Definition 1.1, Theorem 2.1 (Fermat: 1 is not a congruent number) with its proof by
+      descent, and the remark after it deducing the irrationality of sqrt 2
+    relationship: "formalizes"
+    license: ""
+    author_endorsement: "not-contacted"
+
+  - title: "Irrationality of sqrt 2 from Fermat's theorem that 1 is not a congruent number"
+    authors: ["Markus Scheuer"]
+    id: "https://math.stackexchange.com/a/1332960"
+    type: "web post"
+    location: "the cited answer, which refers to Conrad's notes for the proof"
+    relationship: "formalizes"
+    license: "CC BY-SA (Math StackExchange contributor content)"
+    author_endorsement: "not-contacted"
+
   - title: "Classical proofs of Fermat's theorem on sums of two squares via quadratic reciprocity and via Wilson's theorem"
     authors: []
     id: ""
@@ -228,7 +248,7 @@ related_formalizations:
 # classification - what area of mathematics the formalized result belongs to.
 classification:
   arxiv: ["math.NT", "math.CO", "math.HO", "cs.LO"]
-  msc2020: ["11A41", "11A07", "11E25", "11J72", "11M06", "05A19", "05B45", "52C20", "68V20"]
+  msc2020: ["11A41", "11A07", "11D25", "11E25", "11J72", "11M06", "05A19", "05B45", "52C20", "68V20"]
 
 # project status
 status:
@@ -238,7 +258,7 @@ status:
     fixes one `Prop`-valued statement in a `Defs.lean` file, and every proof in that
     family proves exactly that `Prop`. Currently covered: Fermat's little theorem
     (4 proofs), the infinitude of primes (9 proofs, including a Dirichlet-style pair
-    for the classes 1 and 3 mod 4), the irrationality of sqrt 2 (3 proofs),
+    for the classes 1 and 3 mod 4), the irrationality of sqrt 2 (4 proofs),
     Fermat's theorem on sums of two squares (4 proofs), the Basel problem (4 proofs),
     the integer-rectangle tiling theorem of Wagon (all 14 of his proofs), and two
     combinatorial identities (Pascal's rule and the hockey-stick identity, each
@@ -322,6 +342,10 @@ status:
       axioms: *standard_axioms
     - declaration: "IrrationalSqrtTwo_FermatLastTheorem"
       file: "DifferentProofs/IrrationalSqrtTwo/FermatLastTheorem.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "IrrationalSqrtTwo_CongruentNumber"
+      file: "DifferentProofs/IrrationalSqrtTwo/CongruentNumber.lean"
       sorry_count: 0
       axioms: *standard_axioms
 
@@ -503,6 +527,20 @@ automation:                    # [required]
         hardware: "API-only (hosted)"
       prompting_notes: "Initial proof drafts, then human-reviewed and cleaned up to project style before merge."
 
+    - method: "agent"
+      models: ["DeepSeek v4.1"]
+      framework: "OpenMath"
+      tool_setup: >-
+        The OpenMath platform with the DeepSeek v4.1 model, used to produce the initial proof
+        that 1 is not a congruent number and the irrationality of sqrt 2 deduced from it.
+      cost:
+        wall_time: ""
+        spend_usd: ""
+        hardware: "API-only (hosted)"
+      prompting_notes: >-
+        Initial proof draft, then refactored to project style with Claude Code (Fermat's
+        theorem moved to `DifferentProofsForMathlib/`) and human-reviewed before merge.
+
   spend_usd: "subscription-based usage"
   notes: >-
     The repository's CONTRIBUTING.md requires that AI-assisted contributions be
@@ -592,6 +630,11 @@ fidelity:
       subtraction truncates, so the middle case's third coordinate `x - y + z`, whose
       intermediate `x - y` is negative when `x < y`, is written `x + z - y`; the two
       agree as integers.
+    - `IrrationalSqrtTwo_CongruentNumber` rests on Fermat's theorem that 1 is not a congruent
+      number (`not_isCongruentNumber_one`), proved by Conrad's descent step by step. Conrad
+      gives a separate reason for each of its three coprimality claims; the formalization
+      reduces each one to the coprimality of `a ^ 2` and `b`. Natural-number subtraction is
+      avoided by naming the differences (`c = b + 2 * m`, `r ^ 2 = s ^ 2 + w`, `t = u + 2 * b'`).
     - Reusable supporting results are stated in mathlib-friendly generality under
       `DifferentProofsForMathlib/`, mirroring mathlib's directory layout, rather
       than in the narrow form each proof needs.
@@ -633,7 +676,7 @@ alignment:
       lean: "IrrationalSqrtTwo"
       module: "DifferentProofs.IrrationalSqrtTwo.Defs"
       status: "proved"
-      note: "Proved three ways."
+      note: "Proved four ways."
     - source: "Fermat's theorem on sums of two squares"
       lean: "FermatSumOfTwoSquares"
       module: "DifferentProofs.SumOfTwoSquares.Defs"
