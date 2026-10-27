@@ -13,6 +13,7 @@ public import DifferentProofsForMathlib.Combinatorics.Graph.HalfEdgePairing
 public import DifferentProofsForMathlib.Data.Finset.Powerset
 public import DifferentProofsForMathlib.MeasureTheory.Measure.Stieltjes
 public import DifferentProofsForMathlib.MeasureTheory.Measure.Typeclasses.NoAtoms
+public import DifferentProofsForMathlib.NumberTheory.CongruentNumber
 public import DifferentProofsForMathlib.NumberTheory.ModularForms.Derivative
 public import DifferentProofsForMathlib.NumberTheory.ModularForms.QExpansion
 public import DifferentProofsForMathlib.RingTheory.RootsOfUnity.Complex

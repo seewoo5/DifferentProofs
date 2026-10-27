@@ -20,6 +20,7 @@ public import DifferentProofs.FermatLittleTheorem.Lagrange
 public import DifferentProofs.InfinitudeOfPrimes.Basic
 public import DifferentProofs.InfinitudeOfPrimes.Defs
 public import DifferentProofs.InfinitudeOfPrimes.Dirichlet
+public import DifferentProofs.InfinitudeOfPrimes.Erdos
 public import DifferentProofs.InfinitudeOfPrimes.Euclid
 public import DifferentProofs.InfinitudeOfPrimes.Euler
 public import DifferentProofs.InfinitudeOfPrimes.Goldbach
@@ -51,6 +52,7 @@ public import DifferentProofs.IntegerRectangle.Tiling.Integral
 public import DifferentProofs.IntegerRectangle.Tiling.Slice
 public import DifferentProofs.IntegerRectangle.Tiling.Walks
 public import DifferentProofs.IrrationalSqrtTwo.Basic
+public import DifferentProofs.IrrationalSqrtTwo.CongruentNumber
 public import DifferentProofs.IrrationalSqrtTwo.Defs
 public import DifferentProofs.IrrationalSqrtTwo.Descent
 public import DifferentProofs.IrrationalSqrtTwo.FermatLastTheorem

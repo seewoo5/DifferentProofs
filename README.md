@@ -22,12 +22,14 @@ This project contains formalizations of different proofs of the same mathematica
 - [Wunderlich's proof](DifferentProofs/InfinitudeOfPrimes/Wunderlich.lean)
 - [Infinitely many primes in certain congruence classes](DifferentProofs/InfinitudeOfPrimes/Dirichlet.lean)
 - [Using the irrationality of π² and the Euler product for ζ(2)](DifferentProofs/InfinitudeOfPrimes/Zeta.lean)
+- [Erdős' proof](DifferentProofs/InfinitudeOfPrimes/Erdos.lean)
 
 ### Irrationality of √2
 
 - [Using infinite descent](DifferentProofs/IrrationalSqrtTwo/Descent.lean)
 - [Using 2-adic valuations](DifferentProofs/IrrationalSqrtTwo/Valuation.lean)
 - [Using Fermat's last theorem for n = 3](DifferentProofs/IrrationalSqrtTwo/FermatLastTheorem.lean)
+- [Using Fermat's theorem that 1 is not a congruent number](DifferentProofs/IrrationalSqrtTwo/CongruentNumber.lean)
 
 ### Fermat's theorem on sums of two squares
 

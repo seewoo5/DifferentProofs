@@ -6,7 +6,8 @@
     "IrrationalSqrtTwoNat_Descent",
     "IrrationalSqrtTwo_Valuation",
     "IrrationalSqrtTwoNat_Valuation",
-    "IrrationalSqrtTwo_FermatLastTheorem"
+    "IrrationalSqrtTwo_FermatLastTheorem",
+    "IrrationalSqrtTwo_CongruentNumber"
   ],
   "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"],
   "enable_nanoda": false

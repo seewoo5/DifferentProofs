@@ -5,6 +5,7 @@ import DifferentProofsBlueprint.ProofColor
 import DifferentProofs.InfinitudeOfPrimes.Basic
 import DifferentProofs.InfinitudeOfPrimes.Defs
 import DifferentProofs.InfinitudeOfPrimes.Dirichlet
+import DifferentProofs.InfinitudeOfPrimes.Erdos
 import DifferentProofs.InfinitudeOfPrimes.Euclid
 import DifferentProofs.InfinitudeOfPrimes.Euler
 import DifferentProofs.InfinitudeOfPrimes.Goldbach
@@ -346,4 +347,41 @@ $`\prod_{p < n} (1 - p^{-2})^{-1}` would be constant for large $`n`, so Euler's 
 $`\zeta(2) = \prod_p (1 - p^{-2})^{-1}` would exhibit $`\zeta(2)` as a finite product of
 rational numbers, hence as a rational number. But $`\zeta(2) = \pi^2/6` and $`\pi^2` is
 irrational {uses "thm:irrational-pi-sq"}[], a contradiction.
+:::
+
+The eighth proof is by Erdős, who counts the integers up to $`n` by writing each of them as a
+square times a squarefree number.
+
+:::lemma_ "lem:erdos-counting-bound" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes.Erdos.le_two_pow_primeCounting_mul_sqrt")
+For every natural number $`n`, we have $`n \le 2^{\pi(n)} \lfloor \sqrt{n} \rfloor`, where
+$`\pi(n)` is the number of primes at most $`n`.
+:::
+
+:::proof "lem:erdos-counting-bound"
+Every integer $`m` with $`1 \le m \le n` is $`b^2 a` with $`a` squarefree and $`b \ge 1`. Being
+squarefree, $`a` is the product of the primes in a set $`s` of primes at most $`n`, and
+$`b^2 \le m \le n` gives $`b \le \lfloor \sqrt{n} \rfloor`. So each of the $`n` integers in
+$`[1, n]` is $`b^2 \prod_{p \in s} p` for one of the $`2^{\pi(n)}` sets $`s` and one of the
+$`\lfloor \sqrt{n} \rfloor` values of $`b`.
+:::
+
+:::lemma_ "lem:erdos-log-bound" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes.Erdos.le_four_pow_primeCounting")
+For every natural number $`n`, we have $`n \le 4^{\pi(n)}`, that is,
+$`\pi(n) \ge \log_2(n) / 2`.
+:::
+
+:::proof "lem:erdos-log-bound"
+Squaring the counting bound {uses "lem:erdos-counting-bound"}[] and using
+$`\lfloor \sqrt{n} \rfloor^2 \le n` gives
+$`n^2 \le 4^{\pi(n)} \lfloor \sqrt{n} \rfloor^2 \le 4^{\pi(n)} n`; divide by $`n`.
+:::
+
+:::theorem "thm:inf-primes-erdos" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_Erdos") (proofColor := "#fed7aa")
+There are infinitely many prime numbers.
+:::
+
+:::proof "thm:inf-primes-erdos"
+The lower bound $`\pi(n) \ge \log_2(n) / 2` {uses "lem:erdos-log-bound"}[] is unbounded in $`n`.
+If there were only $`k` primes, then $`\pi(n) \le k` for every $`n`, and $`n = 4^k + 1` would
+contradict $`n \le 4^{\pi(n)}`.
 :::
