@@ -137,6 +137,15 @@ sources:                       # [required] list of sources or an original proof
     license: ""
     author_endorsement: "n/a"
 
+  - title: "From Euclid to Present: A Collection of Proofs regarding the Infinitude of Primes"
+    authors: ["Lindsey Harrison"]
+    id: "https://www.gcsu.edu/sites/files/page-assets/node-808/attachments/harrison.pdf"
+    type: "expository paper"   # dated December 14, 2013; hosted by Georgia College & State University
+    location: "Section 4.5 (Erdős): Lemma 3 and the claim proved from it"
+    relationship: "formalizes"
+    license: ""
+    author_endorsement: "not-contacted"
+
   - title: "Proofs of Fermat's little theorem (Wikipedia)"
     authors: []                # collectively authored
     id: "https://en.wikipedia.org/wiki/Proofs_of_Fermat%27s_little_theorem"
@@ -257,7 +266,7 @@ status:
     statement, so that the proofs can be compared side by side. Each theorem family
     fixes one `Prop`-valued statement in a `Defs.lean` file, and every proof in that
     family proves exactly that `Prop`. Currently covered: Fermat's little theorem
-    (4 proofs), the infinitude of primes (9 proofs, including a Dirichlet-style pair
+    (4 proofs), the infinitude of primes (10 proofs, including a Dirichlet-style pair
     for the classes 1 and 3 mod 4), the irrationality of sqrt 2 (4 proofs),
     Fermat's theorem on sums of two squares (4 proofs), the Basel problem (4 proofs),
     the integer-rectangle tiling theorem of Wagon (all 14 of his proofs), and two
@@ -320,6 +329,10 @@ status:
       axioms: *standard_axioms
     - declaration: "InfinitudeOfPrimes_Zeta"
       file: "DifferentProofs/InfinitudeOfPrimes/Zeta.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    - declaration: "InfinitudeOfPrimes_Erdos"
+      file: "DifferentProofs/InfinitudeOfPrimes/Erdos.lean"
       sorry_count: 0
       axioms: *standard_axioms
     - declaration: "InfinitudeOfPrimes_from_one_four"
@@ -532,14 +545,16 @@ automation:                    # [required]
       framework: "OpenMath"
       tool_setup: >-
         The OpenMath platform with the DeepSeek v4.1 model, used to produce the initial proof
-        that 1 is not a congruent number and the irrationality of sqrt 2 deduced from it.
+        that 1 is not a congruent number and the irrationality of sqrt 2 deduced from it, and
+        the initial formalization of Erdős' proof of the infinitude of primes.
       cost:
         wall_time: ""
         spend_usd: ""
         hardware: "API-only (hosted)"
       prompting_notes: >-
-        Initial proof draft, then refactored to project style with Claude Code (Fermat's
-        theorem moved to `DifferentProofsForMathlib/`) and human-reviewed before merge.
+        Initial proof drafts, then refactored to project style with Claude Code (Fermat's
+        theorem moved to `DifferentProofsForMathlib/`; for Erdős' proof, the chain of
+        injections replaced by one counting map) and human-reviewed before merge.
 
   spend_usd: "subscription-based usage"
   notes: >-
@@ -626,6 +641,12 @@ fidelity:
       as its concrete Fibonacci number with three distinct prime factors.
     - The Dirichlet-style file covers only the residue classes 1 and 3 mod 4, not
       Dirichlet's theorem in general.
+    - Erdős' proof (Harrison, Section 4.5) takes her Lemma 3 from mathlib
+      (`Nat.sq_mul_squarefree_of_pos`) instead of reproving it from the fundamental theorem
+      of arithmetic, and counts the squarefree parts and the square roots at once: every
+      `m ∈ [1, n]` is `b ^ 2 * ∏ p ∈ s, p` for a set `s` of primes at most `n` and
+      `1 ≤ b ≤ ⌊√n⌋`. The bound `π(n) ≥ log₂(n) / 2` is stated in the log-free form
+      `n ≤ 4 ^ π(n)`.
     - Zagier's involution is formalized on `ℕ³`, like his set `S`. Natural-number
       subtraction truncates, so the middle case's third coordinate `x - y + z`, whose
       intermediate `x - y` is negative when `x < y`, is written `x + z - y`; the two
@@ -671,7 +692,7 @@ alignment:
       lean: "InfinitudeOfPrimes"
       module: "DifferentProofs.InfinitudeOfPrimes.Defs"
       status: "proved"
-      note: "Proved nine ways, including Dirichlet-style variants for the classes 1 and 3 mod 4."
+      note: "Proved ten ways, including Dirichlet-style variants for the classes 1 and 3 mod 4."
     - source: "Irrationality of sqrt 2"
       lean: "IrrationalSqrtTwo"
       module: "DifferentProofs.IrrationalSqrtTwo.Defs"
