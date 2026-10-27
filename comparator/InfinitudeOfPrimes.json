@@ -13,7 +13,8 @@
     "InfinitudeOfPrimes_cong_three_four",
     "InfinitudeOfPrimes_from_three_four",
     "InfinitudeOfPrimes_Zeta",
-    "InfinitudeOfPrimes_Erdos"
+    "InfinitudeOfPrimes_Erdos",
+    "InfinitudeOfPrimes_Mersenne"
   ],
   "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"],
   "enable_nanoda": false
