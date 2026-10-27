@@ -145,8 +145,8 @@ sources:                       # [required] list of sources or an original proof
     relationship: "formalizes"
     license: ""
     author_endorsement: "not-contacted"
-  
-    - title: "Proof of the infinitude of primes via Mersenne numbers"
+
+  - title: "Proof of the infinitude of primes via Mersenne numbers"
     authors: ["user9413"]
     id: "https://math.stackexchange.com/a/50020"
     type: "web post"
