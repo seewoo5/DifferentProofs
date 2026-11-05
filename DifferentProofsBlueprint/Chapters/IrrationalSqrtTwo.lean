@@ -54,10 +54,11 @@ $`\sqrt{2}` is irrational.
 
 :::proof "thm:sqrt-two-descent"
 Use {uses "thm:sqrt-two-nat-impl-sqrt-two"}[] to reduce to the natural-number form.
-Suppose $`p^2 = 2q^2` with $`q > 0`. Then $`2 \mid p^2`, so $`2 \mid p` since
-$`2` is prime; write $`p = 2r`. Substituting gives $`q^2 = 2r^2`, a new
+Suppose $`p^2 = 2q^2` with $`q > 0`. Then $`p` is even, because the square of an
+odd number is odd; write $`p = 2r`. Substituting gives $`q^2 = 2r^2`, a new
 solution whose first component $`q` is strictly smaller than $`p`. By strong
-induction no solution with $`q \neq 0` exists.
+induction no solution with $`q \neq 0` exists. The natural-number form depends
+only on the axiom `propext`, which its statement already forces.
 :::
 
 Second proof is by $`2`-adic valuation.
