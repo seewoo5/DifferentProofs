@@ -23,6 +23,8 @@ theorem InfinitudeOfPrimes_Euclid : InfinitudeOfPrimes := sorry
 
 theorem InfinitudeOfPrimes_Euclid' : InfinitudeOfPrimes := sorry
 
+theorem InfinitudeOfPrimes_Constructive : InfinitudeOfPrimes := sorry
+
 theorem InfinitudeOfPrimes_Goldbach : InfinitudeOfPrimes := sorry
 
 theorem InfinitudeOfPrimes_Euler : InfinitudeOfPrimes := sorry

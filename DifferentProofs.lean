@@ -18,6 +18,7 @@ public import DifferentProofs.FermatLittleTheorem.Defs
 public import DifferentProofs.FermatLittleTheorem.Dynamical
 public import DifferentProofs.FermatLittleTheorem.Lagrange
 public import DifferentProofs.InfinitudeOfPrimes.Basic
+public import DifferentProofs.InfinitudeOfPrimes.Constructive
 public import DifferentProofs.InfinitudeOfPrimes.Defs
 public import DifferentProofs.InfinitudeOfPrimes.Dirichlet
 public import DifferentProofs.InfinitudeOfPrimes.Erdos

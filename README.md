@@ -16,6 +16,7 @@ This project contains formalizations of different proofs of the same mathematica
 ### Infinitude of primes
 
 - [Euclid's proof](DifferentProofs/InfinitudeOfPrimes/Euclid.lean)
+- [Euclid's proof, using only `propext`](DifferentProofs/InfinitudeOfPrimes/Constructive.lean)
 - [Goldbach's proof](DifferentProofs/InfinitudeOfPrimes/Goldbach.lean)
 - [Euler's proof](DifferentProofs/InfinitudeOfPrimes/Euler.lean)
 - [Saidak's proof](DifferentProofs/InfinitudeOfPrimes/Saidak.lean)
