@@ -416,6 +416,14 @@ status:
       axioms:
         - propext
         - Quot.sound
+    # The natural-number form behind `IrrationalSqrtTwo_Descent`, which depends only on what its
+    # statement forces. `#guard_msgs` in the file checks this, and
+    # comparator/IrrationalSqrtTwoConstructive.json checks that it avoids `Classical.choice`.
+    - declaration: "IrrationalSqrtTwoNat_Descent"
+      file: "DifferentProofs/IrrationalSqrtTwo/Descent.lean"
+      sorry_count: 0
+      axioms:
+        - propext
 
     # --- Fermat's theorem on sums of two squares (statement: `FermatSumOfTwoSquares`) ---
     - declaration: "FermatSumOfTwoSquares_QuadraticReciprocity"

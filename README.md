@@ -28,6 +28,7 @@ This project contains formalizations of different proofs of the same mathematica
 ### Irrationality of √2
 
 - [Using infinite descent](DifferentProofs/IrrationalSqrtTwo/Descent.lean)
+  (the natural-number form depends only on `propext`)
 - [Using 2-adic valuations](DifferentProofs/IrrationalSqrtTwo/Valuation.lean)
 - [Using Fermat's last theorem for n = 3](DifferentProofs/IrrationalSqrtTwo/FermatLastTheorem.lean)
 - [Using Fermat's theorem that 1 is not a congruent number](DifferentProofs/IrrationalSqrtTwo/CongruentNumber.lean)
@@ -100,9 +101,8 @@ file, that the proof establishes exactly the statement recorded in
 beyond `propext`, `Quot.sound`, and `Classical.choice`, and that the proof term
 is accepted by a fresh run of the Lean kernel. Each `comparator/<Topic>.json`
 lists the theorems to check for one topic.
-[`comparator/IrrationalSqrtTwoConstructive.json`](comparator/IrrationalSqrtTwoConstructive.json)
-is the exception: it checks the natural-number form from the constructive proof of
-the irrationality of √2, and does not permit `Classical.choice`.
+The `comparator/*Constructive.json` configs are the exception: they list proofs
+that avoid `Classical.choice`, and do not permit that axiom.
 
 Each challenge file imports only Mathlib, so a statement and the project's
 definitions behind it can be read in one file. The definitions are copied from
