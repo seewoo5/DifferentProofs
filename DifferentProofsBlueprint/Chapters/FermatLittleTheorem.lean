@@ -5,6 +5,7 @@ import DifferentProofsBlueprint.ProofColor
 import DifferentProofs.FermatLittleTheorem.Alkauskas
 import DifferentProofs.FermatLittleTheorem.Basic
 import DifferentProofs.FermatLittleTheorem.Binomial
+import DifferentProofs.FermatLittleTheorem.Constructive
 import DifferentProofs.FermatLittleTheorem.Defs
 import DifferentProofs.FermatLittleTheorem.Dynamical
 import DifferentProofs.FermatLittleTheorem.Lagrange
@@ -54,6 +55,22 @@ For any prime $`p` and integer $`a`, one has $`a^p \equiv a \pmod p`.
 In characteristic $`p`, Freshman's dream gives
 $`(x + 1)^p = x^p + 1`. Applying this in `ZMod p` and inducting over natural
 representatives proves the congruence.
+:::
+
+A variant of this proof depends only on the axiom `propext`, which the statement already forces.
+
+:::theorem "thm:flt-constructive" (parent := "grp:flt") (lean := "FermatLittleTheorem_Constructive") (proofColor := "#ddd6fe")
+For any prime $`p` and integer $`a`, one has $`a^p \equiv a \pmod p`.
+:::
+
+:::proof "thm:flt-constructive"
+This proves {uses "def:flt"}[] by the same argument, proving what the first proof takes from mathlib.
+The binomial theorem for $`(a + 1)^n` follows by induction on $`n` from Pascal's rule, with the sum
+written as a recursion on its upper limit. For $`0 < k < p` we have
+$`p \binom{p-1}{k-1} = k \binom{p}{k}`, so $`p` divides $`\binom{p}{k}` by Euclid's lemma for the
+factor $`k`. That lemma is proved by descent on $`k`: if $`p` divides $`ck`, then it divides
+$`c (p \bmod k)`. Hence $`(a + 1)^p \equiv a^p + 1 \pmod p`, so the theorem holds for $`a + 1` if and
+only if it holds for $`a`, and induction in both directions from $`a = 0` finishes the proof.
 :::
 
 Second proof uses Lagrange's theorem on groups, applied to the multiplicative group of units in $`\mathbb{Z}/p\mathbb{Z}`.

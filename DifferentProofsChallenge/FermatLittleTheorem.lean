@@ -17,6 +17,8 @@ def FermatLittleTheorem : Prop := ∀ p : ℕ, ∀ a : ℤ, p.Prime → a ^ p �
 
 theorem FermatLittleTheorem_Binomial : FermatLittleTheorem := sorry
 
+theorem FermatLittleTheorem_Constructive : FermatLittleTheorem := sorry
+
 theorem FermatLittleTheorem_Alkauskas : FermatLittleTheorem := sorry
 
 theorem FermatLittleTheorem_Lagrange : FermatLittleTheorem := sorry

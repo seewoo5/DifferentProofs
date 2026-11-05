@@ -298,7 +298,8 @@ status:
     statement, so that the proofs can be compared side by side. Each theorem family
     fixes one `Prop`-valued statement in a `Defs.lean` file, and every proof in that
     family proves exactly that `Prop`. Currently covered: Fermat's little theorem
-    (4 proofs), the infinitude of primes (10 proofs, including a Dirichlet-style pair
+    (4 proofs, plus a variant of the binomial proof that uses only `propext`), the
+    infinitude of primes (10 proofs, including a Dirichlet-style pair
     for the classes 1 and 3 mod 4, plus a variant of Euclid's proof that uses only
     `propext`), the irrationality of sqrt 2 (5 proofs),
     Fermat's theorem on sums of two squares (4 proofs), the Basel problem (4 proofs),
@@ -322,6 +323,11 @@ status:
       file: "DifferentProofs/FermatLittleTheorem/Binomial.lean"
       sorry_count: 0
       axioms: *standard_axioms
+    - declaration: "FermatLittleTheorem_Constructive"
+      file: "DifferentProofs/FermatLittleTheorem/Constructive.lean"
+      sorry_count: 0
+      axioms:
+        - propext
     - declaration: "FermatLittleTheorem_Lagrange"
       file: "DifferentProofs/FermatLittleTheorem/Lagrange.lean"
       sorry_count: 0
@@ -733,6 +739,10 @@ fidelity:
       `m ∈ [1, n]` is `b ^ 2 * ∏ p ∈ s, p` for a set `s` of primes at most `n` and
       `1 ≤ b ≤ ⌊√n⌋`. The bound `π(n) ≥ log₂(n) / 2` is stated in the log-free form
       `n ≤ 4 ^ π(n)`.
+    - `FermatLittleTheorem_Constructive` follows the same argument as
+      `FermatLittleTheorem_Binomial`, but writes the binomial expansion as a recursion, because
+      the statement of `add_pow` uses `Finset.range`, which depends on `Classical.choice`. It also
+      proves Euclid's lemma by descent, and works with divisibility in `ℤ` instead of in `ZMod p`.
     - `InfinitudeOfPrimes_Constructive` follows the same `n! + 1` argument as
       `InfinitudeOfPrimes_Euclid`, and only replaces the mathlib lemmas that reach
       `Classical.choice`: prime factors come from a bounded search over divisors, and a finite
@@ -787,7 +797,9 @@ alignment:
       lean: "FermatLittleTheorem"
       module: "DifferentProofs.FermatLittleTheorem.Defs"
       status: "proved"
-      note: "Proved four ways; see `main_results`."
+      note: >-
+        Proved four ways; see `main_results`. `FermatLittleTheorem_Constructive` is a further
+        variant of the binomial proof that uses only `propext`.
     - source: "Infinitude of primes"
       lean: "InfinitudeOfPrimes"
       module: "DifferentProofs.InfinitudeOfPrimes.Defs"

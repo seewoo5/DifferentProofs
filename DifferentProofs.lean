@@ -14,6 +14,7 @@ public import DifferentProofs.CombinatorialIdentities.Pascal.Counting
 public import DifferentProofs.FermatLittleTheorem.Alkauskas
 public import DifferentProofs.FermatLittleTheorem.Basic
 public import DifferentProofs.FermatLittleTheorem.Binomial
+public import DifferentProofs.FermatLittleTheorem.Constructive
 public import DifferentProofs.FermatLittleTheorem.Defs
 public import DifferentProofs.FermatLittleTheorem.Dynamical
 public import DifferentProofs.FermatLittleTheorem.Lagrange
