@@ -27,3 +27,7 @@ theorem IrrationalSqrtTwoNat_Valuation : IrrationalSqrtTwoNat := sorry
 theorem IrrationalSqrtTwo_FermatLastTheorem : IrrationalSqrtTwo := sorry
 
 theorem IrrationalSqrtTwo_CongruentNumber : IrrationalSqrtTwo := sorry
+
+theorem IrrationalSqrtTwo_Constructive : IrrationalSqrtTwo := sorry
+
+theorem IrrationalSqrtTwoNat_Constructive : IrrationalSqrtTwoNat := sorry

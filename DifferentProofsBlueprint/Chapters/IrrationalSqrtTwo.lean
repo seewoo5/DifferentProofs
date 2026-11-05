@@ -4,6 +4,7 @@ import VersoBlueprint
 import DifferentProofsBlueprint.ProofColor
 import DifferentProofs.IrrationalSqrtTwo.Basic
 import DifferentProofs.IrrationalSqrtTwo.CongruentNumber
+import DifferentProofs.IrrationalSqrtTwo.Constructive
 import DifferentProofs.IrrationalSqrtTwo.Defs
 import DifferentProofs.IrrationalSqrtTwo.Descent
 import DifferentProofs.IrrationalSqrtTwo.FermatLastTheorem
@@ -129,4 +130,61 @@ If $`\sqrt{2}` were rational, then $`\sqrt{2}`, $`\sqrt{2}` and $`2` would be th
 rational right triangle with area $`1`, contradicting {uses "thm:one-not-congruent"}[]. This is
 the remark after Theorem 2.1 in Conrad's notes; see also
 [this Math StackExchange answer](https://math.stackexchange.com/a/1332960).
+:::
+
+Fifth proof is constructive: it bounds the distance from $`\sqrt{2}` to every positive rational
+from below, and the bound does not use the axiom `Classical.choice`. The statement that
+$`\sqrt{2}` is irrational itself does, because the real numbers do, so the bound is proved in an
+ordered field that need not be $`\mathbb{R}`.
+
+:::lemma_ "lem:sqrt-two-constructive-val" (parent := "grp:sqrt-two") (lean := "IrrationalSqrtTwo.Constructive.sq_ne_two_mul_sq")
+For positive integers $`a` and $`b`, we have $`a^2 \neq 2b^2`.
+:::
+
+:::proof "lem:sqrt-two-constructive-val"
+Halving repeatedly, write $`a = 2^k m` and $`b = 2^\ell n` with $`m` and $`n` odd. Then
+$`a^2 = 2^{2k} m^2` and $`2b^2 = 2^{2\ell + 1} n^2` with $`m^2` and $`n^2` odd. The exponent in such
+a factorization is unique, so the $`2`-adic valuation of $`a^2` is even and that of $`2b^2` is odd.
+:::
+
+:::theorem "thm:sqrt-two-nat-constructive" (parent := "grp:sqrt-two") (lean := "IrrationalSqrtTwoNat_Constructive")
+The natural-number form {uses "def:sqrt-two-nat"}[] holds, and its proof does not use
+`Classical.choice`.
+:::
+
+:::proof "thm:sqrt-two-nat-constructive"
+Suppose that $`p^2 = 2q^2`. If $`q` is positive, then so is $`p`, and this contradicts
+{uses "lem:sqrt-two-constructive-val"}[].
+:::
+
+:::theorem "thm:sqrt-two-constructive-apart" (parent := "grp:sqrt-two") (lean := "IrrationalSqrtTwo.Constructive.apart_of_sq_eq_two")
+Let $`K` be a partially ordered field in which $`0 < Q` and $`0 < yQ` imply $`0 < y`, and let
+$`s \in K` satisfy $`s \geq 0` and $`s^2 = 2`. For positive integers $`a` and $`b`, either
+$`\frac{1}{3b^2} < s - \frac{a}{b}` or $`\frac{1}{3b^2} < \frac{a}{b} - s`. The proof does not use
+`Classical.choice`.
+:::
+
+:::proof "thm:sqrt-two-constructive-apart"
+Write $`x = a/b`. Since $`x` is positive and $`s` is nonnegative, $`s + x` is positive, so we can
+divide by it. Since $`s^2 = 2`, we have $`(s - x) \cdot b^2 (s + x) = 2b^2 - a^2`, which is a nonzero
+integer by {uses "lem:sqrt-two-constructive-val"}[]. Also $`s < 3/2`, as $`(3 - 2s)(3 + 2s) = 1`.
+We split on whether $`2a \leq 3b`, which is a question about natural numbers. The order on $`K` is
+not assumed to be total or decidable, so the proof cannot compare $`a/b` with an element of $`K`
+such as $`3 - s`. If $`2a \leq 3b`, then $`s + x < 3`, and so, with the sign of $`2b^2 - a^2`,
+$`\pm (s - x) = \frac{|2b^2 - a^2|}{b^2 (s + x)} \geq \frac{1}{b^2 (s + x)} > \frac{1}{3b^2}`.
+If $`3b < 2a`, then $`x - s > x - \frac{3}{2} \geq \frac{1}{2b} \geq \frac{1}{3b^2}`.
+This is the proof in the section "Constructive proof" of
+[Wikipedia's article on the square root of 2](https://en.wikipedia.org/wiki/Square_root_of_2#Constructive_proof),
+as discussed in [this Math StackExchange question](https://math.stackexchange.com/q/1589603).
+:::
+
+:::theorem "thm:sqrt-two-constructive" (parent := "grp:sqrt-two") (lean := "IrrationalSqrtTwo_Constructive") (proofColor := "#bae6fd")
+$`\sqrt{2}` is irrational.
+:::
+
+:::proof "thm:sqrt-two-constructive"
+This proof establishes the irrationality of $`\sqrt{2}` {uses "def:sqrt-two"}[]
+directly, without the natural-number reduction.
+By {uses "thm:sqrt-two-constructive-apart"}[] with $`K = \mathbb{R}` and $`s = \sqrt{2}`, a positive
+rational $`a/b` satisfies $`|\sqrt{2} - a/b| \geq \frac{1}{3b^2} > 0`, so it is not $`\sqrt{2}`.
 :::
