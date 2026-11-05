@@ -9,8 +9,6 @@ public import DifferentProofs.BaselProblem.RamanujanUnnormalized
 public import DifferentProofs.CombinatorialIdentities.Defs
 public import DifferentProofs.CombinatorialIdentities.HockeyStick.DoubleCounting
 public import DifferentProofs.CombinatorialIdentities.HockeyStick.Induction
-public import DifferentProofs.CombinatorialIdentities.Pascal.Binomial
-public import DifferentProofs.CombinatorialIdentities.Pascal.Counting
 public import DifferentProofs.FermatLittleTheorem.Alkauskas
 public import DifferentProofs.FermatLittleTheorem.Basic
 public import DifferentProofs.FermatLittleTheorem.Binomial
