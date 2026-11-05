@@ -417,8 +417,8 @@ status:
         - propext
         - Quot.sound
     # The natural-number form behind `IrrationalSqrtTwo_Descent`, which depends only on what its
-    # statement forces. `#guard_msgs` in the file checks this, and
-    # comparator/IrrationalSqrtTwoConstructive.json checks that it avoids `Classical.choice`.
+    # statement forces. `#guard_msgs` in the file and
+    # comparator/IrrationalSqrtTwoDescentConstructive.json both check this.
     - declaration: "IrrationalSqrtTwoNat_Descent"
       file: "DifferentProofs/IrrationalSqrtTwo/Descent.lean"
       sorry_count: 0

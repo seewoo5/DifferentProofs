@@ -2,8 +2,7 @@
   "challenge_module": "DifferentProofsChallenge.IrrationalSqrtTwo",
   "solution_module": "DifferentProofs",
   "theorem_names": [
-    "IrrationalSqrtTwoNat_Constructive",
-    "IrrationalSqrtTwoNat_Descent"
+    "IrrationalSqrtTwoNat_Constructive"
   ],
   "permitted_axioms": ["propext", "Quot.sound"],
   "enable_nanoda": false

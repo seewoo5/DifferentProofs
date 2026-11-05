@@ -12,8 +12,10 @@ odd. Writing `p = 2 * r` gives `q ^ 2 = 2 * r ^ 2`, a solution with a smaller fi
 The natural-number form `IrrationalSqrtTwoNat_Descent` depends only on `propext`, which its
 statement already forces, so no proof of it can use fewer axioms. Keeping it there rules out `lia`,
 `omega` and mathlib's `Nat.Prime.dvd_of_dvd_pow`, which reach `Classical.choice` or `Quot.sound`.
-The `#guard_msgs` at the end of this file fail the build otherwise. `IrrationalSqrtTwo_Descent`
-depends on `Classical.choice`, because the statement `IrrationalSqrtTwo` does.
+The `#guard_msgs` at the end of this file fail the build otherwise, and
+`comparator/IrrationalSqrtTwoDescentConstructive.json` has Comparator check this in CI.
+`IrrationalSqrtTwo_Descent` depends on `Classical.choice`, because the statement
+`IrrationalSqrtTwo` does.
 -/
 
 @[expose] public section
