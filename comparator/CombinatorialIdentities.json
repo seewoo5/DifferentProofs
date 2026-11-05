@@ -2,8 +2,6 @@
   "challenge_module": "DifferentProofsChallenge.CombinatorialIdentities",
   "solution_module": "DifferentProofs",
   "theorem_names": [
-    "PascalIdentity_counting",
-    "PascalIdentity_binomial",
     "HockeyStickIdentity_doubleCounting",
     "HockeyStickIdentity_induction"
   ],
