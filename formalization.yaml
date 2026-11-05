@@ -196,6 +196,29 @@ sources:                       # [required] list of sources or an original proof
     license: "CC BY-SA (Math StackExchange contributor content)"
     author_endorsement: "not-contacted"
 
+  - title: "Square root of 2"
+    authors: ["Wikipedia contributors"]
+    id: "https://en.wikipedia.org/wiki/Square_root_of_2#Constructive_proof"
+    type: "web post"
+    location: >-
+      the section "Constructive proof". The article cites Katz and Katz, Intellectica 56 (2011),
+      arXiv:1110.5456, and Bishop, Contemporary Mathematics 39 (1985), for this argument; those
+      were not consulted for the formalization.
+    relationship: "formalizes"
+    license: "CC BY-SA (Wikipedia contributor content)"
+    author_endorsement: "n/a"
+
+  - title: "Question on a constructive proof of irrationality of sqrt 2"
+    authors: ["Watson"]
+    id: "https://math.stackexchange.com/q/1589603"
+    type: "web post"
+    location: >-
+      the question, which quotes an older revision of the Wikipedia section, and the asker's
+      comment explaining why the valuation of 2 * b ^ 2 is odd without a proof by contradiction
+    relationship: "formalizes"
+    license: "CC BY-SA (Math StackExchange contributor content)"
+    author_endorsement: "not-contacted"
+
   - title: "Classical proofs of Fermat's theorem on sums of two squares via quadratic reciprocity and via Wilson's theorem"
     authors: []
     id: ""
@@ -276,7 +299,7 @@ status:
     fixes one `Prop`-valued statement in a `Defs.lean` file, and every proof in that
     family proves exactly that `Prop`. Currently covered: Fermat's little theorem
     (4 proofs), the infinitude of primes (10 proofs, including a Dirichlet-style pair
-    for the classes 1 and 3 mod 4), the irrationality of sqrt 2 (4 proofs),
+    for the classes 1 and 3 mod 4), the irrationality of sqrt 2 (5 proofs),
     Fermat's theorem on sums of two squares (4 proofs), the Basel problem (4 proofs),
     the integer-rectangle tiling theorem of Wagon (all 14 of his proofs), and two
     combinatorial identities (Pascal's rule and the hockey-stick identity, each
@@ -374,6 +397,25 @@ status:
       file: "DifferentProofs/IrrationalSqrtTwo/CongruentNumber.lean"
       sorry_count: 0
       axioms: *standard_axioms
+    - declaration: "IrrationalSqrtTwo_Constructive"
+      file: "DifferentProofs/IrrationalSqrtTwo/Constructive.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+    # The statement `IrrationalSqrtTwo` itself depends on `Classical.choice`. These two results
+    # behind `IrrationalSqrtTwo_Constructive` do not: `#guard_msgs` in the file checks both, and
+    # comparator/IrrationalSqrtTwoConstructive.json checks the first.
+    - declaration: "IrrationalSqrtTwoNat_Constructive"
+      file: "DifferentProofs/IrrationalSqrtTwo/Constructive.lean"
+      sorry_count: 0
+      axioms:
+        - propext
+        - Quot.sound
+    - declaration: "IrrationalSqrtTwo.Constructive.apart_of_sq_eq_two"
+      file: "DifferentProofs/IrrationalSqrtTwo/Constructive.lean"
+      sorry_count: 0
+      axioms:
+        - propext
+        - Quot.sound
 
     # --- Fermat's theorem on sums of two squares (statement: `FermatSumOfTwoSquares`) ---
     - declaration: "FermatSumOfTwoSquares_QuadraticReciprocity"
@@ -686,6 +728,16 @@ fidelity:
       gives a separate reason for each of its three coprimality claims; the formalization
       reduces each one to the coprimality of `a ^ 2` and `b`. Natural-number subtraction is
       avoided by naming the differences (`c = b + 2 * m`, `r ^ 2 = s ^ 2 + w`, `t = u + 2 * b'`).
+    - `IrrationalSqrtTwo_Constructive` follows the constructive proof in Wikipedia's article on
+      the square root of 2, but because the statement `Irrational (Real.sqrt 2)` itself depends on
+      `Classical.choice`, the bound is first proved for a nonnegative square root of 2 in a
+      partially ordered field (`IrrationalSqrtTwo.Constructive.apart_of_sq_eq_two`), where it
+      depends only on `propext` and `Quot.sound`, and is then instantiated at `ℝ`. The case
+      distinction is on the natural numbers, `2 * a ≤ 3 * b`, instead of the comparison of `a / b`
+      with the real number `3 - sqrt 2` in the revision quoted on Math StackExchange; the current
+      revision of the article assumes `1 < a / b < 3 / 2`, whose lower bound is not needed. The
+      case `3 / 2 < a / b`, which the source calls trivial, is proved. The denominators in the
+      chain of inequalities are cleared, and the resulting inequality is strict.
     - Reusable supporting results are stated in mathlib-friendly generality under
       `DifferentProofsForMathlib/`, mirroring mathlib's directory layout, rather
       than in the narrow form each proof needs.
@@ -727,7 +779,7 @@ alignment:
       lean: "IrrationalSqrtTwo"
       module: "DifferentProofs.IrrationalSqrtTwo.Defs"
       status: "proved"
-      note: "Proved four ways."
+      note: "Proved five ways."
     - source: "Fermat's theorem on sums of two squares"
       lean: "FermatSumOfTwoSquares"
       module: "DifferentProofs.SumOfTwoSquares.Defs"

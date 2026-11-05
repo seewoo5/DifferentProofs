@@ -7,7 +7,8 @@
     "IrrationalSqrtTwo_Valuation",
     "IrrationalSqrtTwoNat_Valuation",
     "IrrationalSqrtTwo_FermatLastTheorem",
-    "IrrationalSqrtTwo_CongruentNumber"
+    "IrrationalSqrtTwo_CongruentNumber",
+    "IrrationalSqrtTwo_Constructive"
   ],
   "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"],
   "enable_nanoda": false
