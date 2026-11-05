@@ -1,0 +1,9 @@
+{
+  "challenge_module": "DifferentProofsChallenge.InfinitudeOfPrimes",
+  "solution_module": "DifferentProofs",
+  "theorem_names": [
+    "InfinitudeOfPrimes_Constructive"
+  ],
+  "permitted_axioms": ["propext"],
+  "enable_nanoda": false
+}

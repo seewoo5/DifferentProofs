@@ -3,6 +3,7 @@ import VersoManual
 import VersoBlueprint
 import DifferentProofsBlueprint.ProofColor
 import DifferentProofs.InfinitudeOfPrimes.Basic
+import DifferentProofs.InfinitudeOfPrimes.Constructive
 import DifferentProofs.InfinitudeOfPrimes.Defs
 import DifferentProofs.InfinitudeOfPrimes.Dirichlet
 import DifferentProofs.InfinitudeOfPrimes.Erdos
@@ -68,6 +69,31 @@ There are infinitely many prime numbers.
 If all primes were bounded by $`n`, a prime divisor of $`n! + 1` would both
 divide $`n!` and divide $`n! + 1`, hence divide $`1`, impossible; so the primes
 are infinite {uses "def:inf-primes"}[].
+:::
+
+Another variant also uses $`n! + 1`, and depends only on the axiom `propext`, which the statement
+already forces.
+
+:::lemma_ "lem:inf-primes-constructive-gt" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes.Constructive.exists_prime_gt")
+For any natural number $`n`, there exists a prime number greater than $`n`, as in
+{uses "def:inf-primes-large"}[].
+:::
+
+:::proof "lem:inf-primes-constructive-gt"
+Every $`m \geq 2` has a prime factor: search the numbers below $`m` for a divisor other than $`1`.
+If there is none, then $`m` is prime, and otherwise we use strong induction on that divisor. A prime
+factor $`p` of $`n! + 1` is greater than $`n`, since otherwise $`p` would divide $`n!`, and hence
+$`1`.
+:::
+
+:::theorem "thm:inf-primes-constructive" (parent := "grp:inf-primes") (lean := "InfinitudeOfPrimes_Constructive") (proofColor := "#fed7aa")
+There are infinitely many prime numbers.
+:::
+
+:::proof "thm:inf-primes-constructive"
+A finite set of natural numbers is bounded, by way of its equivalence with some
+$`\{0, \dots, n - 1\}`, so by {uses "lem:inf-primes-constructive-gt"}[] the set of primes is not
+finite {uses "def:inf-primes"}[].
 :::
 
 Second proof is by Goldbach, using Fermat numbers $`F_n = 2^{2^n} + 1` and their pairwise coprimality.

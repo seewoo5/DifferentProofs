@@ -299,7 +299,8 @@ status:
     fixes one `Prop`-valued statement in a `Defs.lean` file, and every proof in that
     family proves exactly that `Prop`. Currently covered: Fermat's little theorem
     (4 proofs), the infinitude of primes (10 proofs, including a Dirichlet-style pair
-    for the classes 1 and 3 mod 4), the irrationality of sqrt 2 (5 proofs),
+    for the classes 1 and 3 mod 4, plus a variant of Euclid's proof that uses only
+    `propext`), the irrationality of sqrt 2 (5 proofs),
     Fermat's theorem on sums of two squares (4 proofs), the Basel problem (4 proofs),
     the integer-rectangle tiling theorem of Wagon (all 14 of his proofs), and two
     combinatorial identities (Pascal's rule and the hockey-stick identity, each
@@ -343,6 +344,11 @@ status:
       file: "DifferentProofs/InfinitudeOfPrimes/Euclid.lean"
       sorry_count: 0
       axioms: *standard_axioms
+    - declaration: "InfinitudeOfPrimes_Constructive"
+      file: "DifferentProofs/InfinitudeOfPrimes/Constructive.lean"
+      sorry_count: 0
+      axioms:
+        - propext
     - declaration: "InfinitudeOfPrimes_Goldbach"
       file: "DifferentProofs/InfinitudeOfPrimes/Goldbach.lean"
       sorry_count: 0
@@ -727,6 +733,10 @@ fidelity:
       `m ∈ [1, n]` is `b ^ 2 * ∏ p ∈ s, p` for a set `s` of primes at most `n` and
       `1 ≤ b ≤ ⌊√n⌋`. The bound `π(n) ≥ log₂(n) / 2` is stated in the log-free form
       `n ≤ 4 ^ π(n)`.
+    - `InfinitudeOfPrimes_Constructive` follows the same `n! + 1` argument as
+      `InfinitudeOfPrimes_Euclid`, and only replaces the mathlib lemmas that reach
+      `Classical.choice`: prime factors come from a bounded search over divisors, and a finite
+      set is bounded by way of its equivalence with `Fin n`.
     - Zagier's involution is formalized on `ℕ³`, like his set `S`. Natural-number
       subtraction truncates, so the middle case's third coordinate `x - y + z`, whose
       intermediate `x - y` is negative when `x < y`, is written `x + z - y`; the two
@@ -782,7 +792,10 @@ alignment:
       lean: "InfinitudeOfPrimes"
       module: "DifferentProofs.InfinitudeOfPrimes.Defs"
       status: "proved"
-      note: "Proved ten ways, including Dirichlet-style variants for the classes 1 and 3 mod 4."
+      note: >-
+        Proved ten ways, including Dirichlet-style variants for the classes 1 and 3 mod 4.
+        `InfinitudeOfPrimes_Constructive` is a further variant of Euclid's proof that uses only
+        `propext`.
     - source: "Irrationality of sqrt 2"
       lean: "IrrationalSqrtTwo"
       module: "DifferentProofs.IrrationalSqrtTwo.Defs"
