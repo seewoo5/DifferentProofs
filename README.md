@@ -88,6 +88,12 @@ tiling, auxiliary tilings obtained by moving its lines, horizontal slices, walks
 tile, and the corners of the tiles at a point — is in
 [`DifferentProofs/IntegerRectangle/Tiling/`](DifferentProofs/IntegerRectangle/Tiling).
 
+### The modular group is a free product
+
+$\mathrm{PSL}(2, \mathbb{Z}) \cong C_2 * C_3$:
+
+- [Alperin's proof, by ping-pong on the irrational numbers](DifferentProofs/ModularGroup/Alperin.lean)
+
 ## Verifying that the proofs prove the same thing
 
 Because the point of the project is that these proofs establish *the same*
