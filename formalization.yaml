@@ -665,7 +665,10 @@ automation:                    # [required]
       prompting_notes: >-
         Worked from the linked Math.SE answer to formalize the Mersenne-number proof
         of the infinitude of primes (`DifferentProofs/InfinitudeOfPrimes/Mersenne.lean`),
-        then in follow-up sessions cleaned up the proof.
+        then in follow-up sessions cleaned up the proof. Also wrote the initial
+        standalone draft of Alperin's ping-pong proof that PSL(2, Z) is the free product
+        C_2 * C_3, working from the linked blog post; Claude Code then converted it to
+        project conventions and cleaned it up (`DifferentProofs/ModularGroup/Alperin.lean`).
 
   spend_usd: "subscription-based usage"
   notes: >-
