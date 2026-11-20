@@ -255,6 +255,26 @@ sources:                       # [required] list of sources or an original proof
     license: ""
     author_endorsement: "n/a"
 
+  - title: "An elementary application of ping-pong lemma"
+    authors: []                # the post on the blog "Mathematical Notes" does not name its author
+    id: "https://chiasme.wordpress.com/2015/03/08/an-elementary-application-of-ping-pong-lemma/"
+    type: "blog post"
+    location: "whole post"
+    relationship: "formalizes"
+    license: ""
+    author_endorsement: "not-contacted"
+
+  - title: "PSL_2(Z) = Z_2 * Z_3"
+    authors: ["Roger C. Alperin"]
+    id: "Amer. Math. Monthly 100 (1993), no. 4, 385-386; doi:10.2307/2324963"
+    type: "article"
+    location: >-
+      the argument as presented in the blog post above, which credits it to this note; the note
+      itself was not consulted for the formalization
+    relationship: "formalizes"
+    license: ""
+    author_endorsement: "not-contacted"
+
 # related_formalizations - prior or parallel formalizations, if known.
 # Mathlib is both a dependency of this project and a prior formalization of several
 # of the same statements; this project deliberately reproves them by other routes.
@@ -288,8 +308,9 @@ related_formalizations:
 
 # classification - what area of mathematics the formalized result belongs to.
 classification:
-  arxiv: ["math.NT", "math.CO", "math.HO", "cs.LO"]
-  msc2020: ["11A41", "11A07", "11D25", "11E25", "11J72", "11M06", "05A19", "05B45", "52C20", "68V20"]
+  arxiv: ["math.NT", "math.CO", "math.GR", "math.HO", "cs.LO"]
+  msc2020: ["11A41", "11A07", "11D25", "11E25", "11F06", "11J72", "11M06", "05A19", "05B45", "20E06",
+            "52C20", "68V20"]
 
 # project status
 status:
@@ -303,9 +324,10 @@ status:
     for the classes 1 and 3 mod 4, plus a variant of Euclid's proof that uses only
     `propext`), the irrationality of sqrt 2 (5 proofs),
     Fermat's theorem on sums of two squares (4 proofs), the Basel problem (4 proofs),
-    the integer-rectangle tiling theorem of Wagon (all 14 of his proofs), and the
-    hockey-stick identity (proved two ways). A Verso blueprint under `DifferentProofsBlueprint/` records the
-    informal statements, proof sketches, and dependency graph; reusable supporting
+    the integer-rectangle tiling theorem of Wagon (all 14 of his proofs), the
+    hockey-stick identity (proved two ways), and the isomorphism of the modular group
+    PSL(2, Z) with the free product C_2 * C_3 (1 proof). A Verso blueprint under
+    `DifferentProofsBlueprint/` records the informal statements, proof sketches, and dependency graph; reusable supporting
     lemmas that could be upstreamed live in `DifferentProofsForMathlib/`.
   sorry_count: 0
   sorry_in_definitions: 0
@@ -541,6 +563,12 @@ status:
       sorry_count: 0
       axioms: *standard_axioms
 
+    # --- The modular group is a free product (statement: `ModularGroupFreeProduct`) ---
+    - declaration: "ModularGroupFreeProduct_Alperin"
+      file: "DifferentProofs/ModularGroup/Alperin.lean"
+      sorry_count: 0
+      axioms: *standard_axioms
+
 # how it was produced. Extra per-entry fields are allowed.
 automation:                    # [required]
   methods:                     # [required] one entry per distinct phase/run/tool
@@ -637,7 +665,10 @@ automation:                    # [required]
       prompting_notes: >-
         Worked from the linked Math.SE answer to formalize the Mersenne-number proof
         of the infinitude of primes (`DifferentProofs/InfinitudeOfPrimes/Mersenne.lean`),
-        then in follow-up sessions cleaned up the proof.
+        then in follow-up sessions cleaned up the proof. Also wrote the initial
+        standalone draft of Alperin's ping-pong proof that PSL(2, Z) is the free product
+        C_2 * C_3, working from the linked blog post; Claude Code then converted it to
+        project conventions and cleaned it up (`DifferentProofs/ModularGroup/Alperin.lean`).
 
   spend_usd: "subscription-based usage"
   notes: >-
@@ -757,6 +788,18 @@ fidelity:
       revision of the article assumes `1 < a / b < 3 / 2`, whose lower bound is not needed. The
       case `3 / 2 < a / b`, which the source calls trivial, is proved. The denominators in the
       chain of inequalities are cleared, and the resulting inequality is strict.
+    - `ModularGroupFreeProduct_Alperin` follows the blog post's account of Alperin's proof, with
+      these differences. `PSL(2, ℤ)` acts on `ℝ ∪ {∞}` (`OnePoint ℝ`) through mathlib's action of
+      `GL(2, ℝ)` by Möbius transformations, rather than on the irrational numbers alone; the
+      ping-pong sets are the positive and the negative irrationals, as in the post. The ping-pong
+      step is mathlib's ping-pong lemma (`Monoid.CoprodI.lift_injective_of_ping_pong`) instead of
+      the post's case analysis: a word of even length is conjugated by an element of the factor of
+      order three, where the post conjugates by `B` and compares the image of the positive
+      irrationals with `1`. That lemma is stated for the free product of a family of groups, here
+      indexed by `Bool`, which `Monoid.CoprodI.boolEquivCoprod` (in `DifferentProofsForMathlib`)
+      identifies with the binary free product of the statement. The statement
+      `ModularGroupFreeProduct` only asks for an isomorphism; the proof constructs the one sending
+      the generators of `C₂` and `C₃` to the images of `S` and `T S`.
     - Reusable supporting results are stated in mathlib-friendly generality under
       `DifferentProofsForMathlib/`, mirroring mathlib's directory layout, rather
       than in the narrow form each proof needs.
@@ -826,6 +869,11 @@ alignment:
       module: "DifferentProofs.CombinatorialIdentities.Defs"
       status: "proved"
       note: "Proved two ways: induction on `n`, and double counting."
+    - source: "The modular group PSL(2, Z) is the free product of cyclic groups of orders 2 and 3"
+      lean: "ModularGroupFreeProduct"
+      module: "DifferentProofs.ModularGroup.Defs"
+      status: "proved"
+      note: "Proved once, by Alperin's ping-pong argument."
 
     # Wagon's fourteen proofs, in the paper's order.
     - source: "Wagon, Proof 1 (complex double integral, de Bruijn)"

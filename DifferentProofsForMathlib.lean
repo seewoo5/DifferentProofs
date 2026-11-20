@@ -11,6 +11,7 @@ public import DifferentProofsForMathlib.Combinatorics.Graph.Connected.EdgeCut
 public import DifferentProofsForMathlib.Combinatorics.Graph.Cycle
 public import DifferentProofsForMathlib.Combinatorics.Graph.HalfEdgePairing
 public import DifferentProofsForMathlib.Data.Finset.Powerset
+public import DifferentProofsForMathlib.GroupTheory.Coprod.CoprodI
 public import DifferentProofsForMathlib.MeasureTheory.Measure.Stieltjes
 public import DifferentProofsForMathlib.MeasureTheory.Measure.Typeclasses.NoAtoms
 public import DifferentProofsForMathlib.NumberTheory.CongruentNumber

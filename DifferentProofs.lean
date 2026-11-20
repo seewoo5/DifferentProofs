@@ -58,6 +58,8 @@ public import DifferentProofs.IrrationalSqrtTwo.Defs
 public import DifferentProofs.IrrationalSqrtTwo.Descent
 public import DifferentProofs.IrrationalSqrtTwo.FermatLastTheorem
 public import DifferentProofs.IrrationalSqrtTwo.Valuation
+public import DifferentProofs.ModularGroup.Alperin
+public import DifferentProofs.ModularGroup.Defs
 public import DifferentProofs.SumOfTwoSquares.Basic
 public import DifferentProofs.SumOfTwoSquares.Defs
 public import DifferentProofs.SumOfTwoSquares.Jacobi
